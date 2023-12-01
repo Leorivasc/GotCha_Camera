@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="row">
+        {% for camera in cameras %}
+        <div class="column">
+            <div class="stream-container">
+                <div class="tag-label">{{ camera.name }}</div>
+                <img class="stream" src="{{url_for('video_feed', camera_id=loop.index0)}}" alt="Stream Failed">
+                                
+            </div>
+        </div>
+            {% endfor %}
+        
+    </div>
+    
+    <a href="/" class="button">Back</a>
+   
+</body>
+</html>

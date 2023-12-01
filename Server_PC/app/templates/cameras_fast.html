@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proxy de Cámaras</title>
+    <title>Camera </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -11,8 +11,9 @@
         {% for camera in cameras %}
         <div class="column">
             <div class="stream-container">
-                <div class="tag-label">{{ camera.nombre }}</div>
-                <img class="stream" src="{{ url_for('video_feed', camera_id=loop.index0) }}" alt="Stream Failed">
+                <div class="tag-label">{{ camera.name }}</div>
+                <img class="stream" src="{{camera.address}}" alt="Stream Failed">
+                                
             </div>
         </div>
             {% endfor %}
