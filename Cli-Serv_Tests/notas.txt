@@ -1,0 +1,19 @@
+#con chatGPT
+
+pip install opencv-python
+pip install Flask
+pip install gunicorn
+pip install gevent
+
+
+correr server con:
+gunicorn -w 4 -b 0.0.0.0:5000 serv:app   #donde serv->serv.py, app->objeto Flask dentro del serv.py
+
+#Este tiene la ruta para desconectar a la fuerza
+gunicorn -c gunicorn_config.py serv_handleconndisconn:app
+
+urls:
+/video_feed
+/endconnection
+
+
