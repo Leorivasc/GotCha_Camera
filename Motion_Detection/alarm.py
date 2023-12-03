@@ -3,7 +3,7 @@
 # let’s import the libraries
 # For playing the audio, we will be using “pyttsx3” python library to convert text to speech
 import cv2
-import pyttsx3
+import pyttsx3 #needs espeak on linux
 import threading
 import time
 
