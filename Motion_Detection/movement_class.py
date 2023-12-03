@@ -4,32 +4,39 @@ import time
 import threading
 import pygame.mixer as mixer
 
-#Plays an mp3 clip
-def play_mp3(nombre_archivo):
-    # Pygame mixer
-    mixer.init()
+class MovementDetector:
 
-    # Sound object
-    sonido = mixer.Sound(nombre_archivo)
+    def __init__(self, camera_name, camera_url):
+            self.camera_name = camera_name
+            self.camera_url = camera_url
 
-    # Plays on a separate thread
-    def play():
-        sonido.play()
 
-    # Runs on a thread to prevent locking
-    play_thread = threading.Thread(target=play)
+    #Plays an mp3 clip
+    def play_mp3(nombre_archivo):
+        # Pygame mixer
+        mixer.init()
 
-    #Play
-    play_thread.start()
+        # Sound object
+        sonido = mixer.Sound(nombre_archivo)
+
+        # Plays on a separate thread
+        def play():
+            sonido.play()
+
+        # Runs on a thread to prevent locking
+        play_thread = threading.Thread(target=play)
+
+        #Play
+        play_thread.start()
     
-#Draws a yellow square around the given pixel
-def drawYellowSquare(frame,pixel):
-    cv2.rectangle(frame, (pixel[0]-2, pixel[1]-2), (pixel[0]+2,pixel[1]+2), (0,255,255), 2)
-    #return frame
+    #Draws a yellow square around the given pixel
+    def drawYellowSquare(frame,pixel):
+        cv2.rectangle(frame, (pixel[0]-2, pixel[1]-2), (pixel[0]+2,pixel[1]+2), (0,255,255), 2)
+        #return frame
 
-def drawRedSquare(frame,pixel):
-    cv2.rectangle(frame, (pixel[0]-2, pixel[1]-2), (pixel[0]+2,pixel[1]+2), (0,0,255), 2)
-    #return frame
+    def drawRedSquare(frame,pixel):
+        cv2.rectangle(frame, (pixel[0]-2, pixel[1]-2), (pixel[0]+2,pixel[1]+2), (0,0,255), 2)
+        #return frame
 
 
 

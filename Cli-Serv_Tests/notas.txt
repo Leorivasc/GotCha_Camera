@@ -1,4 +1,4 @@
-#con chatGPT
+#General notes
 
 pip install opencv-python
 pip install Flask

@@ -1,4 +1,5 @@
-#Del BingGPT
+#Creates a mask and applies it to an image
+#Basically a demo of how to use a mask on a picture
 
 import cv2
 import numpy as np
