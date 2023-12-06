@@ -1,5 +1,6 @@
 #Stream server. Accepts multiple clients.
-#Based on: https://stackoverflow.com/questions/74500671/raspberry-pi-camera-streaming-to-multiple-clients?newreg=725701012e9248c5bb13b90b770c681b
+#Based on: https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
+
 
 
 import io
@@ -12,10 +13,10 @@ from http import server
 PAGE="""\
 <html>
 <head>
-<title>picamera MJPEG streaming</title>
+<title>GotCha PI Streaming</title>
 </head>
 <body>
-<h1>PiCamera MJPEG Streaming</h1>
+<h1>GotCha! PI Streaming</h1>
 <img src="/video_feed" width="320" height="240" />
 </body>
 </html>
