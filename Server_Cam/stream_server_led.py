@@ -195,7 +195,9 @@ with picamera.PiCamera(resolution='320x240', framerate=24) as camera:
     try:
         address = ('', 8000)
         server = StreamingServer(address, StreamingHandler)
+        led.start_blinking()
         server.serve_forever()
+        
     finally:
         camera.stop_recording()
         led.cleanup()
