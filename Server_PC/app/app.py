@@ -61,9 +61,9 @@ def index():
     return render_template('index.html')
 
 #Camera streaming route (processed images, needs more workers)
-@app.route('/cameras_processed')
-def cameras_processed():
-    return render_template('cameras_processed.html', cameras=cameras)
+@app.route('/cameras_proxied')
+def cameras_proxied():
+    return render_template('cameras_proxied.html', cameras=cameras)
 
 
 #Camera streaming route (fast, directly from cameras)
@@ -72,11 +72,11 @@ def cameras_fast():
     return render_template('cameras_fast.html', cameras=cameras)
 
 
-#Video feed route for camera with id=camera_id
+#Video feed route for camera with id=camera_id (PROXY)
 @app.route('/video_feed/<int:camera_id>')
 def video_feed(camera_id):
     camera = cameras[camera_id]
-    camera_url = f"{camera['address']}"
+    camera_url = f"{camera['address']}/video_feed" #The actual feed
     
     return Response(generate_frames(camera_url), content_type='multipart/x-mixed-replace; boundary=frame')
 

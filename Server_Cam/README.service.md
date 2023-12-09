@@ -1,12 +1,12 @@
-To add as a service:
+# To add as a service:
 
-create the file: 
+Create the file: 
 
 ```
 /etc/systemd/system/gotchacam.service
 ```
 
-With the followig content:
+With the followig content and modify to fit your setup
 
 ```
 [Unit]
@@ -15,9 +15,9 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/home/leo/VENV/bin/python3 /home/leo/CamTests/camera/stream_server_led.py
+ExecStart=/<your_path_to_venv>/VENV/bin/python3 /<path_to_script>/camera/stream_server_led.py
 Restart=always
-User=leo
+User=<user>
 
 [Install]
 WantedBy=multi-user.target

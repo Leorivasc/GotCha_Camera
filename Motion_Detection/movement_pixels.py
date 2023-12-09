@@ -33,12 +33,12 @@ def drawRedSquare(frame,pixel):
 
 
 
-video=cv2.VideoCapture("http://pi2.local:8000/video_feed")
+video=cv2.VideoCapture("http://pizero1.local:8000/video_feed")
 
 
 # Configura el tamaño del frame (Pi zero)
-video.set(3, 640)  # Ancho
-video.set(4, 480)  # Alto
+video.set(3, 320)  # Ancho
+video.set(4, 240)  # Alto
 
 # Check if the video opened successfully
 if (video.isOpened()== False): 
