@@ -7,9 +7,10 @@
 # python3 proxy_stream.py for TESTING
 # gunicorn -c gunicorn_config.py app:app for PRODUCTION
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
 import cv2
 import configparser
+import datetime
 
 app = Flask(__name__)
 
@@ -32,6 +33,23 @@ def read_config():
 
 cameras = read_config()
 
+#Write date/time in a frame
+def add_datetime(frame):
+    #Get date
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    #Configurar el texto
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottom_left_corner = (10, frame.shape[0] - 10)
+    font_scale = 0.5
+    font_color = (255, 255, 255)  # Blanco
+    line_type = 1
+
+    #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
+    return frame
+
 
 #Generates the frames to be served
 def generate_frames(camera_url):
@@ -40,6 +58,9 @@ def generate_frames(camera_url):
     while True:
         success, frame = cap.read()
         
+        #Print datetime bottom left corner
+        frame = add_datetime(frame)
+
         if not success:
             break
 
@@ -80,7 +101,12 @@ def video_feed(camera_id):
     
     return Response(generate_frames(camera_url), content_type='multipart/x-mixed-replace; boundary=frame')
 
-
+#Return a JSON array with the current cameras list
+@app.route('/getcameras')
+def getcameras():
+    jcameras = jsonify(cameras)
+    jcameras.status_code=200
+    return jcameras
 
 
 if __name__ == '__main__':
