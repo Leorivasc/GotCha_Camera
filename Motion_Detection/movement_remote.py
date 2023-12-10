@@ -44,7 +44,7 @@ def drawBlueSquare(frame,pixel):
     #return frame
 
 
-base_url="http://192.168.137.145:8000" #Use ip to prevent delay in DNS resolution
+base_url="http://192.168.137.35:8000" #Use ip to prevent delay in DNS resolution
 
 video=cv2.VideoCapture(f"{base_url}/video_feed")
 

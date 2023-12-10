@@ -113,7 +113,7 @@ while True:
     (contours,_)=cv2.findContours(threshold_frame,cv2.RETR_EXTERNAL ,cv2.CHAIN_APPROX_NONE)
     
     #Draw all contours
-    #cv2.drawContours(frame,contours,-1,(255,0,0),3)
+    cv2.drawContours(frame,contours,-1,(255,0,0),3)
     
 
     for c in contours:
