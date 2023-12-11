@@ -7,12 +7,14 @@ import socketserver
 from threading import Condition
 from http import server
 from classes import GPIO_Out
+from classes import Counter
 import re
 
 #Led and relay pins
 led = GPIO_Out(21)
 relay = GPIO_Out(20)
-
+connections = Counter(0)
+isAlert=False
 
 PAGE="""\
 <html>
@@ -49,7 +51,10 @@ class StreamingOutput(object):
 class StreamingHandler(server.BaseHTTPRequestHandler):
         
     
+
     def do_GET(self):
+        
+        global isAlert
 
         #Regexp to emulate GET parameters: '/command?key=value'
         #It supports multiple key=value separated by '&' 
@@ -71,14 +76,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_html_response(f"Command recieved<br> key={k},  value={v}" )
     
 
-        elif freq_pat.match(self.path):
-            freq=self.path.split('/')[2]
-            led.set_frequency(float(freq))
-            led.start_blinking()
-            self.send_html_response(f"Frequency set to {freq}")
 
         ###Led business
-        #Custom routes to operate the attached LED (default  GPIO 21)
+        #Custom routes to remotely operate the attached LED (default  GPIO 21)
 
         #Turns led ON
         elif self.path =='/ledon':
@@ -100,6 +100,12 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             led.stop_blinking()
             self.send_html_response("Led blink OFF")
 
+        #Processes /blinkon/<frequency> routes (regexp here)
+        elif freq_pat.match(self.path):
+            freq=self.path.split('/')[2]
+            led.set_frequency(float(freq))
+            led.start_blinking()
+            self.send_html_response(f"Frequency set to {freq}")
 
 
         ###Reay business
@@ -117,25 +123,41 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
 
 
-        #Alert state
+        #Trigger alarm mode
         elif self.path=='/alarm':
             relay.turn_on()       #Turn relay on (lights?)
             led.set_frequency(10) #Set blinking freq
             led.start_blinking()  #Starts led blinking
             self.send_html_response("ALARM!")
+            isAlert=True
 
-        #Alert state
+        #Clears alarm mode
         elif self.path=='/clear':
             relay.turn_off()       #Turn relay on (lights?)
-            led.set_frequency(0.5) #Set blinking freq
+            #Restarts blinking frequency depending on 
+            if connections.get()==0:
+                led.set_frequency(0.25)
+            else:
+                led.set_frequency(0.5) #Set blinking freq    
             led.start_blinking()  #Starts led blinking
             self.send_html_response("ALL CLEAR!")
+            isAlert=False
 
         #Returns Index.html
         elif self.path == '/index.html':
             content = PAGE
             self.send_html_response(content)
         
+        #Returns a JSON with the current status of the server
+        elif self.path == '/status':
+            content = '{"connections":'+'"'+str(connections.get())\
+                    +'"'+',"led":'+'"'+str(led.get_status())\
+                    +'"'+',"relay":'+'"'+str(relay.get_status())\
+                    +'"'+',"alert":'+'"'+str(isAlert)\
+                    +'"'+'}'
+            self.send_json_response(content)
+
+
         #Performs the streaming
         elif self.path == '/video_feed':
             self.send_response(200)
@@ -144,6 +166,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Pragma', 'no-cache')
             self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
             self.end_headers()
+            connections.inc()
+            if led.get_frequency()!=10:#Do not change frequency if alarm is on
+                led.set_frequency(0.5) #Connections. blinking.
             try:
                 while True:
                     with output.condition:
@@ -155,10 +180,14 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(frame)
                     self.wfile.write(b'\r\n')
-            except Exception as e:
+            except Exception as e:              #Disconnection
+                connections.dec()
                 logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
+                    'Removed streaming client %s: %s, clients: %d',
+                    self.client_address, str(e), connections.get())
+                if connections.get()==0 and led.get_frequency()!=10: #Do not change frequency if alarm is on
+                    led.set_frequency(0.25) #No connections. Slow blinking
+
         
         #Route given nonexistent
         else:
