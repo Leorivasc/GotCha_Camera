@@ -9,24 +9,15 @@ from http import server
 from classes import GPIO_Out
 from classes import Counter
 import re
+import socket
 
 #Led and relay pins
 led = GPIO_Out(21)
 relay = GPIO_Out(20)
 connections = Counter(0)
 isAlert=False
+hostname = socket.gethostname()
 
-PAGE="""\
-<html>
-<head>
-<title>picamera MJPEG streaming</title>
-</head>
-<body>
-<h1>GotCha!</h1>
-<img src="/video_feed" width="320" height="240" />
-</body>
-</html>
-"""
 
 class StreamingOutput(object):
     def __init__(self):
@@ -55,6 +46,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
         
         global isAlert
+        global hostname
 
         #Regexp to emulate GET parameters: '/command?key=value'
         #It supports multiple key=value separated by '&' 
@@ -145,12 +137,72 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
         #Returns Index.html
         elif self.path == '/index.html':
-            content = PAGE
-            self.send_html_response(content)
+            self.send_html_response("""
+                               <html>
+                                <head>
+                                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                    <style>
+                                    table, td, th {
+                                    border: 1px solid;
+                                    }
+
+                                    table {
+                                    width:320px;
+                                    border-collapse: collapse;
+                                    }
+                                    </style>
+
+                                    <title>picamera MJPEG streaming</title>
+                                </head>
+                                <body>
+                                <h1>GotCha! Cam</h1>
+                                    <div>
+                                        <div>
+                                        <img src="/video_feed" width="320" height="240" alt="Loading..." />
+                                        </div>
+                                        <div id="status_table">Loading...</div>
+                                    </div>
+
+                                <!-- Refresh status table every 5 seconds -->
+                                <script>
+                                    $(function () {
+                                        setInterval(function () {
+                                            $.get("/htmlstatus", function (data) {
+                                                $("#status_table").html(data);
+                                            });
+                                        }, 5000);
+                                    });
+                                </script>
+
+                                </body>
+                                </html>
+                                """)
+            
+        #Returns an html table with the current status of the server
+        elif self.path == '/htmlstatus':
+            content = f"""
+                    <table>
+                        <tr>
+                            <th>Connections</th>
+                            <th>Led</th>
+                            <th>Relay</th>
+                            <th>Alert</th>
+                        </tr>
+                        <tr>
+                            <td>{connections.get()}</td>
+                            <td>{led.get_status()}</td>
+                            <td>{relay.get_status()}</td>
+                            <td>{isAlert}</td>  
+                        </tr>
+                    </table>
+                    """
+            self.send_html_response(content)    
         
         #Returns a JSON with the current status of the server
         elif self.path == '/status':
-            content = '{"connections":'+'"'+str(connections.get())\
+            content = '{'+\
+                    '"hostname":'+'"'+hostname\
+                    +'"'+',"connections":'+'"'+str(connections.get())\
                     +'"'+',"led":'+'"'+str(led.get_status())\
                     +'"'+',"relay":'+'"'+str(relay.get_status())\
                     +'"'+',"alert":'+'"'+str(isAlert)\
