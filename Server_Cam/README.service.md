@@ -26,5 +26,15 @@ WantedBy=multi-user.target
 
 Then run:
 
+```
 sudo systemctl enable gotchacam
 sudo systemctl start gotchacam
+```
+
+To apply changes:
+
+```
+sudo systemctl daemon-reload
+```
+
+

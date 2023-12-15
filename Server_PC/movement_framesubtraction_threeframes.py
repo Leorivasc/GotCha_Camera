@@ -82,10 +82,11 @@ def three_frame_difference(name, url):
         for c in contours:
             # contourArea() method filters out any small contours
             # You can change this value
-            print(cv2.contourArea(c))
+            #print(cv2.contourArea(c))
             if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
                 (x, y, w, h)=cv2.boundingRect(c)
                 cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,225,255), 1)
+                ###MOVEMENT DETECTION HERE###
 
 
         # Mostrar el frame con las diferencias resaltadas

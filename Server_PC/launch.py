@@ -8,6 +8,7 @@ connection.connect()
 cameras = connection.query_data("cameras")
 connection.close_connection()
 script = "movement_framesubtraction_threeframes.py"
+server = "gunicorn -c ./app/gunicorn_config.py app:app"
 
 # Run the script for each camera
 def run_scripts():
@@ -24,6 +25,9 @@ def run_scripts():
             print(f"Process {camera_name} started")
         except Exception as e:
             print(f"Error al ejecutar los scripts: {e}")
+
+    proc = subprocess.Popen(["gunicorn", "-c", "app/gunicorn_config.py", "app/app:app"])
+    processes.append(proc)
 
     # Wait for all processes to finish
     for proc in processes:
