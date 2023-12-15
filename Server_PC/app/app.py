@@ -31,7 +31,6 @@ def read_config():
     return cameras
 
 
-cameras = read_config()
 
 #Write date/time in a frame
 def add_datetime(frame):
@@ -75,6 +74,10 @@ def generate_frames(camera_url):
 
 
 #-----------Routes-----------------
+
+#Load cameras list from config.ini
+cameras = read_config()
+
 
 #entry point
 @app.route('/')
