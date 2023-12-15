@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import threading
 import time
 
+#This class implements a GPIO output that can be turned on, off or blink
 class GPIO_Out:
     #Constructor
     def __init__(self, gpio_pin):

@@ -26,8 +26,8 @@ def run_scripts():
         except Exception as e:
             print(f"Error al ejecutar los scripts: {e}")
 
-    proc = subprocess.Popen(["gunicorn", "-c", "app/gunicorn_config.py", "app/app:app"])
-    processes.append(proc)
+    #proc = subprocess.Popen(["gunicorn", "-c", "app/gunicorn_config.py", "app/app:app"])
+    #processes.append(proc)
 
     # Wait for all processes to finish
     for proc in processes:
