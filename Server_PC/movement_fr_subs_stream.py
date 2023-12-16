@@ -9,9 +9,10 @@ from classes import SQLiteDB
 from classes import read_config
 from flask import Flask, render_template, Response
 import threading
+import datetime
 
 app = Flask(__name__)
-# Variable para almacenar el último frame procesado
+# To store the last frame
 last_frame = None
 frame_lock = threading.Lock()
 
@@ -107,8 +108,10 @@ def three_frame_difference():
         #cv2.imshow(f'{name} Frame1',frame1)
 
         
-        with frame_lock:
+        with frame_lock: 
             last_frame = frame1.copy()
+            add_datetime(last_frame)
+         
 
         # Salir si se presiona la tecla 'q'
         #if cv2.waitKey(30) & 0xFF == ord('q'):
@@ -130,6 +133,25 @@ def generate_frames():
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+
+#Write date/time in a frame
+def add_datetime(frame):
+    #Get date
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    #Configurar el texto
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottom_left_corner = (10, frame.shape[0] - 10)
+    font_scale = 0.5
+    font_color = (255, 255, 255)  # Blanco
+    line_type = 1
+
+    #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
+    return frame
+
 
 
 @app.route('/video_feed')
