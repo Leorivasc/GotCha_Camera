@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from classes import do_get
 from classes import SQLiteDB
+from classes import read_config
 from flask import Flask, render_template, Response
 import threading
 
@@ -13,15 +14,16 @@ app = Flask(__name__)
 # Variable para almacenar el último frame procesado
 last_frame = None
 frame_lock = threading.Lock()
-name=""
-url=""
+
 
 
 def three_frame_difference():
 
-    global name
-    global url
+    global camera
     global last_frame
+    name = camera['name']
+    url = f"http://{camera['ip_address']}:{camera['port']}"
+    
 
     cap = cv2.VideoCapture(f"{url}/video_feed")
 
@@ -43,8 +45,8 @@ def three_frame_difference():
         connection.close_connection()
 
         #Apply camera configuration on each iteration
-        N= int(camera_config[0][3])
-        detectionarea = int(camera_config[0][4])
+        N= int(camera['frameskip'])
+        detectionarea = int(camera['detectionarea'])
 
         # Renumber 2nd frame as 1st, 3rd frame as 2nd, and load new frame as 3rd
         frame1 = frame2.copy()
@@ -141,9 +143,9 @@ def video_feed():
 
 
 
- # Iniciar el hilo para procesar frames    
+# Iniciar el hilo para procesar frames    
 name = "PiZero1"
-url = "http://192.168.1.13:8000"
+camera=read_config(name)[0] #only the 1st result just in case
 frame_thread = threading.Thread(target=three_frame_difference)
 frame_thread.daemon = True
 if not frame_thread.is_alive():

@@ -1,8 +1,14 @@
 import sqlite3
 import requests
-
+import json
 
 class SQLiteDB:
+    """##Generic## SQLite database class.
+    Attributes:
+        db_name (str): The name of the database file.
+        connection (sqlite3.Connection): The database connection object.
+        cursor (sqlite3.Cursor): The database cursor object.
+    """
     def __init__(self, db_name="app/database.sqlite"):
         self.db_name = db_name
         self.connection = None
@@ -36,6 +42,25 @@ class SQLiteDB:
         result = self.cursor.fetchall()
         return result
 
+
+    #Query data as dict
+    def query_data_dict(self, table_name, condition=None):
+        query = f"SELECT * FROM {table_name}"
+        if condition:
+            query += f" WHERE {condition}"
+
+        cursor = self.cursor
+
+        try:
+            cursor.execute(query)
+            columns = [column[0] for column in cursor.description]
+            result = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+        finally:
+            self.connection.close()
+            return result
+        
+
     #Close connection
     def close_connection(self):
         """Close the database connection."""
@@ -47,7 +72,7 @@ def do_get(url):
     """Perform a GET request to the specified URL.
     Args:
         url (str): The URL to which the request will be performed.
-        Returns:
+    Returns:
         str: The response text if the request was successful, an error message otherwise.
     """
 
@@ -71,3 +96,23 @@ def do_get(url):
     except requests.exceptions.RequestException as e:
         print(f"Bad request: {e}")
         return(f"Bad request: {e}")
+
+
+
+
+def read_config(camera_name):
+    """Read the cameras configuration from database by using SQLiteDB class.
+    Args:
+        camera_name (str): The name of the camera to be read.
+    Returns:
+        Camera information row as dict.
+    """
+    connection = SQLiteDB()
+    connection.connect()
+    camera = connection.query_data_dict("cameras","name='"+camera_name+"'")
+    connection.close_connection()
+    return camera
+
+
+
+
