@@ -7,9 +7,22 @@ import numpy as np
 from classes import do_get
 import sys
 from classes import SQLiteDB
+from flask import Flask, render_template, Response
+import threading
+
+app = Flask(__name__)
+# Variable para almacenar el último frame procesado
+last_frame = None
+frame_lock = threading.Lock()
+name=""
+url=""
 
 
-def three_frame_difference(name, url):
+def three_frame_difference():
+
+    global name
+    global url
+    global last_frame
 
     cap = cv2.VideoCapture(f"{url}/video_feed")
 
@@ -21,6 +34,8 @@ def three_frame_difference(name, url):
     #Create DB connection for the configuration
     connection = SQLiteDB()
     
+    print("Started 3-frame difference algorithm")
+
     while True:
 
         #Get camera configuration from DB (N frames to skip,detection area size)
@@ -86,28 +101,61 @@ def three_frame_difference(name, url):
             if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
                 (x, y, w, h)=cv2.boundingRect(c)
                 cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,225,255), 1)
+                #print("Movement detected")
                 ###MOVEMENT DETECTION HERE###
 
 
         # Mostrar el frame con las diferencias resaltadas
-        cv2.imshow(f'{name} Manual Frame Subtraction', diff)
-        cv2.imshow(f'{name} Thresholded',threshold_diff)
-        cv2.imshow(f'{name} Frame1',frame1)
+        #cv2.imshow(f'{name} Manual Frame Subtraction', diff)
+        #cv2.imshow(f'{name} Thresholded',threshold_diff)
+        #cv2.imshow(f'{name} Frame1',frame1)
 
-
+        
+        with frame_lock:
+            last_frame = frame1.copy()
 
         # Salir si se presiona la tecla 'q'
-        if cv2.waitKey(30) & 0xFF == ord('q'):
-            break
+        #if cv2.waitKey(30) & 0xFF == ord('q'):
+        #   break
 
     cap.release()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
+
+
+def generate_frames():
+    while True:
+        with frame_lock:
+            if last_frame is None:
+                continue
+
+            # Convertir el frame a formato JPEG para la transmisión web
+            _, buffer = cv2.imencode('.jpg', last_frame)
+            frame_bytes = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+ # Iniciar el hilo para procesar frames    
+name = "PiZero1"
+url = "http://192.168.1.13:8000"
+frame_thread = threading.Thread(target=three_frame_difference)
+frame_thread.daemon = True
+if not frame_thread.is_alive():
+    frame_thread.start()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        arg1 = sys.argv[1]
-        arg2 = sys.argv[2]
-        three_frame_difference(arg1, arg2)
-    else:
-        print("Please run the script with the following arguments: <camera_name> <camera_url>")
+    
+#inicio de la aplicación Flask solo si el hilo no está vivo
+   
+    app.run(debug=False, threaded=True)   
+
+    # Ejecutar la aplicación Flask
+    
