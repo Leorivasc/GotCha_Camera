@@ -18,31 +18,26 @@ frame_lock = threading.Lock()
 
 
 def three_frame_difference():
-
-    global camera
+    
     global last_frame
-    name = camera['name']
-    url = f"http://{camera['ip_address']}:{camera['port']}"
+    global name
+    camera=read_config(name)[0] #only the 1st result just in case an error has two cameras with the same name
+    url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
     
 
-    cap = cv2.VideoCapture(f"{url}/video_feed")
+    cap = cv2.VideoCapture(f"{url}/video_feed") #Open the stream
 
-    #Preload 3 consecutive frames numbered 1, 2, 3
+    #Preload 3 consecutive frames numbered 1, 2, 3 (1st frame is discarded)
     _, frame1 = cap.read()
     _, frame2 = cap.read()
     _, frame3 = cap.read()
 
-    #Create DB connection for the configuration
-    connection = SQLiteDB()
-    
-    print("Started 3-frame difference algorithm")
+    print("Starting 3-frame difference algorithm")
 
     while True:
 
-        #Get camera configuration from DB (N frames to skip,detection area size)
-        connection.connect()
-        camera_config=connection.query_data("cameras",f"name='{name}'")
-        connection.close_connection()
+        #Get camera configuration AGAIN from DB so that changes are applied on each iteration LIVE
+        camera=read_config(name)[0] #only the 1st result just in case
 
         #Apply camera configuration on each iteration
         N= int(camera['frameskip'])
@@ -145,7 +140,6 @@ def video_feed():
 
 # Iniciar el hilo para procesar frames    
 name = "PiZero1"
-camera=read_config(name)[0] #only the 1st result just in case
 frame_thread = threading.Thread(target=three_frame_difference)
 frame_thread.daemon = True
 if not frame_thread.is_alive():
