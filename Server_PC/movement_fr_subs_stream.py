@@ -5,7 +5,6 @@
 import cv2
 import numpy as np
 from classes import do_get
-import sys
 from classes import SQLiteDB
 from flask import Flask, render_template, Response
 import threading
