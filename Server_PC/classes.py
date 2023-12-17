@@ -1,6 +1,7 @@
 import sqlite3
 import requests
-import json
+import datetime
+import cv2
 
 class SQLiteDB:
     """##Generic## SQLite database class.
@@ -114,5 +115,19 @@ def read_config(camera_name):
     return camera
 
 
+def add_datetime(frame):
+    #Get date
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
 
+    #Configurar el texto
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottom_left_corner = (10, frame.shape[0] - 10)
+    font_scale = 0.5
+    font_color = (0, 255, 0)  # Verde
+    line_type = 1
+
+    #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
+    return frame
 

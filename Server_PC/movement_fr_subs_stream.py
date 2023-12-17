@@ -7,9 +7,7 @@
 
 import cv2
 import numpy as np
-from classes import do_get
-from classes import SQLiteDB
-from classes import read_config
+from classes import * #helper functions
 from flask import Flask, render_template, Response
 import threading
 import datetime
@@ -136,6 +134,7 @@ def three_frame_difference():
 
     cap.release()
 
+
 def generate_frames():
     while True:
         with frame_lock:
@@ -148,26 +147,6 @@ def generate_frames():
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
-
-#Write date/time in a frame
-def add_datetime(frame):
-    #Get date
-    now = datetime.datetime.now()
-    time = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    #Configurar el texto
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    bottom_left_corner = (10, frame.shape[0] - 10)
-    font_scale = 0.5
-    font_color = (0, 255, 0)  # Verde
-    line_type = 1
-
-    #Put text
-    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
-    return frame
-
-
 
 @app.route('/video_feed')
 def video_feed():
