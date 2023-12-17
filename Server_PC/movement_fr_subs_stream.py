@@ -1,6 +1,9 @@
-#This one implements a three-frame difference algorithm to detect movement in a video stream.
-#Sensitivity is improved by skipping N frames.
-# (Srivastav, 2017)
+#This one implements a three-frame difference algorithm (Srivastav, 2017)to detect movement in a video stream.
+#Sensitivity is improved by skipping N frames. 
+# Database configurable.
+# Accepts live DB changes
+# Mask configurable. mask_{name}.jpg must exist in the same folder as this script
+# Accepts live mask changes
 
 import cv2
 import numpy as np
@@ -10,19 +13,35 @@ from classes import read_config
 from flask import Flask, render_template, Response
 import threading
 import datetime
+import os
+import logging
+
 
 app = Flask(__name__)
 # To store the last frame
 last_frame = None
 frame_lock = threading.Lock()
 
+#Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
 
 
 def three_frame_difference():
-    
-    global last_frame
-    global name
-    camera=read_config(name)[0] #only the 1st result just in case an error has two cameras with the same name
+    """This function implements a three-frame difference algorithm to detect movement.
+    It uses last_frame to store the last frame so that it is accessible from /video_feed function
+    It must be run on its own thread so that it does not block the main thread
+    Args:
+        camera_name (str): The name of the camera to be used. It must be the registered in the database.sqlite DB.
+    """
+
+    global last_frame #To store the last frame
+
+    camera_name="defaultCam"
+    camname= os.environ.get('CAMERA','PiZero1')
+    print(f"Camera: {camname}?")
+    if camname is not None:
+        camera_name=camname
+
+    camera=read_config(camera_name)[0] #only the 1st result just in case an error has two cameras with the same name
     url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
     
 
@@ -33,12 +52,13 @@ def three_frame_difference():
     _, frame2 = cap.read()
     _, frame3 = cap.read()
 
-    print("Starting 3-frame difference algorithm")
+    print(f"Starting 3-frame difference algorithm: {camera_name}")
+    logging.info(f"Starting 3-frame difference algorithm: {camera_name}")
 
     while True:
 
         #Get camera configuration AGAIN from DB so that changes are applied on each iteration LIVE
-        camera=read_config(name)[0] #only the 1st result just in case
+        camera=read_config(camera_name)[0] #only the 1st result just in case
 
         #Apply camera configuration on each iteration
         N= int(camera['frameskip'])
@@ -77,12 +97,18 @@ def three_frame_difference():
         threshold_diff = cv2.dilate(threshold_diff, np.ones((3, 3), np.uint8), iterations=2)
 
 
-        #If MASK is found, apply it to the frame
-        mask = cv2.imread("mask.jpg",cv2.COLOR_BGR2GRAY)
+        #If MASK is found, apply it to the frame. 'name' must match the camera name
+        mask = cv2.imread(f"mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY)
         if mask is None:
-            print("Mask failed to load")
+            print("Mask not found. Creating default mask")
+            image = np.zeros((240,320),dtype=np.uint8)
+            #image[:120,:]=1 #Top half of the image is '1', bottom half is '0' (image looks black)
+            image[:]=1 #All image is '1' (image looks black)
+            cv2.imwrite(f'mask_{camera_name}.jpg', image)
+            mask = cv2.imread(f"mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY) #Read the mask again
         else:
-            #We apply the mask image to exclude image areas with "0" in the mask
+            
+            #We apply the m ask image to exclude image areas with "0" in the mask
             #diff = cv2.bitwise_and(diff,mask)
             threshold_diff = cv2.multiply(threshold_diff,mask) #Works with grayscale images
 
@@ -102,24 +128,13 @@ def three_frame_difference():
                 ###MOVEMENT DETECTION HERE###
 
 
-        # Mostrar el frame con las diferencias resaltadas
-        #cv2.imshow(f'{name} Manual Frame Subtraction', diff)
-        #cv2.imshow(f'{name} Thresholded',threshold_diff)
-        #cv2.imshow(f'{name} Frame1',frame1)
-
         
         with frame_lock: 
             last_frame = frame1.copy()
             add_datetime(last_frame)
          
 
-        # Salir si se presiona la tecla 'q'
-        #if cv2.waitKey(30) & 0xFF == ord('q'):
-        #   break
-
     cap.release()
-    #cv2.destroyAllWindows()
-
 
 def generate_frames():
     while True:
@@ -145,7 +160,7 @@ def add_datetime(frame):
     font = cv2.FONT_HERSHEY_SIMPLEX
     bottom_left_corner = (10, frame.shape[0] - 10)
     font_scale = 0.5
-    font_color = (255, 255, 255)  # Blanco
+    font_color = (0, 255, 0)  # Verde
     line_type = 1
 
     #Put text
@@ -160,19 +175,18 @@ def video_feed():
 
 
 
-# Iniciar el hilo para procesar frames    
-name = "PiZero1"
-frame_thread = threading.Thread(target=three_frame_difference)
-frame_thread.daemon = True
-if not frame_thread.is_alive():
-    frame_thread.start()
 
 
 if __name__ == "__main__":
-    
-#inicio de la aplicación Flask solo si el hilo no está vivo
-   
+
+
+    #Start thread to read frames
+    frame_thread = threading.Thread(target=three_frame_difference)
+    frame_thread.daemon = True
+    if not frame_thread.is_alive():
+        logging.info("Starting frame thread")
+        frame_thread.start()
+
     app.run(debug=False, threaded=True)   
 
-    # Ejecutar la aplicación Flask
     
