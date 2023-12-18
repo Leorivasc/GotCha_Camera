@@ -10,17 +10,11 @@ import numpy as np
 from classes import * #helper functions
 from flask import Flask, render_template, Response
 import threading
-import datetime
 import os
 import logging
 
 
 app = Flask(__name__)
-# To store the last frame
-last_frame = None
-frame_lock = threading.Lock()
-
-#Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
 
 
 def three_frame_difference():
@@ -32,6 +26,9 @@ def three_frame_difference():
     """
 
     global last_frame #To store the last frame
+
+    global ccc
+    print(f"THREEFRAME Camera: {ccc}?")
 
     camera_name="defaultCam"
     camname= os.environ.get('CAMERA','PiZero1')
@@ -152,19 +149,22 @@ def generate_frames():
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+# To store the last frame
+last_frame = None
+frame_lock = threading.Lock()
 
+#Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
+ccc = os.getenv('CAMERA')
+print(f"START Camera: {ccc}?")
 
+#Start thread to read frames
+frame_thread = threading.Thread(target=three_frame_difference)
+frame_thread.daemon = True
+if not frame_thread.is_alive():
+    logging.info("Starting frame thread")
+    frame_thread.start()
 
-
-if __name__ == "__main__":
-
-
-    #Start thread to read frames
-    frame_thread = threading.Thread(target=three_frame_difference)
-    frame_thread.daemon = True
-    if not frame_thread.is_alive():
-        logging.info("Starting frame thread")
-        frame_thread.start()
+if __name__ == "__main__" : 
 
     app.run(debug=False, threaded=True)   
 
