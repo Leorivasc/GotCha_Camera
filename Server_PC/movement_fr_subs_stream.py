@@ -12,10 +12,11 @@ from flask import Flask, render_template, Response
 import threading
 import os
 import logging
+from flask_cors import CORS
 
 
 app = Flask(__name__)
-
+CORS(app) #To allow cross-origin requests
 
 def three_frame_difference():
     """This function implements a three-frame difference algorithm to detect movement.
@@ -23,24 +24,32 @@ def three_frame_difference():
     It must be run on its own thread so that it does not block the main thread
     Args:
         camera_name (str): The name of the camera to be used. It must be the registered in the database.sqlite DB.
+          At the same time, it must be given as an argument to the -e flag on gunicorn launch command (-e CAMERA=camera_name)
+
     """
 
     global last_frame #To store the last frame
 
+    #For debugging purposes, print the camera name
     global ccc
-    print(f"THREEFRAME Camera: {ccc}?")
+    print(f"THREEFRAME Camera: {ccc}")
 
+    #Get camera configuration from environment variable -e CAMERA=cameraname
     camera_name="defaultCam"
-    camname= os.environ.get('CAMERA','PiZero1')
-    print(f"Camera: {camname}?")
+    camname= os.environ.get('CAMERA',None)
+    print(f"Camera: {camname}")
     if camname is not None:
         camera_name=camname
+    else:
+        print("No camera name provided. Please check the -e flag on gunicorn. Exiting")
+        quit()
 
+    #Get camera configuration from DB using the camera name as key
     camera=read_config(camera_name)[0] #only the 1st result just in case an error has two cameras with the same name
     url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
     
-
-    cap = cv2.VideoCapture(f"{url}/video_feed") #Open the stream
+    #Open the stream
+    cap = cv2.VideoCapture(f"{url}/video_feed") 
 
     #Preload 3 consecutive frames numbered 1, 2, 3 (1st frame is discarded)
     _, frame1 = cap.read()
@@ -48,7 +57,6 @@ def three_frame_difference():
     _, frame3 = cap.read()
 
     print(f"Starting 3-frame difference algorithm: {camera_name}")
-    logging.info(f"Starting 3-frame difference algorithm: {camera_name}")
 
     while True:
 
@@ -142,8 +150,14 @@ def generate_frames():
             _, buffer = cv2.imencode('.jpg', last_frame)
             frame_bytes = buffer.tobytes()
 
+        #yield (b'--frame\r\n'
+        #      b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n'
+                   b'Content-Length: ' + f"{len(frame_bytes)}".encode() + b'\r\n'
+                   b'\r\n' + frame_bytes + b'\r\n')
+
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -155,13 +169,13 @@ frame_lock = threading.Lock()
 
 #Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
 ccc = os.getenv('CAMERA')
-print(f"START Camera: {ccc}?")
+print(f"START Camera: {ccc}")
 
 #Start thread to read frames
 frame_thread = threading.Thread(target=three_frame_difference)
 frame_thread.daemon = True
 if not frame_thread.is_alive():
-    logging.info("Starting frame thread")
+    print("Starting thread")
     frame_thread.start()
 
 if __name__ == "__main__" : 
