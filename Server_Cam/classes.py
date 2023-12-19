@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import threading
 import time
+import datetime
+import cv2
 
 #This class implements a GPIO output that can be turned on, off or blink
 class GPIO_Out:
@@ -101,3 +103,119 @@ class Counter:
 
     def get(self):
         return self.value
+
+
+
+def do_get(url):
+    """Perform a GET request to the specified URL.
+    Args:
+        url (str): The URL to which the request will be performed.
+    Returns:
+        str: The response text if the request was successful, an error message otherwise.
+    """
+
+    try:
+        #Perform GET
+        print("Connecting to "+url)
+        ans = requests.get(url)
+
+        #Verify status ok or else
+        if ans.status_code == 200:
+            print(f"Response: {ans.text}")
+            return(f"{ans.text}")
+            pass
+        else:
+            print(f"Connection error: {ans.status_code}")
+            return(f"Connection error: {ans.status_code}")
+
+    except requests.exceptions.Timeout:
+        print("Error: Timeout")
+        return("Error: Timeout")
+    except requests.exceptions.RequestException as e:
+        print(f"Bad request: {e}")
+        return(f"Bad request: {e}")
+
+
+def add_datetime(frame):
+    #Get date
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    #Configurar el texto
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottom_left_corner = (10, frame.shape[0] - 10)
+    font_scale = 0.5
+    font_color = (0, 255, 0)  # Verde
+    line_type = 1
+
+    #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
+    return frame
+
+
+class VideoRecorder:
+    """This class implements a video recorder"""
+
+
+
+    def __init__(self,url):
+        self.isRecording = False
+        self.url=url
+        
+
+    def save_video_span(self,duration):
+        # Init camera
+        cap = cv2.VideoCapture(self.url)
+
+        self.isRecording = True
+
+        now = datetime.datetime.now()
+        time = now.strftime("%Y-%m-%d_%H_%M_%S")
+
+        # Verify cam opening
+        if not cap.isOpened():
+            print("Error opening camera.")
+            exit()
+
+        # Configure video recording
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fps = 25.0
+        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, fps, (640,480))  # Resolution
+
+        # Graba la secuencia de video durante 10 segundos
+        ini_time = cv2.getTickCount()
+
+        #Recording loop
+        while True:
+
+            #Read frame
+            ret, frame = cap.read()
+
+            if not ret:
+                print("Error al capturar el fotograma.")
+                break
+
+            #Print datetime on frame
+            frame = add_datetime(frame)
+
+            #Record frame
+            video_out.write(frame)
+
+            #Opens in window
+            #cv2.imshow('Video', frame)
+
+            #Breaks after 'duration' seconds
+            current_time = cv2.getTickCount()
+            time_passed = (current_time - ini_time) / cv2.getTickFrequency()
+            if time_passed > duration:
+                break #Breaks recording loop
+
+
+        # Libera los recursos
+        cap.release()
+        video_out.release()
+        self.isRecording = False #Recording finished
+
+
+    def isRecording(self):
+        return self.isRecording
