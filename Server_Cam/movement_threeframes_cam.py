@@ -31,12 +31,24 @@ def three_frame_difference():
     
     #Open the stream
     cap = cv2.VideoCapture(cam_url) 
-    recorder = VideoRecorder(cam_url) #Init recorder
+
+    #Recording to video file
+    doRecord=False
+    dateBuffer= ThingBuffer() #Buffer to store the date to be used in the video filename
+    iniTimeBuffer=ThingBuffer() #Buffer to store the initial time of the recording
+    duration=10 #Duration of the recording in seconds
+    
+    # Configure video recording
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fps = 25.0
+    video_out = cv2.VideoWriter("alarm.avi", fourcc, fps, (320,240))  # Resolution
+
 
     #Preload 3 consecutive frames numbered 1, 2, 3 (1st frame is discarded)
     _, frame1 = cap.read()
     _, frame2 = cap.read()
     _, frame3 = cap.read()
+
 
 
     #Main loop
@@ -102,31 +114,72 @@ def three_frame_difference():
         # Find contours in the thresholded image
         contours, _ = cv2.findContours(threshold_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+        framex=frame1.copy()
+        #framey=frame2.copy()
+        #framez=frame3.copy()
+        #Traverse all contours finding areas greater than a threshold
+        #If an area is found, draw a rectangle around it
+        #set doRecord to True to start recording
         for c in contours:
             # contourArea() method filters out any small contours
             # You can change this value
             #print(cv2.contourArea(c))
-            if cv2.contourArea(c)> 10: #Sensitive to small movements
+
+            if cv2.contourArea(c)> 64:      #Sensitivity in square pixels
                 (x, y, w, h)=cv2.boundingRect(c)
-                cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,225,255), 1)
-                print("Movement detected")
-                ###MOVEMENT DETECTION HERE###
-                if not recorder.isRecording:
-                    recorder.save_video_span(10)
+                
 
-        
+                framex=cv2.rectangle(framex, (x, y), (x+w, y+h), (125,225,255), 1)
+                #framey=cv2.rectangle(framey, (x, y), (x+w, y+h), (125,225,255), 1)
+                #framez=cv2.rectangle(framez, (x, y), (x+w, y+h), (125,225,255), 1)
 
-        #last_frame = frame1.copy()
-        #add_datetime(last_frame)
-        #cv2.imshow('Frame1',last_frame)
 
-    #cap.release()
+                if not doRecord:
+                    print("Recording started")
+                    doRecord=True #Start recording flag
+                    #store date as a string in the buffer
+                    dateBuffer.store(datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")) #Store the date to be used in the video filename
+                    iniTimeBuffer.store(cv2.getTickCount()) #Store the initial time of the recording
+                
 
+        if doRecord:
+
+
+            new_filename=f'alarm_{dateBuffer.get()}.avi' #Get the date from the buffer, keeped until unlocked
+            
+
+            #Record
+            framex = add_datetime(framex) #Add datetime to the frame
+            #framey = add_datetime(framey) #Add datetime to the frame
+            #framez = add_datetime(framex) #Add datetime to the frame
+            video_out.write(framex) #Write frame to video
+            #video_out.write(framey) #Write frame to video
+            #video_out.write(framez) #Write frame to video
+            
+            #Breaks after 'duration' seconds
+            current_time = cv2.getTickCount()
+            time_passed = (current_time - iniTimeBuffer.get()) / cv2.getTickFrequency()
+            
+            #print(time_passed) #DEBUG
+            if time_passed > duration:
+                video_out.release()
+                doRecord=False
+                print("Recording finished")
+                dateBuffer.unlock() #Unlock the buffer
+                iniTimeBuffer.unlock() #Unlock the buffer
+                os.rename("alarm.avi",new_filename)
+
+
+        #Opens in window
+        #cv2.imshow('Video', frame1)
 
 
 if __name__ == "__main__" : 
 
     three_frame_difference()
 
-
-    
+#Probar con thread. aparentemente e loop pierde tiempo en el chequeo de contornos.
+#Lo malo es que se pierde la capacidad de guardar el frame con los contnrnos dibujados
+#thread1 = threading.Thread(target=record_whatever, args=(1,))
+#thread1.start()
+#Se puede copiar la tecnica del frame_lock de server_pc

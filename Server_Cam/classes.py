@@ -180,7 +180,7 @@ class VideoRecorder:
         # Configure video recording
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         fps = 25.0
-        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, fps, (640,480))  # Resolution
+        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, fps, (320,240))  # Resolution
 
         # Graba la secuencia de video durante 10 segundos
         ini_time = cv2.getTickCount()
@@ -192,7 +192,7 @@ class VideoRecorder:
             ret, frame = cap.read()
 
             if not ret:
-                print("Error al capturar el fotograma.")
+                print("Error capturing frame.")
                 break
 
             #Print datetime on frame
@@ -207,6 +207,7 @@ class VideoRecorder:
             #Breaks after 'duration' seconds
             current_time = cv2.getTickCount()
             time_passed = (current_time - ini_time) / cv2.getTickFrequency()
+            #print(time_passed) #DEBUG
             if time_passed > duration:
                 break #Breaks recording loop
 
@@ -219,3 +220,30 @@ class VideoRecorder:
 
     def isRecording(self):
         return self.isRecording
+
+class ThingBuffer:
+    """This class implements a small buffer with r/w control bit"""
+    
+    def __init__(self, initial_value=None):
+        self.value = initial_value
+        self.locked = False
+
+    def store(self, value):
+        if not self.locked:
+            self.value = value #Store value
+            self.locked = True #Lock buffer until cleared
+            return True
+        else:
+            #print("Buffer is locked. Can't store value.")
+            return False
+
+    def get(self):
+        return self.value
+    
+    def lock(self):
+        self.locked = True   
+
+    def unlock(self):
+        self.locked = False
+
+
