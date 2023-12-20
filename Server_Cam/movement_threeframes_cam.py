@@ -38,10 +38,15 @@ def three_frame_difference():
     iniTimeBuffer=ThingBuffer() #Buffer to store the initial time of the recording
     duration=10 #Duration of the recording in seconds
     
+    #resolution
+    resX = 320
+    resY = 240
+
+
     # Configure video recording
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    fps = 25.0
-    video_out = cv2.VideoWriter("alarm.avi", fourcc, fps, (320,240))  # Resolution
+    fps = 12
+    video_out = cv2.VideoWriter("alarm.avi", fourcc, fps, (resX,resY))  # Resolution
 
 
     #Preload 3 consecutive frames numbered 1, 2, 3 (1st frame is discarded)
@@ -98,7 +103,7 @@ def three_frame_difference():
         mask = cv2.imread(f"mask.jpg",cv2.COLOR_BGR2GRAY)
         if mask is None:
             print("Mask not found. Creating default mask")
-            image = np.zeros((240,320),dtype=np.uint8)
+            image = np.zeros((resY,resX),dtype=np.uint8) #Inverted, rows,cols
             #image[:120,:]=1 #Top half of the image is '1', bottom half is '0' (image looks black)
             image[:]=1 #All image is '1' (image looks black)
             cv2.imwrite(f'mask.jpg', image)
@@ -168,6 +173,7 @@ def three_frame_difference():
                 dateBuffer.unlock() #Unlock the buffer
                 iniTimeBuffer.unlock() #Unlock the buffer
                 os.rename("alarm.avi",new_filename)
+                video_out = cv2.VideoWriter("alarm.avi", fourcc, fps, (resX,resY))  # Prepare for new
 
 
         #Opens in window

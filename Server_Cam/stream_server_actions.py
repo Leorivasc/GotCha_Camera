@@ -17,6 +17,13 @@ relay = GPIO_Out(20)
 connections = Counter(0)
 isAlert=False
 hostname = socket.gethostname()
+port=8000
+
+#Resolution
+resX=320
+resY=240
+
+fps=12
 
 
 class StreamingOutput(object):
@@ -47,6 +54,10 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         
         global isAlert
         global hostname
+        global resX
+        global resY
+        global fps
+        global port
 
         #Regexp to emulate GET parameters: '/command?key=value'
         #It supports multiple key=value separated by '&' 
@@ -269,12 +280,12 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     daemon_threads = True
 
 
-
-with picamera.PiCamera(resolution='320x240', framerate=24) as camera:
+#Camera config
+with picamera.PiCamera(resolution=f'{resX}x{resY}', framerate=fps) as camera:
     output = StreamingOutput()
     camera.start_recording(output, format='mjpeg')
     try:
-        address = ('', 8000)
+        address = ('', port)
         server = StreamingServer(address, StreamingHandler)
         led.start_blinking()
         server.serve_forever()

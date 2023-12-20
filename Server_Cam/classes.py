@@ -158,10 +158,12 @@ class VideoRecorder:
 
 
 
-    def __init__(self,url):
+    def __init__(self,url ,fps=12, resX=320, resY=240):
         self.isRecording = False
-        self.url=url
-        
+        self.url=url     
+        self.fps=fps
+        self.resX=resX
+        self.resY=resY
 
     def save_video_span(self,duration):
         # Init camera
@@ -179,8 +181,7 @@ class VideoRecorder:
 
         # Configure video recording
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        fps = 25.0
-        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, fps, (320,240))  # Resolution
+        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, self.fps, (self.resX,self.resY))  # Resolution
 
         # Graba la secuencia de video durante 10 segundos
         ini_time = cv2.getTickCount()
@@ -221,8 +222,13 @@ class VideoRecorder:
     def isRecording(self):
         return self.isRecording
 
+
+
+
 class ThingBuffer:
-    """This class implements a small buffer with r/w control bit"""
+    """This class implements a small buffer with r/w control bit
+        Usable inside main loops to keep values unchanged conditionally
+    """
     
     def __init__(self, initial_value=None):
         self.value = initial_value
