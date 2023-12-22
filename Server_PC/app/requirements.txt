@@ -3,3 +3,6 @@
     gunicorn
     gevent
     pygame
+    requests
+    flask-cors
+    

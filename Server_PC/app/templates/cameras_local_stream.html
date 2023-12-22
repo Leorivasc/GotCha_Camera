@@ -1,5 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
+<!--This page is used to display the local stream of the cameras passing through 'movement_fr_subs_stream.py'-->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +16,7 @@
         <div class="column">
             <div class="stream-container">
                 <div class="tag-label">{{ camera.name }}</div>
-                <img class="stream" src="http://{{camera.ip_address}}:{{camera.port}}{{camera.path}}" alt="Connecting...">
+                <img class="stream" src="http://localhost:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
                                 
             </div>
         </div>

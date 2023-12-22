@@ -11,6 +11,7 @@ from flask import Flask, render_template, Response, jsonify
 import cv2
 import configparser
 import datetime
+from classes import * #helper functions
 
 app = Flask(__name__)
 
@@ -76,8 +77,9 @@ def generate_frames(camera_url):
 #-----------Routes-----------------
 
 #Load cameras list from config.ini
-cameras = read_config()
+cameras1 = read_config()
 
+cameras = read_config_all()
 
 #entry point
 @app.route('/')
@@ -100,9 +102,17 @@ def cameras_fast():
 @app.route('/video_feed/<int:camera_id>')
 def video_feed(camera_id):
     camera = cameras[camera_id]
-    camera_url = f"{camera['address']}/video_feed" #The actual feed
+    camera_url= f"http://{camera['ip_address']}:{camera['port']}{camera['path']}"
+    #camera_url = f"{camera['address']}/video_feed" #The actual feed
     
     return Response(generate_frames(camera_url), content_type='multipart/x-mixed-replace; boundary=frame')
+
+#Video feed route for processed video using three frame difference
+@app.route('/video_local_stream')
+def video_local_stream():
+    return render_template('cameras_local_stream.html', cameras=cameras)
+    
+
 
 #Return a JSON array with the current cameras list
 @app.route('/getcameras')
