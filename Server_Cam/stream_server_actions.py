@@ -151,7 +151,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_html_response("""
                                <html>
                                 <head>
-                                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                    
                                     <style>
                                     table, td, th {
                                     border: 1px solid;
@@ -176,13 +176,20 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
                                 <!-- Refresh status table every 5 seconds -->
                                 <script>
-                                    $(function () {
-                                        setInterval(function () {
-                                            $.get("/htmlstatus", function (data) {
-                                                $("#status_table").html(data);
-                                            });
-                                        }, 5000);
+                                   <!--credit: https://stackoverflow.com/questions/989625/how-to-refresh-div modified to remove jQuery calls-->
+                                   document.addEventListener("DOMContentLoaded", function () {
+                                    setInterval(function () {
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.onreadystatechange = function () {
+                                        if (xhr.readyState === 4 && xhr.status === 200) {
+                                            document.getElementById("status_table").innerHTML = xhr.responseText;
+                                        }
+                                        };
+                                        xhr.open("GET", "/htmlstatus", true);
+                                        xhr.send();
+                                    }, 5000);
                                     });
+
                                 </script>
 
                                 </body>
