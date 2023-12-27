@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <title>Reproducir dos streams de video MJPEG</title>
+</head>
+<body>
+    <script>
+        // URL de tus streams de video MJPEG
+        const stream1URL = "http://localhost:5002/video_feed";
+        const stream2URL = "http://localhost:5001/video_feed";
+
+        function setup() {
+            // Crea un lienzo del tamaño de los videos
+            createCanvas(640, 240);
+            frameRate(12)
+            // Crea los objetos de video para cada stream
+
+            video1 = createImg(stream1URL,"1");
+            video1.hide();
+            video2 = createImg(stream2URL,"2");
+            video2.hide();
+
+            // Establece la posición de los videos
+            //video1.position(0, 0);
+            //video2.position(640, 0);
+        }
+
+        function draw() {
+            // Dibuja los videos en el lienzo
+            if (frameCount%4==0){
+                if (video1){
+                image(video1, 0, 0);
+                }
+            }else{
+                if (video2){
+                image(video2, 320, 0);
+                }
+            }
+            
+        }
+
+        function windowResized() {
+            // Ajusta el tamaño del lienzo si la ventana cambia de tamaño
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>

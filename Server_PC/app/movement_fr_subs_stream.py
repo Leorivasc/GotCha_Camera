@@ -102,14 +102,14 @@ def three_frame_difference():
 
 
         #If MASK is found, apply it to the frame. 'name' must match the camera name
-        mask = cv2.imread(f"mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY)
+        mask = cv2.imread(f"masks/mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY)
         if mask is None:
             print("Mask not found. Creating default mask")
             image = np.zeros((240,320),dtype=np.uint8)
             #image[:120,:]=1 #Top half of the image is '1', bottom half is '0' (image looks black)
             image[:]=1 #All image is '1' (image looks black)
-            cv2.imwrite(f'mask_{camera_name}.jpg', image)
-            mask = cv2.imread(f"mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY) #Read the mask again
+            cv2.imwrite(f'masks/mask_{camera_name}.jpg', image)
+            mask = cv2.imread(f"masks/mask_{camera_name}.jpg",cv2.COLOR_BGR2GRAY) #Read the mask again
         else:
             
             #We apply the m ask image to exclude image areas with "0" in the mask
