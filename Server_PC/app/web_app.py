@@ -9,29 +9,13 @@
 
 from flask import Flask, render_template, Response, jsonify
 import cv2
-import configparser
 import datetime
 from classes import * #helper functions
+import socket
 
 app = Flask(__name__)
 
-
-# Read list of cameras from config.ini
-def read_config():
-    config = configparser.ConfigParser()
-    config.read('cameras_config.ini')
-    cameras = []
-    for section in config.sections():
-        camera = {
-            'name': config[section]['name'],
-            'address': config[section]['address'],
-            
-        }
-        cameras.append(camera)
-
-    return cameras
-
-
+#-----------Functions-----------------
 
 #Write date/time in a frame
 def add_datetime(frame):
@@ -51,7 +35,7 @@ def add_datetime(frame):
     return frame
 
 
-#Generates the frames to be served
+#Generates the frames to be served locally
 def generate_frames(camera_url):
     cap = cv2.VideoCapture(camera_url)
     
@@ -75,9 +59,6 @@ def generate_frames(camera_url):
 
 
 #-----------Routes-----------------
-
-#Load cameras list from config.ini
-cameras1 = read_config()
 
 cameras = read_config_all()
 
@@ -110,7 +91,13 @@ def video_feed(camera_id):
 #Video feed route for processed video using three frame difference
 @app.route('/video_local_stream')
 def video_local_stream():
-    return render_template('cameras_local_stream.html', cameras=cameras)
+
+    #Get server IP to present links properly
+    host_name = socket.gethostname()
+    server_ip = socket.gethostbyname(host_name)
+
+    #Send cameras and server data to the template
+    return render_template('cameras_local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip)
     
 
 

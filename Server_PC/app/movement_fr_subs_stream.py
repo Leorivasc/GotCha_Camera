@@ -11,9 +11,9 @@ from classes import * #helper functions
 from flask import Flask, render_template, Response
 import threading
 import os
-import logging
 from flask_cors import CORS
-import random
+import time
+
 
 
 app = Flask(__name__)
@@ -27,9 +27,12 @@ def three_frame_difference():
         camera_name (str): The name of the camera to be used. It must be the registered in the database.sqlite DB.
           At the same time, it must be given as an argument to the -e flag on gunicorn launch command (-e CAMERA=camera_name)
 
+          To run standalone: CAMERA=<camera_name> python3 movement_fr_subs_stream.py
+
     """
 
     global last_frame #To store the last frame
+    global frame_thread #To control the thread from within the function
 
     #For debugging purposes, print the camera name
     global cam_env
@@ -80,10 +83,24 @@ def three_frame_difference():
         _, frame3 = cap.read()
         
         if not _:
-            # No more frames to read
+            # No more frames to read or connection lost?
+            #lets loop until we get a frame again
+            print("No more frames to read. Connection lost?")
+            while not _:
+                time.sleep(5)
+                print("Trying to reconnect...")
+                try:
+                    cap = cv2.VideoCapture(f"{url}/video_feed") 
+                    _, frame3 = cap.read()
+                except:
+                    print("Connection failed. Trying again...")
+                finally:
+                    if _:
+                        print("Connection reestablished")
+                        
             break
 
-        # Calculate difference between consecutive frames
+        #Calculate difference between consecutive frames
         diffA = cv2.absdiff(frame1, frame2)
         diffB = cv2.absdiff(frame2, frame3)
 
@@ -91,7 +108,7 @@ def three_frame_difference():
         diff = cv2.bitwise_or(diffA, diffB)
 
 
-        # Convertir la diferencia a escala de grises
+        #Convert to grayscale
         gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
 
         # Aplicar un umbral para resaltar las diferencias
@@ -147,6 +164,10 @@ def generate_frames():
             if last_frame is None:
                 continue
 
+            #We sleep to reduce network traffic. If not present, there is always an image to yield
+            #then traffic may reach 1.5 to 2MB/s and hang the browser (firefox in particular)
+            time.sleep(0.083) #12fps (limits traffic to ~300KB/s)
+
             # Convertir el frame a formato JPEG para la transmisión web
             _, buffer = cv2.imencode('.jpg', last_frame)
             frame_bytes = buffer.tobytes()
@@ -163,6 +184,10 @@ def generate_frames():
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+#### Init portion ####
 
 # To store the last frame
 last_frame = None

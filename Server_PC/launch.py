@@ -12,7 +12,7 @@ os.chdir("app")
 #Prepare and read cameras config database
 db = SQLiteDB("database.sqlite")
 db.connect()
-cameras = db.query_data_dict("cameras")
+cameras = read_config_all() #Read all enabled cameras
 db.connection.close()
 
 #Prepare gunicorn command

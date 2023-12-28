@@ -60,7 +60,7 @@ class SQLiteDB:
         finally:
             self.connection.close()
             return result
-        
+
 
     #Close connection
     def close_connection(self):
@@ -122,7 +122,7 @@ def read_config_all():
     """
     connection = SQLiteDB()
     connection.connect()
-    cameras = connection.query_data_dict("cameras")
+    cameras = connection.query_data_dict("cameras", "isEnabled=1")
     connection.close_connection()
     return cameras
 

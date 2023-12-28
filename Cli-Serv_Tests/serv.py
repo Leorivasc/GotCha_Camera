@@ -9,6 +9,9 @@ import cv2
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
+####PC CAMERA REFUSES TO CHANGE RESOLUTION USING cap.set()####
+cap.set(3, 320)  # Ancho
+cap.set(4, 240)  # Altura
 
 #uploading mask image config
 UPLOAD_FOLDER = 'upload'
@@ -26,15 +29,22 @@ else:
 #Frames for video feed
 def generate_frames():
     while True:
-        # Lee un cuadro de la cámara
-        success, frame = cap.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        try:
+            # Lee un cuadro de la cámara
+            success, frame = cap.read()
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) ## Correct color for cv2, or else it looks blue
+            ##16:9=640,360
+            frame = cv2.resize(frame, (320, 240)) ####FORCE RESIZE (pc camera refuses to change resolution using cap.set())
+            if not success:
+                break
+            else:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        except Exception as e:
+            print(f"Error reading from camera or color correcting, will pass... {e}")
+            pass
 
 #Route for video
 @app.route('/video_feed')
@@ -91,5 +101,5 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=8000)
 
