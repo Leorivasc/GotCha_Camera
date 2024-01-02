@@ -209,12 +209,13 @@ class Three_Frame_Difference:
             # Read new 3rd frame
             _, frame3 = cap.read()
             
+            #Loop to reconnect if connection is lost. It will loop until a frame is read again
             if not _:
                  # No more frames to read or connection lost?
             #lets loop until we get a frame again
                 print("No more frames to read. Connection lost?")
                 while not _:
-                    time.sleep(5)
+                    time.sleep(5) #Retry in 5 seconds
                     print("Trying to reconnect...")
                     try:
                         cap = cv2.VideoCapture(f"{url}/video_feed") 
@@ -273,10 +274,13 @@ class Three_Frame_Difference:
                 #print(cv2.contourArea(c))
                 if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
                     (x, y, w, h)=cv2.boundingRect(c)
-                    cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,225,255), 1)
+                    cv2.rectangle(frame1, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
                     #print("Movement detected")
                     ###MOVEMENT DETECTION HERE###
 
+                else:
+                    (x, y, w, h)=cv2.boundingRect(c)
+                    cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,255,255), 1) #yellow rectangle
 
             
             with self.frame_lock: 
