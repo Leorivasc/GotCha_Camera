@@ -278,6 +278,8 @@ class Three_Frame_Difference:
                     #print("Movement detected")
                     ###MOVEMENT DETECTION HERE###
 
+                    do_get(f"{url}/alarm") #Send alarm to server
+
                 else:
                     (x, y, w, h)=cv2.boundingRect(c)
                     cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,255,255), 1) #yellow rectangle
