@@ -2,5 +2,5 @@
 bind = "0.0.0.0:8000"
 workers = 4
 #worker_class = "gevent"
-timeout = 10
+timeout = 0
 threaded = True
