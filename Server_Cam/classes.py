@@ -85,6 +85,7 @@ class GPIO_Out:
 
 
 #this class implements a counter that can be incremented or decremented
+#Good for use inside 'while true' loops and change values conditionally
 class Counter:
     def __init__(self, initial_value=0):
         self.value = initial_value
@@ -137,6 +138,8 @@ def do_get(url):
 
 
 def add_datetime(frame):
+    '''This function adds the current datetime to the frame (needs OPENCV)'''
+
     #Get date
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -154,9 +157,7 @@ def add_datetime(frame):
 
 
 class VideoRecorder:
-    """This class implements a video recorder"""
-
-
+    """This class implements a video recorder. (needs OPENCV)"""
 
     def __init__(self,url ,fps=12, resX=320, resY=240):
         self.isRecording = False

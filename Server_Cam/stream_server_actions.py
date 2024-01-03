@@ -1,5 +1,13 @@
 #Based on: https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
 
+#This script starts a web server that streams the camera feed and allows to control the attached LED and relay
+#It also provides a status page with the current status of the server
+#This script is intended to be run as a service at startup
+#It can be controlled remotely by sending GET requests to the server
+#This code DOES NOT use OPENCV or performs any image proessing. It uses the picamera library to stream the camera feed
+#The rationale behind this is to keep the server as light as possible to avoid performance issues (so that it can be run on a Raspberry Pi Zero W)
+#The GPIO pins are controlled through the GPIO_Out class, which is a wrapper for the RPi.GPIO library. See classes.py for more info
+
 import io
 import picamera
 import logging
@@ -26,6 +34,7 @@ resY=240
 fps=12
 
 
+#Streaming class provided by picamera website. It controls the streaming output by returning the current frame
 class StreamingOutput(object):
     def __init__(self):
         self.frame = None
@@ -45,11 +54,9 @@ class StreamingOutput(object):
         return self.buffer.write(buf)
 
 
-
+#Streaming handler class. It handles the GET requests and returns the corresponding responses (virtual 'routes' are handled here)
 class StreamingHandler(server.BaseHTTPRequestHandler):
-        
-    
-
+         
     def do_GET(self):
         
         global isAlert
@@ -80,7 +87,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
     
 
 
-        ###Led business
+        #-----Led business----#
         #Custom routes to remotely operate the attached LED (default  GPIO 21)
 
         #Turns led ON
@@ -111,8 +118,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_html_response(f"Frequency set to {freq}")
 
 
-        ###Reay business
-        #Custom routes to operate the attached RELAY (default  GPIO 20)
+        #----Relay business----#
+        #Custom routes to operate the attached RELAY or any switch, actually. (default  GPIO 20)
         
         #Switches relay ON
         elif self.path =='/relayon':
@@ -125,7 +132,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_html_response("Relay OFF")
 
 
-
+        #----Alarm mode is about turning the relay on and blinking the led at a high frequency----#
         #Trigger alarm mode
         elif self.path=='/alarm':
             relay.turn_on()       #Turn relay on (lights?)
@@ -146,19 +153,25 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_html_response("ALL CLEAR!")
             isAlert=False
 
+        #----Entry point, returns the default index.html----#
         #Returns Index.html
+        #By default it will refresh every 30 minutes
         elif self.path == '/index.html':
             self.send_html_response("""
                                <html>
                                 <head>
-                                    
+                                    <meta http-equiv="refresh" content="1800">
+
+                                    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+                                    <meta http-equiv="Pragma" content="no-cache">
+                                    <meta http-equiv="Expires" content="0">
                                     <style>
                                     table, td, th {
                                     border: 1px solid;
                                     }
 
                                     table {
-                                    width:320px;
+                                    width:"""+str(resX)+"""px;
                                     border-collapse: collapse;
                                     }
                                     </style>
@@ -169,14 +182,13 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                                 <h1>GotCha! Cam</h1>
                                     <div>
                                         <div>
-                                        <img src="/video_feed" width="320" height="240" alt="Loading..." />
+                                        <img src="/video_feed" width="""+str(resX)+""" height="""+str(resY)+""" alt="Loading..." />
                                         </div>
                                         <div id="status_table">Loading...</div>
                                     </div>
 
                                 <!-- Refresh status table every 5 seconds -->
                                 <script>
-                                   <!--credit: https://stackoverflow.com/questions/989625/how-to-refresh-div modified to remove jQuery calls-->
                                    document.addEventListener("DOMContentLoaded", function () {
                                     setInterval(function () {
                                         var xhr = new XMLHttpRequest();
@@ -196,6 +208,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                                 </html>
                                 """)
             
+
+        #----Status route----#
         #Returns an html table with the current status of the server
         elif self.path == '/htmlstatus':
             content = f"""
@@ -216,6 +230,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                     """
             self.send_html_response(content)    
         
+
+        #----Status route in JSON----#
         #Returns a JSON with the current status of the server
         elif self.path == '/status':
             content = '{'+\
@@ -228,6 +244,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_json_response(content)
 
 
+        #----Streaming route----#
         #Performs the streaming
         elif self.path == '/video_feed':
             self.send_response(200)
@@ -258,14 +275,15 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                 if connections.get()==0 and led.get_frequency()!=10: #Do not change frequency if alarm is on
                     led.set_frequency(0.25) #No connections. Slow blinking
 
-        
+
+        #----Route not found----#
         #Route given nonexistent
         else:
             self.send_error(404)
             self.end_headers()
 
 
-    #'Send' helper class functions
+    #'Send' helper class functions to wrap content type
     def send_html_response(self,content):
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
@@ -281,13 +299,13 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.wfile.write(content.encode("utf-8"))
 
 
-
+#Streaming server class. It contains the server itself. Provided by picamera website
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
 
-#Camera config
+#Camera config. Provided by picamera website
 with picamera.PiCamera(resolution=f'{resX}x{resY}', framerate=fps) as camera:
     output = StreamingOutput()
     camera.start_recording(output, format='mjpeg')
