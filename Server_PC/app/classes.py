@@ -5,6 +5,7 @@ import cv2
 import threading
 import time
 import numpy as np
+import json
 
 class SQLiteDB:
     """##Generic## SQLite database class.
@@ -77,29 +78,29 @@ def do_get(url):
     Args:
         url (str): The URL to which the request will be performed.
     Returns:
-        str: The response text if the request was successful, an error message otherwise.
+        Tuple: True/False, The response text if the request was successful, an error message otherwise.
     """
 
     try:
         #Perform GET
-        print("Connecting to "+url)
+        #print("Connecting to "+url)
         ans = requests.get(url)
 
         #Verify status ok or else
         if ans.status_code == 200:
-            print(f"Response: {ans.text}")
-            return(f"{ans.text}")
-            pass
+            #print(f"Response: {ans.text}")
+            return((True,f"{ans.text}")) #Returns TUPLE (True, response)
+
         else:
-            print(f"Connection error: {ans.status_code}")
-            return(f"Connection error: {ans.status_code}")
+            #print(f"Connection error: {ans.status_code}")
+            return((False,f"Connection error: {ans.status_code}"))
 
     except requests.exceptions.Timeout:
-        print("Error: Timeout")
-        return("Error: Timeout")
+        #print((False,"Error: Timeout"))
+        return((False,"Error: Timeout"))
     except requests.exceptions.RequestException as e:
-        print(f"Bad request: {e}")
-        return(f"Bad request: {e}")
+        #print((False,f"Bad request: {e}"))
+        return((False,f"Bad request: {e}"))
 
 
 def read_config(camera_name):
@@ -145,6 +146,15 @@ def add_datetime(frame):
     return frame
 
 
+def wait_timer(seconds, callback, *arg):
+    def timer_thread():
+        time.sleep(seconds)
+        callback(*arg)
+
+    thread = threading.Thread(target=timer_thread)
+    thread.start()
+
+
 
 
 class Three_Frame_Difference:
@@ -156,6 +166,12 @@ class Three_Frame_Difference:
         self.frame_lock = threading.Lock()
         self.loopOK=True         #To control the restarting of the loop upon desconnection from cammera
         self.foreverLoop=True   #To control the forever loop
+        self.isAlert = False #To prevent having to read camera in every contour detection
+        
+        self.camera_conf = read_config(self.camera_name)[0] #Get camera configuration from DB using the camera name as key
+        self.url = f"http://{self.camera_conf['ip_address']}:{self.camera_conf['port']}" #url for the camera stream
+
+
 
     def three_frame_difference_loop(self):
 
@@ -176,11 +192,13 @@ class Three_Frame_Difference:
 
         #Get camera configuration from DB using the camera name as key
         camera=read_config(self.camera_name)[0] #only the 1st result just in case an error has two cameras with the same name
+        self.camera_conf=camera #Save camera configuration to object attribute
         
-        url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
+        self.url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
         
+
         #Open the stream
-        cap = cv2.VideoCapture(f"{url}/video_feed") 
+        cap = cv2.VideoCapture(f"{self.url}/video_feed") 
 
         #Preload 3 consecutive frames numbered 1, 2, 3 (1st frame is discarded)
         _, frame1 = cap.read()
@@ -218,7 +236,7 @@ class Three_Frame_Difference:
                     time.sleep(5) #Retry in 5 seconds
                     print("Trying to reconnect...")
                     try:
-                        cap = cv2.VideoCapture(f"{url}/video_feed") 
+                        cap = cv2.VideoCapture(f"{self.url}/video_feed") 
                         _, frame3 = cap.read()
                     except:
                         print("Connection failed. Trying again...")
@@ -268,6 +286,8 @@ class Three_Frame_Difference:
             # Find contours in the thresholded image
             contours, _ = cv2.findContours(threshold_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+
+            # Loop over the contours (THERE COULD BE MANY EACH FRAME)
             for c in contours:
                 # contourArea() method filters out any small contours
                 # You can change this value
@@ -275,16 +295,18 @@ class Three_Frame_Difference:
                 if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
                     (x, y, w, h)=cv2.boundingRect(c)
                     cv2.rectangle(frame1, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
-                    #print("Movement detected")
-                    ###MOVEMENT DETECTION HERE###
-
-                    do_get(f"{url}/alarm") #Send alarm to server
+                    self.isAlert=True #Threshold exceeded. Alert is triggered
 
                 else:
                     (x, y, w, h)=cv2.boundingRect(c)
                     cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,255,255), 1) #yellow rectangle
 
-            
+
+            #Check if the contours loop returned any alerts to trigger
+            if self.isAlert:
+                self.startAlert() #Starts the alert (if not already started. It works alone)
+                        
+
             with self.frame_lock: 
                 self.last_frame = frame1.copy()
                 add_datetime(self.last_frame)
@@ -350,7 +372,25 @@ class Three_Frame_Difference:
                     b'Content-Type: image/jpeg\r\n'
                     b'Content-Length: ' + f"{len(frame_bytes)}".encode() + b'\r\n'
                     b'\r\n' + frame_bytes + b'\r\n')    
-            
+
+
+
+    def startAlert(self):
+        self.isAlert=True
+        conn_ok, alertstatus = do_get(f"{self.url}/status") #read status from camera
+        alertstatus=json.loads(alertstatus) #convert to dict
+
+        if conn_ok:
+            if alertstatus['alert'] == "False":
+                print(f"Movement detected in camera {self.camera_conf['name']}. Sending alarm. {str(self.camera_conf['alertlength'])} seconds")
+                do_get(f"{self.url}/alarm") #Send alarm to server
+                self.isAlert=True
+                wait_timer(self.camera_conf['alertlength'], do_get,f"{self.url}/clear") #Turn off alarm after 10 seconds
+            else:
+                print("Movement detected but alarm already active")
+                self.isAlert=False
+
+
 
 
 
