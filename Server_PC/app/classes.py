@@ -378,7 +378,13 @@ class Three_Frame_Difference:
     def startAlert(self):
         self.isAlert=True
         conn_ok, alertstatus = do_get(f"{self.url}/status") #read status from camera
-        alertstatus=json.loads(alertstatus) #convert to dict
+        
+        try:
+            alertstatus=json.loads(alertstatus) #convert to dict
+        except:
+            print("Error parsing JSON")
+            return
+        
 
         if conn_ok:
             if alertstatus['alert'] == "False":
