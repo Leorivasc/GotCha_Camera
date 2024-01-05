@@ -1,19 +1,29 @@
-#FLASK APP. Standalone.Serves video streaming. Useful for PC camera.
+#FLASK APP. Standalone.Serves video streaming. Useful for PC camera. Lightweight.
 #Uses Flask, OpenCV
 #To run: python3 stream_server_pc.py
 #To access: http://localhost:8000/video_feed
-#NO templates provided. Just the video feed.
+#NO templates provided. Just the video feed. No additional features.
 
 from flask import Flask, render_template, Response, send_from_directory
-import os
-
 import cv2
+
+PAGE="""\
+<html>
+<head>
+<title>GotCha PI Streaming</title>
+</head>
+<body>
+<h1>GotCha! PC Streaming</h1>
+<img src="/video_feed" width="320" height="240" />
+</body>
+</html>
+"""
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
-####PC CAMERA REFUSES TO CHANGE RESOLUTION USING cap.set()####
-cap.set(3, 320)  # Ancho
-cap.set(4, 240)  # Altura
+####PC CAMERA MAY REFUSE TO CHANGE RESOLUTION USING cap.set()####
+cap.set(3, 320)  # Width
+cap.set(4, 240)  # Height
 
 
 #Frames for video feed
@@ -22,7 +32,7 @@ def generate_frames():
         try:
             # Lee un cuadro de la cámara
             success, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) ## Correct color for cv2, or else it looks blue in some cameras
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) ## Color correct for cv2, or else it looks blue in some cameras (?)
             ##16:9=640,360
             frame = cv2.resize(frame, (320, 240)) ####FORCE RESIZE (pc camera refuses to change resolution using cap.set())
             if not success:
@@ -44,21 +54,16 @@ def video_feed():
 
 
 
-# Ruta para cargar la página inicial
+#Returns the main page with the video feed
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return PAGE
 
    
-
-# Ruta para servir archivos estáticos (HTML, JS, CSS, imágenes, etc.)
-@app.route('/mask_app/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('mask_app', filename)
-
+#### TODO: FALTA ROUTE PARA STATUS JSON ####
 
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=8000)
+    app.run(debug=True, host='0.0.0.0', port=8000)
 
