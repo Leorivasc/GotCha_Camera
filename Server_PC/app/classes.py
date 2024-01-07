@@ -288,22 +288,24 @@ class Three_Frame_Difference:
 
 
             # Loop over the contours (THERE COULD BE MANY EACH FRAME)
-            for c in contours:
-                # contourArea() method filters out any small contours
-                # You can change this value
-                #print(cv2.contourArea(c))
-                if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
-                    (x, y, w, h)=cv2.boundingRect(c)
-                    cv2.rectangle(frame1, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
-                    self.isAlert=True #Threshold exceeded. Alert is triggered
+            if not self.isAlert: #If there is an alert, we don't want to trigger it again
+                for c in contours:
+                    # contourArea() method filters out any small contours
+                    # You can change this value
+                    #print(cv2.contourArea(c))
+                    if cv2.contourArea(c)> detectionarea: #Sensitive to small movements
+                        (x, y, w, h)=cv2.boundingRect(c)
+                        cv2.rectangle(frame1, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
+                        self.isAlert=True #Threshold exceeded. Alert is triggered
+                        continue #We don't want to trigger the alert again if there are more contours
 
-                else:
-                    (x, y, w, h)=cv2.boundingRect(c)
-                    cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,255,255), 1) #yellow rectangle
+                    else:
+                        (x, y, w, h)=cv2.boundingRect(c)
+                        cv2.rectangle(frame1, (x, y), (x+w, y+h), (125,255,255), 1) #yellow rectangle
 
 
             #Check if the contours loop returned any alerts to trigger
-            if self.isAlert:
+            if self.isAlert and self.camera_conf['isTriggerable'] == 1:
                 self.startAlert() #Starts the alert (if not already started. It works alone)
                         
 
