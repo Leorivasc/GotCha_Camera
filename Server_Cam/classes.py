@@ -136,6 +136,13 @@ def do_get(url):
         print(f"Bad request: {e}")
         return(f"Bad request: {e}")
 
+def wait_timer(seconds, callback, *arg):
+    def timer_thread():
+        time.sleep(seconds)
+        callback(*arg)
+
+    thread = threading.Thread(target=timer_thread)
+    thread.start()
 
 def add_datetime(frame):
     '''This function adds the current datetime to the frame (needs OPENCV)'''

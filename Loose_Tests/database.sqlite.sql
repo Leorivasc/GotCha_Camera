@@ -11,9 +11,12 @@ CREATE TABLE IF NOT EXISTS "cameras" (
 	"alertlength"	INTEGER NOT NULL DEFAULT 10,
 	"isTriggerable"	INTEGER NOT NULL DEFAULT 1,
 	"isEnabled"	INTEGER NOT NULL DEFAULT 1,
+	"mirrorport"	INTEGER NOT NULL DEFAULT 0 UNIQUE,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-INSERT INTO "cameras" ("id","name","ip_address","port","path","frameskip","detectionarea","recordtime","alertlength","isTriggerable","isEnabled") VALUES (1,'PiZero1','192.168.1.14',8000,'/video_feed',4,300,20,5,1,1),
- (2,'Pi2','192.168.1.12',8000,'/video_feed',4,300,20,10,1,1),
- (3,'LaptopLeo','192.168.1.17',8000,'/video_feed',2,300,20,10,0,0);
+INSERT INTO "cameras" ("id","name","ip_address","port","path","frameskip","detectionarea","recordtime","alertlength","isTriggerable","isEnabled","mirrorport") VALUES (1,'PiZero1','192.168.137.91',8000,'/video_feed',4,1000,20,10,1,1,5000),
+ (2,'Pi2','192.168.137.151',8000,'/video_feed',4,1000,20,10,1,1,5001),
+ (3,'LaptopLeo','192.168.137.1',8000,'/video_feed',2,300,20,10,0,0,5002),
+ (4,'Localhost','127.0.0.1',8000,'/video_feed',4,1600,10,10,0,0,5003),
+ (5,'Vst','134.171.190.34',80,'/mjpg/video.mjpg',0,800,20,10,0,0,5004);
 COMMIT;

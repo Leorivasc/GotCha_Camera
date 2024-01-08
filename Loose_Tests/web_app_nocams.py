@@ -7,6 +7,10 @@
 # python3 proxy_stream.py for TESTING
 # gunicorn -c gunicorn_config.py app:app for PRODUCTION
 
+#This is a standalone server that connects to ALREADY CREATED camera streams
+#Those streams are local and must be created through the web_cam.py script
+#This server mostly proxies the streams, so that cameras are not affected by the workers problem
+
 from flask import Flask, render_template, Response, jsonify
 import cv2
 import datetime

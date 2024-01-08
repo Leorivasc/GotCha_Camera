@@ -1,25 +1,30 @@
 #This launcher is used to run the app in a production environment
 #It will launch a gunicorn process for each camera in the database
-#It always defaults to movement_fr_subs_stream.py <- may change in the future
+
+#Use: python launch.py
+
+#Will open a flask webserver for each camera and a gunicor server for the website
 
 import subprocess
 import os
 from app.classes import *
+from app.classes.functions import *
 from app import *
 
-#Change current dir to app
+#Change current dir to app. It all happens in the app folder
 os.chdir("app")
 #Prepare and read cameras config database
-db = SQLiteDB("database.sqlite")
-db.connect()
 cameras = read_config_all() #Read all enabled cameras
-db.connection.close()
+
 
 #Prepare gunicorn command
-camera_app="gunicorn -c mov_gunicorn_config.py movement_fr_subs_stream:app"
+#camera_app command will be executed for each camera in the database
+camera_app="python web_cam.py"
+#website_app command will be executed for the website
 website_app = "gunicorn -c web_gunicorn_config.py web_app:app"
 
-# Run the script for each camera
+
+# Starts each camera and website
 def run_scripts():
     processes = []
 
@@ -34,7 +39,8 @@ def run_scripts():
 
 
         try:
-            command = f"{camera_app} --bind 0.0.0.0:{mirror_port} --env CAMERA={camera_name}"
+            #command = f"{camera_app} --bind 0.0.0.0:{mirror_port} --env CAMERA={camera_name}"
+            command = f"CAMERA={camera_name} {camera_app}"
             proc = subprocess.Popen(command, shell=True)
             processes.append(proc)
             print(f"Process {camera_name} started")
