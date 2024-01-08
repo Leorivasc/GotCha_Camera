@@ -55,6 +55,8 @@ if not frame_thread.is_alive():
     print("Starting thread")
     frame_thread.start()
 
+
+
 if __name__ == "__main__" : 
 
     app.run(debug=False, threaded=True, port=cam['mirrorport'],host='0.0.0.0') 

@@ -11,16 +11,14 @@
 #Those streams are local and must be created through the web_cam.py script
 #This server mostly proxies the streams, so that cameras are not affected by the workers problem
 
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, send_from_directory
 import cv2
 
 from classes.functions import * #helper functions
 import socket
+import os
 
 app = Flask(__name__)
-
-#-----------Functions-----------------
-
 
 
 
@@ -53,16 +51,20 @@ cameras = read_config_all()
 def index():
     return render_template('index.html')
 
+
+
 #Camera streaming route (processed images, needs more workers)
 @app.route('/cameras_processed')
 def cameras_proxied():
     return render_template('cameras_processed.html', cameras=cameras)
 
 
+
 #Camera streaming route (fast, directly from cameras)
 @app.route('/cameras_fast')
 def cameras_fast():
     return render_template('cameras_fast.html', cameras=cameras)
+
 
 
 #Video feed route for camera with id=camera_id (PROXY)
@@ -73,6 +75,8 @@ def video_feed(camera_id):
     #camera_url = f"{camera['address']}/video_feed" #The actual feed
     
     return Response(generate_frames(camera_url), content_type='multipart/x-mixed-replace; boundary=frame')
+
+
 
 #Video feed route for processed video using three frame difference
 @app.route('/video_local_stream')
@@ -95,5 +99,19 @@ def getcameras():
     return jcameras
 
 
+#Listing of camera recordings
+@app.route('/list_recordings')
+def file_list():
+    # Gets the list of files in the uploads folder
+    files = os.listdir("recordings")
+    return render_template('list_recordings.html', files=files)
+
+#Downloads for recordings
+@app.route('/download/<filename>')
+def download_file(filename):
+    # Manejar las descargas de archivos
+    return send_from_directory("recordings", filename)
+
+
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, port=8080, host='0.0.0.0')
+    app.run(debug=False, threaded=True, port=8080, host='0.0.0.0')

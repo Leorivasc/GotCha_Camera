@@ -14,7 +14,7 @@ class VideoRecorder:
         self.filename = None
         self.video_out = None
 
-        self.tempfilename = f"{self.camera_name}_alert.avi"
+        self.tempfilename = f"{self.camera_name}_alert.webm"
         self.recording = False
         
         #Get the path to the database file
@@ -25,9 +25,10 @@ class VideoRecorder:
         self.recording = True
         if self.date == None:
             self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
-            self.filename=f"alarm_{self.camera_name}_{self.date}.avi" #Set filename
+            self.filename=f"alarm_{self.camera_name}_{self.date}.webm" #Set filename
             self.iniTicks = cv2.getTickCount() #Set initial time
-            self.video_out = cv2.VideoWriter(self.tempfilename, cv2.VideoWriter_fourcc(*'XVID'), 12, (320,240))  # Resolution
+            #self.video_out = cv2.VideoWriter(self.tempfilename, cv2.VideoWriter_fourcc(*'XVID'), 12, (320,240))  # Resolution
+            self.video_out = cv2.VideoWriter(self.tempfilename, cv2.VideoWriter_fourcc(*'VP90'), 12, (320,240))
             print(f"Recording {self.camera_name}")
 
 
@@ -81,10 +82,11 @@ class VideoRecorder:
             exit()
 
         #Configure video recording
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.avi', fourcc, 12, (320,240))
+        #fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*'VP90')
+        video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.webm', fourcc, 12, (320,240))
 
-        newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.avi"
+        newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
 
         #Graba la secuencia de video durante 10 segundos
         ini_time = cv2.getTickCount()
@@ -118,7 +120,7 @@ class VideoRecorder:
         video_out.release()
         print("Recording finished")
         self.recording = False #Recording finished
-        os.rename(f"alarm_{self.camera_name}.avi", os.path.join(self.destfolder,newname))
+        os.rename(f"alarm_{self.camera_name}.webm", os.path.join(self.destfolder,newname))
 
     def justRecord(self,url,timespan):
         if self.recording:
