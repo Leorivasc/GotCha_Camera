@@ -4,8 +4,11 @@ let mask;
 
 let black;
 let brushSize = 20;
+
+let camera_name = ""
+
 function setup() {
-  let canvas = createCanvas(1000, 1000);
+  let canvas = createCanvas(320, 240);
   //canvas.parent('canvas');
   
   //show canvas
@@ -21,6 +24,71 @@ function setup() {
   document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
   document.getElementById('saveLocalButton').addEventListener('click', saveMaskLocally, false);
   document.getElementById('uploadButton').addEventListener('click', uploadMaskToServer, false);
+  document.getElementById('loadFromCamera').addEventListener('click', loadFromCamera, false);
+  document.getElementById('invertColor').addEventListener('click', invertColor, false);
+
+  //get camera name
+  camera_name = document.getElementById('cameraName').value;
+}
+
+function loadFromCamera(){
+  snapshoturl = document.getElementById('snapShotURL').value;
+
+  img = loadImage(snapshoturl, function() {
+    resizeCanvas(img.width, img.height);
+    mask = createImage(img.width, img.height);
+   
+    image(img, 0, 0);
+
+    // Create the mask image. It is all white, opaque, and the same size as the loaded image
+    mask.loadPixels();
+    for (let i = 0; i < mask.width * mask.height * 4; i += 4) {
+      mask.pixels[i] = 255;
+      mask.pixels[i + 1] = 255;
+      mask.pixels[i + 2] = 255;
+      mask.pixels[i + 3] = 1; // 1 to pass the if
+    }
+    mask.updatePixels();
+
+
+    // Create a black image to use as copy source
+    black = createImage(img.width, img.height);
+    black.loadPixels();
+    for (let i = 0; i < black.width * black.height * 4; i += 4) {
+      black.pixels[i] = 0;
+      black.pixels[i + 1] = 0;
+      black.pixels[i + 2] = 0;
+      black.pixels[i + 3] = 255; // 0 = transparent, 255 = opaque
+    }
+    black.updatePixels();
+
+  }, function(e) {
+    console.log('Error loading image:', e);
+  });
+
+}
+
+
+function invertColor(){
+//Will invert the color of the mask
+  if (img && mask) {
+    mask.loadPixels();
+    for (let i = 0; i < width * height * 4; i += 4) {
+      if (mask.pixels[i] === 0 && mask.pixels[i + 1] === 0 && mask.pixels[i + 2] === 0) {
+        mask.pixels[i] = 255;
+        mask.pixels[i + 1] = 255;
+        mask.pixels[i + 2] = 255;
+        mask.pixels[i + 3] = 255; //255 = opaque
+      } else {
+        mask.pixels[i] = 0;
+        mask.pixels[i + 1] = 0;
+        mask.pixels[i + 2] = 0;
+        mask.pixels[i + 3] = 255;//255 = opaque
+      }
+    }
+    mask.updatePixels();
+  }
+
 }
 
 
@@ -119,11 +187,12 @@ function saveMaskLocally() {
 //Upload the mask image to the server
 function uploadMaskToServer() {
   if (img && mask) {
-    prepareMask();
+    //prepareMask();
+    mask2onezeros();
     mask.canvas.toBlob(function(blob) {
       let formData = new FormData();
-      formData.append('mask', blob, 'mask.jpg');
-      fetch('/upload', {
+      formData.append('mask', blob, 'mask_'+camera_name+'.jpg');
+      fetch('/upload_mask', {
         method: 'POST',
         body: formData
       })
@@ -159,4 +228,37 @@ function prepareMask(){
     }
   }
   mask.updatePixels();
+}
+
+function mask2onezeros(){
+  mask.loadPixels();
+  for (let i = 0; i < width * height * 4; i += 4) {
+    if (mask.pixels[i] === 0 && mask.pixels[i + 1] === 0 && mask.pixels[i + 2] === 0) {
+      mask.pixels[i] = 0;
+      mask.pixels[i + 1] = 0;
+      mask.pixels[i + 2] = 0;
+      mask.pixels[i + 3] = 255; //255 = opaque
+    } else {
+      mask.pixels[i] = 1;
+      mask.pixels[i + 1] = 1;
+      mask.pixels[i + 2] = 1;
+      mask.pixels[i + 3] = 255;//255 = opaque
+    }
+  }
+  mask.updatePixels();
+}
+
+//convert mask to bmp of 0 and 1
+function convertMaskToBMP(){
+  let bmp = [];
+  mask.loadPixels();
+  for (let i = 0; i < width * height * 4; i += 4) {
+    if (mask.pixels[i] === 0 && mask.pixels[i + 1] === 0 && mask.pixels[i + 2] === 0) {
+      bmp.push(0);
+    } else {
+      bmp.push(1);
+    }
+  }
+  mask.updatePixels();
+  return bmp;
 }

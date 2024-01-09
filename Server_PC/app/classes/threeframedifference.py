@@ -98,17 +98,27 @@ class Three_Frame_Difference:
             threshold_diff = cv2.dilate(threshold_diff, np.ones((5, 5), np.uint8), iterations=2)
 
 
+            #----Masking areas on image----#
             #If MASK is found, apply it to the frame. 'name' must match the camera name
             mask = cv2.imread(f"masks/mask_{self.camera_name}.jpg",cv2.COLOR_BGR2GRAY)
             if mask is None:
+                #If not found, create a default mask
                 print("Mask not found. Creating default mask")
                 fn.createMask(self.camera_name) #Create default null mask (filled with '1')
                 mask = cv2.imread(f"masks/mask_{self.camera_name}.jpg",cv2.COLOR_BGR2GRAY) #Read the mask again
                 
 
-            #We apply the m ask image to exclude image areas with "0" in the mask
+            #We apply the mask image to exclude image areas with "0" in the mask
             #diff = cv2.bitwise_and(diff,mask)
-            threshold_diff = cv2.multiply(threshold_diff,mask) #Works with grayscale images
+            try:    
+                #This operation fails on uploaded images because of the 3rd dimension in the mask
+                threshold_diff = cv2.multiply(threshold_diff,mask) #Works with grayscale images
+            except:
+                #Remove 3rd dimension from mask and retry
+                mask=mask[:,:,0] #If mask is RGB, convert to grayscale
+                threshold_diff = cv2.multiply(threshold_diff,mask) #Retry
+
+
 
 
 
@@ -212,3 +222,15 @@ class Three_Frame_Difference:
                     b'Content-Type: image/jpeg\r\n'
                     b'Content-Length: ' + f"{len(frame_bytes)}".encode() + b'\r\n'
                     b'\r\n' + frame_bytes + b'\r\n')    
+
+
+    def snapshot(self):
+        """Return the last frame as a JPEG image."""
+        with self.frame_lock:
+            if self.last_frame is None:
+                return None
+
+            _, buffer = cv2.imencode('.jpg', self.last_frame)
+            frame_bytes = buffer.tobytes()
+
+        return frame_bytes

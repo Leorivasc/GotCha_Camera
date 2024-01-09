@@ -13,6 +13,7 @@
 
 from flask import Flask, render_template, Response, jsonify, send_from_directory
 import cv2
+from flask import request
 
 from classes.functions import * #helper functions
 import socket
@@ -41,8 +42,8 @@ def generate_frames(camera_url):
                    b'\r\n' + frame_bytes + b'\r\n')
     cap.release()
 
-
-#-----------Routes-----------------
+###################################
+#-----------Routes----------------#
 
 cameras = read_config_all()
 
@@ -99,6 +100,7 @@ def getcameras():
     return jcameras
 
 
+#-----------Recordings routes-----------------
 #Listing of camera recordings
 @app.route('/list_recordings')
 def file_list():
@@ -112,6 +114,39 @@ def download_file(filename):
     # Manejar las descargas de archivos
     return send_from_directory("recordings", filename)
 
+
+#-----------Mask app-----------------
+#Mask app
+@app.route('/mask_app/<camera_name>')
+def mask_app(camera_name):
+     #Get server IP to present links properly
+    host_name = socket.gethostname()
+    server_ip = socket.gethostbyname(host_name)
+    camera = read_config(camera_name)
+
+    return render_template('mask_app.html', camera=camera, host_name = host_name, server_ip = server_ip)
+
+# Mask upload route
+@app.route('/upload_mask', methods=['POST'])
+def upload_file():
+    #Verify right request
+    if 'mask' not in request.files:
+        return 'File not sent'
+
+    file = request.files['mask']
+
+    # Verificar si el nombre del archivo está vacío
+    if file.filename == '':
+        return 'No filename'
+
+    # Verificar si la extensión del archivo es permitida
+    if file and file.filename.endswith(".jpg"):
+        # Asegurar el nombre del archivo y guardarlo en la carpeta de carga
+        filename = file.filename
+        file.save(os.path.join("masks", filename))
+        return 'File uploaded successfully'
+
+    return 'File not allowed'
 
 if __name__ == '__main__':
     app.run(debug=False, threaded=True, port=8080, host='0.0.0.0')

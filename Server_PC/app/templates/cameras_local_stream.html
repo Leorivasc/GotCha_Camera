@@ -19,12 +19,23 @@
 <body>
     <div class="row">
         {% for camera in cameras %}
-        <div class="column">
+        <div class="column" id="video">
             <div class="stream-container">
-                <div class="tag-label">{{ camera.name }}</div>
-                <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
-                                
+                <div class="column">
+                    <div class="tag-label">{{ camera.name }}</div>
+                    <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
+                </div> 
+               
+                   
             </div>
+        </div>
+        <div class="column" id="data">
+            {{ camera.id }}<br>
+            {{ camera.name }}<br>
+            {{ camera.path }}<br>
+            {{ camera.mirrorport }}<br>
+            {{ camera.server_ip }}<br>
+            <a href="/mask_app/{{ camera.name }}" class="button">Mask</a>
         </div>
             {% endfor %}
         

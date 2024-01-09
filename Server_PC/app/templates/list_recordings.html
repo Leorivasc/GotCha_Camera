@@ -10,7 +10,7 @@
     <ul>
         {% for file in files %}
             <li><a href="{{ url_for('download_file', filename=file) }}" download>{{ file }}</a></li>
-            <video width="640" height="480" controls>
+            <video width="320" height="240" controls>
                 <source src="{{ url_for('download_file', filename=file) }}" type="video/webm">
             </video>
         {% endfor %}

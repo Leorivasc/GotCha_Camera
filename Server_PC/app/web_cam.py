@@ -37,6 +37,9 @@ def video_feed():
     return Response(cam_obj.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+@app.route('/snapshot')
+def snapshot():
+    return Response(cam_obj.snapshot(), mimetype='image/jpeg')
 
 #### Init portion ####
 
