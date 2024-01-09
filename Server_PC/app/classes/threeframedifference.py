@@ -99,6 +99,13 @@ class Three_Frame_Difference:
 
 
             #----Masking areas on image----#
+            #We apply a mask to the image to exclude areas that are not of interest
+            #This is useful to exclude areas that are always moving (like trees or flags or pedestrians)
+
+            #This is achieved by multiplying the mask image by the threshold_diff image (1 or 0)
+            #The mask image must be the same size as the threshold_diff image
+            #The mask image must be grayscale (1 channel)
+            
             #If MASK is found, apply it to the frame. 'name' must match the camera name
             mask = cv2.imread(f"masks/mask_{self.camera_name}.jpg",cv2.COLOR_BGR2GRAY)
             if mask is None:
@@ -120,7 +127,7 @@ class Three_Frame_Difference:
 
 
 
-
+            #----Detecting contours----#
 
             # Find contours in the thresholded image
             contours, _ = cv2.findContours(threshold_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

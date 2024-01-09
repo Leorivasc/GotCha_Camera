@@ -14,13 +14,13 @@
 from flask import Flask, render_template, Response, jsonify, send_from_directory
 import cv2
 from flask import request
-
+from flask_cors import CORS
 from classes.functions import * #helper functions
 import socket
 import os
 
 app = Flask(__name__)
-
+CORS(app) #To allow cross-origin requests
 
 
 #Generates the frames to be served locally

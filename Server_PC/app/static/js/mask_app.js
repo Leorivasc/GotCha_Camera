@@ -232,21 +232,20 @@ function prepareMask(){
 
 function mask2onezeros(){
   mask.loadPixels();
-  for (let i = 0; i < width * height * 4; i += 4) {
-    if (mask.pixels[i] === 0 && mask.pixels[i + 1] === 0 && mask.pixels[i + 2] === 0) {
-      mask.pixels[i] = 0;
-      mask.pixels[i + 1] = 0;
-      mask.pixels[i + 2] = 0;
-      mask.pixels[i + 3] = 255; //255 = opaque
-    } else {
-      mask.pixels[i] = 1;
-      mask.pixels[i + 1] = 1;
-      mask.pixels[i + 2] = 1;
-      mask.pixels[i + 3] = 255;//255 = opaque
+  bmp=[];
+  for (let i=0; i<width*height*4; i+=4){
+    byte = (mask.pixels[i]+mask.pixels[i+1]+mask.pixels[i+2])/3; //average of RGB
+    if (byte>2){
+      bmp.push(1);  
+    }else{
+      bmp.push(0);
     }
   }
+
   mask.updatePixels();
+  return bmp;
 }
+
 
 //convert mask to bmp of 0 and 1
 function convertMaskToBMP(){

@@ -30,18 +30,39 @@
             </div>
         </div>
         <div class="column" id="data">
-            {{ camera.id }}<br>
+        <!----    {{ camera.id }}<br>
             {{ camera.name }}<br>
             {{ camera.path }}<br>
             {{ camera.mirrorport }}<br>
-            {{ camera.server_ip }}<br>
+            {{ camera.server_ip }}<br>-->
             <a href="/mask_app/{{ camera.name }}" class="button">Mask</a>
+            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
         </div>
             {% endfor %}
         
     </div>
     
     <a href="/" class="button">Back</a>
-   
+ 
+    <script>
+        function setAlert(cameraName,cameraip, cameraport){
+            var alertButton = document.getElementById("alert_"+cameraName);
+            if (alertButton.innerHTML == "Alert"){
+                alertButton.innerHTML = "Stop Alert";
+                alertButton.style.backgroundColor = "red";
+                fetch("http://" + cameraip + ":" + cameraport + "/alert")
+            }
+            else{
+                alertButton.innerHTML = "Alert";
+                alertButton.style.backgroundColor = "green";
+                fetch("http://" + cameraip + ":" + cameraport + "/clear")
+            }
+        }
+        
+    </script>   
+
+
 </body>
+
+
 </html>
