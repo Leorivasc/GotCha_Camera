@@ -75,8 +75,7 @@ class VideoRecorder:
         self.url=url
 
         #Init camera
-        cap = cv2.VideoCapture(f"{self.url}/{self.camera_config['path']}")
-
+        cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
         #Verify cam opening
         if not cap.isOpened():
             print("Error opening camera.")
