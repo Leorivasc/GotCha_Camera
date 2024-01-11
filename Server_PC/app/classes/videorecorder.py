@@ -9,6 +9,7 @@ class VideoRecorder:
     
     def __init__(self, camera_name):
         self.camera_name = camera_name
+        self.camera_config = fn.read_config(camera_name)
         self.date = None
         self.iniTicks = None
         self.filename = None
@@ -74,7 +75,7 @@ class VideoRecorder:
         self.url=url
 
         #Init camera
-        cap = cv2.VideoCapture(f"{self.url}/video_feed")
+        cap = cv2.VideoCapture(f"{self.url}/{self.camera_config['path']}")
 
         #Verify cam opening
         if not cap.isOpened():
