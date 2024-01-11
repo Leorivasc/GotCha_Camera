@@ -84,7 +84,7 @@ def video_feed(camera_id):
 def video_local_stream():
 
     #Get server IP to present links properly
-    host_name = socket.gethostname()
+    host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address
     server_ip = socket.gethostbyname(host_name)
 
     #Send cameras and server data to the template
