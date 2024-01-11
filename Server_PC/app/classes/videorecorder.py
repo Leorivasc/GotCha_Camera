@@ -9,7 +9,7 @@ class VideoRecorder:
     
     def __init__(self, camera_name):
         self.camera_name = camera_name
-        self.camera_config = fn.read_config(camera_name)
+        self.camera_config = fn.read_config(camera_name)[0]
         self.date = None
         self.iniTicks = None
         self.filename = None
