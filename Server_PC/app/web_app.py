@@ -109,6 +109,7 @@ def file_list():
     #files = os.listdir("recordings")
     os.chdir("recordings")
     files = glob.glob("*.webm")
+    os.chdir("..")
     return render_template('list_recordings.html', files=files)
 
 #Downloads for recordings
