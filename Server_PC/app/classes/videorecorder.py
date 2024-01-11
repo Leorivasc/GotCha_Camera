@@ -3,7 +3,7 @@ import datetime
 import os
 import threading
 from . import functions as fn
-
+import time
 
 class VideoRecorder:
     
@@ -94,6 +94,7 @@ class VideoRecorder:
         #Recording loop
         while True:
 
+            time.sleep(0.083) #12fps
             #Read frame
             ret, frame = cap.read()
 
