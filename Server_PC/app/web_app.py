@@ -18,6 +18,7 @@ from flask_cors import CORS
 from classes.functions import * #helper functions
 import socket
 import os
+import glob
 
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
@@ -105,7 +106,8 @@ def getcameras():
 @app.route('/list_recordings')
 def file_list():
     # Gets the list of files in the uploads folder
-    files = os.listdir("recordings")
+    #files = os.listdir("recordings")
+    files = glob.glob("recordings/*.webm")
     return render_template('list_recordings.html', files=files)
 
 #Downloads for recordings
