@@ -107,7 +107,8 @@ def getcameras():
 def file_list():
     # Gets the list of files in the uploads folder
     #files = os.listdir("recordings")
-    files = glob.glob("recordings/*.webm")
+    os.chdir("recordings")
+    files = glob.glob("*.webm")
     return render_template('list_recordings.html', files=files)
 
 #Downloads for recordings
