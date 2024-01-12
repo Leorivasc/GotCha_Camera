@@ -17,7 +17,7 @@
     
     <button class = 'button' id="loadFromCamera">Load from Camera</button>
         <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
-        <input type="hidden" id="snapShotURL" value = "http://{{host_name}}:{{camera[0].mirrorport}}/snapshot">
+        <input type="hidden" id="snapShotURL" value = "http://{{server_ip}}:{{camera[0].mirrorport}}/snapshot">
     <button class = 'button' id="invertColor">Invert</button>
     <button class = 'button' id="saveLocalButton">Save Mask Locally</button>
     <button class = 'button' id="uploadButton">Upload Mask to Server</button>
