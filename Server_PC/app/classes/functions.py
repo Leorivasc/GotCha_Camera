@@ -104,7 +104,7 @@ def createMask(camera_name):
     image[:]=1 #All image is '1' (image looks black and makes no effect on the analysis)
     cv2.imwrite(f'masks/mask_{camera_name}.jpg', image)
     
-def loopUntilRead(cap, url):
+def loopUntilRead(cap,url):
     """This function checks the connection to the camera and restarts the loop if connection is lost.
     It must be run on its own thread so that it does not block the main thread
     Args:
@@ -119,6 +119,7 @@ def loopUntilRead(cap, url):
         time.sleep(5) #Retry in 5 seconds
         print("Trying to reconnect...")
         try:
+            cap.release()
             cap = cv2.VideoCapture(f"{url}/video_feed") 
             _, frame = cap.read()
         except:
@@ -126,5 +127,5 @@ def loopUntilRead(cap, url):
         finally:
             if _:
                 print("Connection reestablished")                
-                return frame
+                return (True,frame,cap)
 

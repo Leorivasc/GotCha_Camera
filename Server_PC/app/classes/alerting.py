@@ -26,6 +26,9 @@ class Alerting:
 
 
     def startAlert(self):
+
+        self.camera_conf = fn.read_config(self.camera_name)[0] #Refresh configuration from DB (in case it has changed)
+        
         conn_ok, alertstatus = fn.do_get(f"{self.url}/status")
         alertstatus=json.loads(alertstatus) #Reads JSON status from camera
 

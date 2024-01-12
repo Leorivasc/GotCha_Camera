@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<!--This page is used to display the local stream of the cameras passing through 'movement_fr_subs_stream.py'-->
+<!-- NOT IN USE-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="1800">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Camera </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="row">
+        {% for camera in cameras %}
+            <div class="column" id="video">
+                <div class = "row">
+
+                    <div class="column">
+                        <div class="stream-container">
+                            <div class="column">
+                                <div class="tag-label">{{ camera.name }}</div>
+                                <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
+                            </div> 
+                        </div>
+                    </div>
+          
+                    <div class="column" id="data" style="margin-top:5px">
+                        <div class="row">
+                        <a href="/mask_app/{{ camera.name }}" class="buttongreen">Mask</a>
+                        </div>
+                        {% if camera.isTriggerable== 1 %}
+                        <div class="row">
+                        <a href="#" id="alert_{{camera.name}}" class="buttongreen" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
+                        </div>
+                        {% endif %}
+                    
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+    </div>
+    
+    <a href="/" class="button">Back</a>
+ 
+    <script>
+        function setAlert(cameraName,cameraip, cameraport){
+            var alertButton = document.getElementById("alert_"+cameraName);
+            if (alertButton.innerHTML == "Alert"){
+                alertButton.innerHTML = "Clear";
+                alertButton.classList.replace("buttongreen","buttonred");
+                fetch("http://" + cameraip + ":" + cameraport + "/alarm")
+            }
+            else{
+                alertButton.innerHTML = "Alert";
+                alertButton.classList.replace("buttonred","buttongreen");
+                fetch("http://" + cameraip + ":" + cameraport + "/clear")
+            }
+        }
+        
+    </script>   
+
+
+</body>
+
+
+</html>

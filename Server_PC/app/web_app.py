@@ -81,15 +81,15 @@ def video_feed(camera_id):
 
 
 #Video feed route for processed video using three frame difference
-@app.route('/video_local_stream')
+@app.route('/local_stream')
 def video_local_stream():
-
+    cameras = read_config_all() #Refresh cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address
     server_ip = socket.gethostbyname(host_name)
 
     #Send cameras and server data to the template
-    return render_template('cameras_local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip)
+    return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip)
     
 
 
@@ -153,4 +153,4 @@ def upload_file():
     return 'File not allowed'
 
 if __name__ == '__main__':
-    app.run(debug=False, threaded=True, port=8080, host='0.0.0.0')
+    app.run(debug=True, threaded=True, port=8080, host='0.0.0.0')

@@ -68,11 +68,12 @@ class VideoRecorder:
         return self.recording
     
     
-    def _justRecord(self,url,timespan):
-        #Will roughly record timespan seconds of video on its own routine. Not using other functions
-        #use this function on its own thread
+    def _justRecordWEBM(self,url,timespan):
+        #vp90 seem to work but accelerates video
+        #vp80 seems to work ok
 
         self.url=url
+        self.tempfilename = f"{self.camera_name}_alert.webm"
 
         #Init camera
         cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
@@ -83,7 +84,7 @@ class VideoRecorder:
 
         #Configure video recording
         #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        fourcc = cv2.VideoWriter_fourcc(*'VP90')
+        fourcc = cv2.VideoWriter_fourcc(*'vp80')
         video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.webm', fourcc, 12, (320,240))
 
         newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
@@ -123,12 +124,127 @@ class VideoRecorder:
         self.recording = False #Recording finished
         os.rename(f"alarm_{self.camera_name}.webm", os.path.join(self.destfolder,newname))
 
+    def _justRecordAVI(self,url,timespan):
+            #Will record AVI. Not using other functions
+            #Not compatible with web browsers
+
+            self.url=url
+            self.tempfilename = f"{self.camera_name}_alert.avi"
+
+            #Init camera
+            cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
+            #Verify cam opening
+            if not cap.isOpened():
+                print("Error opening camera.")
+                exit()
+
+            #Configure video recording
+            #fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.avi', fourcc, 12, (320,240))
+
+            newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.avi"
+
+            #Graba la secuencia de video durante 10 segundos
+            ini_time = cv2.getTickCount()
+
+            #Recording loop
+            while True:
+
+                time.sleep(0.083) #12fps
+                #Read frame
+                ret, frame = cap.read()
+
+                if not ret:
+                    print("Error capturing frame.")
+                    break
+
+                #Print datetime on frame
+                frame = fn.add_datetime(frame)
+                frame = fn.add_text(frame,self.camera_name,10,20)
+
+                #Record frame
+                video_out.write(frame)
+
+                #Breaks after 'duration' seconds
+                current_time = cv2.getTickCount()
+                time_passed = (current_time - ini_time) / cv2.getTickFrequency()
+                #print(time_passed) #DEBUG
+                if time_passed > timespan:
+                    break
+
+            #Free resources
+            cap.release()
+            video_out.release()
+            print("Recording finished")
+            self.recording = False #Recording finished
+            os.rename(f"alarm_{self.camera_name}.avi", os.path.join(self.destfolder,newname))
+
+    def _justRecordMP4(self,url,timespan):
+            #Records MP4. Not using other functions
+            #Not compatible with web browsers
+            #OPENCV with its own codec. Not compatible with browsers
+
+            self.url=url
+            self.tempfilename = f"{self.camera_name}_alert.mp4"
+
+            #Init camera
+            cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
+            #Verify cam opening
+            if not cap.isOpened():
+                print("Error opening camera.")
+                exit()
+
+            #Configure video recording
+            #fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+            #fourcc = 0x00000021
+            video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.mp4', fourcc, 12, (320,240))
+
+            newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.mp4"
+
+            #Graba la secuencia de video durante 10 segundos
+            ini_time = cv2.getTickCount()
+
+            #Recording loop
+            while True:
+
+                time.sleep(0.083) #12fps
+                #Read frame
+                ret, frame = cap.read()
+
+                if not ret:
+                    print("Error capturing frame.")
+                    break
+
+                #Print datetime on frame
+                frame = fn.add_datetime(frame)
+                frame = fn.add_text(frame,self.camera_name,10,20)
+
+                #Record frame
+                video_out.write(frame)
+
+                #Breaks after 'duration' seconds
+                current_time = cv2.getTickCount()
+                time_passed = (current_time - ini_time) / cv2.getTickFrequency()
+                #print(time_passed) #DEBUG
+                if time_passed > timespan:
+                    break
+
+            #Free resources
+            cap.release()
+            video_out.release()
+            print("Recording finished")
+            self.recording = False #Recording finished
+            os.rename(f"alarm_{self.camera_name}.mp4", os.path.join(self.destfolder,newname))
+
+
     def justRecord(self,url,timespan):
         if self.recording:
             print("Busy recording")
             return
         print(f"Recording {self.camera_name}, {timespan} seconds")
         self.recording = True
-        thread = threading.Thread(target=self._justRecord, args=(url,timespan,))
+        thread = threading.Thread(target=self._justRecordWEBM, args=(url,timespan,))
         thread.start()
 

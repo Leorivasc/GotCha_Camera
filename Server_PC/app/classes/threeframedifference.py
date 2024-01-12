@@ -76,8 +76,10 @@ class Three_Frame_Difference:
             read, frame3 = cap.read()
             
             #Loop to reconnect if connection is lost. It will loop until a frame is read again
-            if not read:
-                 frame3=fn.loopUntilRead(cap, self.url) #Reconnect and return frame. Should hang in here until frame is read again
+            #cap dies if connection is lost. loopUntilRead() will loop until a frame is read again
+            #and return a new cap object and a new frame to resume the loop
+            while read==False:
+                 (read,frame3,cap)=fn.loopUntilRead(cap,self.url) #Reconnect and return frame. Should hang in here until frame is read again
                             
 
             #Calculate difference between consecutive frames
