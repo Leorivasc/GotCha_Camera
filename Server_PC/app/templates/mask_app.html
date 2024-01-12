@@ -17,10 +17,20 @@
     
     <button class = 'button' id="loadFromCamera">Load from Camera</button>
         <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
-        <input type="hidden" id="snapShotURL" value = "http://{{server_ip}}:{{camera[0].mirrorport}}/snapshot">
+        <input type="hidden" id="snapShotURL" value = ":{{camera[0].mirrorport}}/snapshot">
     <button class = 'button' id="invertColor">Invert</button>
     <button class = 'button' id="saveLocalButton">Save Mask Locally</button>
     <button class = 'button' id="uploadButton">Upload Mask to Server</button>
 
+
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+        
+            var hostname = window.location.hostname;
+            var snapshoturl = document.getElementById("snapShotURL");
+            snapshoturl.value = "http://"+ hostname + snapshoturl.value;
+
+    });
+    </script>
 </body>
 </html>
