@@ -39,7 +39,12 @@ def video_feed():
 
 @app.route('/snapshot')
 def snapshot():
-    return Response(cam_obj.snapshot(), mimetype='image/jpeg')
+    #response.headers.add('Access-Control-Allow-Origin', '*')
+    #return Response(cam_obj.snapshot(), mimetype='image/jpeg')
+
+    response = Response(cam_obj.snapshot(), mimetype='image/jpeg')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 #### Init portion ####
 

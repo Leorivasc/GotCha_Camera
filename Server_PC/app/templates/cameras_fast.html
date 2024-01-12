@@ -15,7 +15,7 @@
 <body>
     <div class="row">
         {% for camera in cameras %}
-        <div class="column">
+        <div class="column card">
             <div class="stream-container">
                 <div class="tag-label">{{ camera.name }}</div>
                 <img class="stream" width="640" height="480" src="http://{{camera.ip_address}}:{{camera.port}}{{camera.path}}" alt="Connecting...">
@@ -26,7 +26,19 @@
         
     </div>
     
-    <a href="/" class="button">Back</a>
+    <div class="row"><a href="#" class="buttongreen center" id="buttonBack">Back</a></div>
    
+    <script>
+        //OnLoad event
+        document.addEventListener("DOMContentLoaded", (event) => {
+        
+            // Goes back to the previous page
+            var buttonBack = document.getElementById("buttonBack");
+            buttonBack.addEventListener("click", (event) => {
+                window.history.back();
+            });
+
+    });
+    </script>
 </body>
 </html>

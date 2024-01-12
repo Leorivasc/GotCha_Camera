@@ -9,7 +9,7 @@ let camera_name = ""
 
 function setup() {
   let canvas = createCanvas(320, 240);
-  //canvas.parent('canvas');
+  canvas.parent('canvasHolder');
   
   //show canvas
   canvas.style('display', 'block');
@@ -21,8 +21,8 @@ function setup() {
   canvas.style('margin-right', 'auto');
 
 
-  document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
-  document.getElementById('saveLocalButton').addEventListener('click', saveMaskLocally, false);
+  //document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+  //document.getElementById('saveLocalButton').addEventListener('click', saveMaskLocally, false);
   document.getElementById('uploadButton').addEventListener('click', uploadMaskToServer, false);
   document.getElementById('loadFromCamera').addEventListener('click', loadFromCamera, false);
   document.getElementById('invertColor').addEventListener('click', invertColor, false);

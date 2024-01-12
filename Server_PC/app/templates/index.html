@@ -5,12 +5,19 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <h1>GotCha!</h1>
-  <p>Surveillance server</p>
-  <a href="/cameras_fast" class="button">Raw Video</a>
-  <a href="/local_stream" class="button">Processed Video</a>
-  <a href="/list_recordings" class="button">List Recordings</a>
+  <div class="container">
 
+    <div class="row">
+      <div class="center col-4 card " style="margin:auto">
+        <h1>GotCha!</h1>
+        <p>Surveillance server</p>
+        <a href="/cameras_fast" class="buttongreen">Raw Video</a>
+        <a href="/local_stream" class="buttongreen">Processed Video</a>
+        <a href="/list_recordings" class="buttongreen">List Recordings</a>
+      </div>
+    </div>  
+
+</div>
   
 </body>
 </html>

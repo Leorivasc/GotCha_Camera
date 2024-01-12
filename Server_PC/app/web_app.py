@@ -1,10 +1,10 @@
 # This is the main file that runs the server
 # It is responsible for serving the html templates and the video feed
 # It also contains the list of cameras that will be served
-# It serves the main page at localhost:5000
+# It serves the main page at localhost:8080
 
 # Start the server with:
-# python3 proxy_stream.py for TESTING
+# python3 web_app.py for TESTING
 # gunicorn -c gunicorn_config.py app:app for PRODUCTION
 
 #This is a standalone server that connects to ALREADY CREATED camera streams
@@ -69,7 +69,8 @@ def cameras_fast():
 
 
 
-#Video feed route for camera with id=camera_id (PROXY)
+#Video feed route for camera with id=camera_id (PROXY direct from cameras)
+#NOT USED (only for testing)
 @app.route('/video_feed/<int:camera_id>')
 def video_feed(camera_id):
     camera = cameras[camera_id]
@@ -81,11 +82,13 @@ def video_feed(camera_id):
 
 
 #Video feed route for processed video using three frame difference
+#i.e. the video feed is processed by the web_cam.py script, so it has the mask and border drawings
+#it redirects to 'mirror' ports.
 @app.route('/local_stream')
 def video_local_stream():
     cameras = read_config_all() #Refresh cameras list and config
     #Get server IP to present links properly
-    host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address
+    host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
     server_ip = socket.gethostbyname(host_name)
 
     #Send cameras and server data to the template
@@ -139,13 +142,13 @@ def upload_file():
 
     file = request.files['mask']
 
-    # Verificar si el nombre del archivo está vacío
+    # Check empty filename
     if file.filename == '':
         return 'No filename'
 
-    # Verificar si la extensión del archivo es permitida
+    #Check permitted file type
     if file and file.filename.endswith(".jpg"):
-        # Asegurar el nombre del archivo y guardarlo en la carpeta de carga
+        #Proceed to save file
         filename = file.filename
         file.save(os.path.join("masks", filename))
         return 'File uploaded successfully'

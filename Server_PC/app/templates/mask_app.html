@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Masking Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
     <style>
@@ -12,23 +13,40 @@
 </head>
 <body>
     <h1>Image Masking Application</h1>
-    <input type="file" id="fileInput" accept=".jpg">
-    <canvas id="canvas"></canvas>
     
-    <button class = 'button' id="loadFromCamera">Load from Camera</button>
-        <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
-        <input type="hidden" id="snapShotURL" value = ":{{camera[0].mirrorport}}/snapshot">
-    <button class = 'button' id="invertColor">Invert</button>
-    <button class = 'button' id="saveLocalButton">Save Mask Locally</button>
-    <button class = 'button' id="uploadButton">Upload Mask to Server</button>
-
-
+    <div id="imageContainer" class="container">
+        <div class="row">
+            <div class="col">
+                <div id="canvasHolder"></div>  
+            </div>
+            <div class="col-2"> 
+                <div class="row">
+                    <!--<input type="file" id="fileInput" accept=".jpg">-->
+                    <a href="#" class = 'buttongreen' id="loadFromCamera">Load</a>
+                        <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
+                        <input type="hidden" id="snapShotURL" value = ":{{camera[0].mirrorport}}/snapshot">
+                    <a href="#" class = 'buttongreen' id="invertColor">Invert</a>
+                    <!--!--<a href="#" class = 'buttongreen' id="saveLocalButton">Save Mask Locally</a>-->
+                    <a href="#" class = 'buttongreen' id="uploadButton">Apply</a>
+                </div>
+            </div>
+        </div>  
+    </div>
+    <div class="row"><a href="#" class="buttongreen center" id="buttonBack">Back</a></div>
     <script>
+        //OnLoad event
         document.addEventListener("DOMContentLoaded", (event) => {
         
+            // Get the camera name and snapshot url from the server, simpler here
             var hostname = window.location.hostname;
             var snapshoturl = document.getElementById("snapShotURL");
             snapshoturl.value = "http://"+ hostname + snapshoturl.value;
+
+            // Goes back to the previous page
+            var buttonBack = document.getElementById("buttonBack");
+            buttonBack.addEventListener("click", (event) => {
+                window.history.back();
+            });
 
     });
     </script>
