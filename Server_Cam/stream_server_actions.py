@@ -287,6 +287,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
     def send_html_response(self,content):
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Content-Length', len(content))
         self.end_headers()
         self.wfile.write(content.encode("utf-8"))
@@ -294,6 +295,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
     def send_json_response(self,content):
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Content-Length', len(content))
         self.end_headers()
         self.wfile.write(content.encode("utf-8"))
