@@ -22,7 +22,7 @@ import os
 from flask_cors import CORS
 import classes.functions as fn
 from classes.threeframedifference import Three_Frame_Difference
-
+from classes.videorecorder import VideoRecorder
 
 
 
@@ -46,6 +46,23 @@ def snapshot():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route('/startrecording')
+def startrecording():
+
+    recorder_obj.startRecording()
+    response = Response("Recording started")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/stoprecording')
+def stoprecording():
+
+    recorder_obj.stopRecording()
+    response = Response("Recording stopped")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
 #### Init portion ####
 
 
@@ -55,6 +72,8 @@ print(f"START Camera: {cam_env}")
 cam=fn.read_config(cam_env)[0] #Read rest of the camera configuration from DB. Only the 1st result just in case.S
 
 cam_obj = Three_Frame_Difference(cam['name']) #Create object to handle the camera
+
+recorder_obj = VideoRecorder(cam['name']) #Create object to handle the video recorder
 
 #Start thread to read frames
 frame_thread = threading.Thread(target=cam_obj.three_frame_difference_loop)

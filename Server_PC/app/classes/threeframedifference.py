@@ -153,7 +153,7 @@ class Three_Frame_Difference:
                     #self.videoRecorder.startRecording() #Start recording
 
                     if not self.videoRecorder.isRecording():
-                        self.videoRecorder.justRecord(self.url, self.camera_conf['recordtime']) #Start recording on its own thread
+                        self.videoRecorder.recordTimeLapse(self.camera_conf['recordtime']) #Start recording on its own thread
 
                     continue #We don't want to trigger the alert again if there are more detections in this frame
 

@@ -15,43 +15,85 @@ class VideoRecorder:
         self.filename = None
         self.video_out = None
 
-        self.tempfilename = ""
+        self.tempfilename = f"{self.camera_name}_alert.webm"
         self.recording = False
         
         #Get the path to the database file
         thisfolder = os.path.dirname(os.path.abspath(__file__))
         self.destfolder = os.path.join(thisfolder, '..', 'recordings')
-        self.url = f"http://{self.camera_config['ip_address']}:{self.camera_config['port']}"
 
+    def startRecording(self):
+        self.recording = True
+        if self.date == None:
+            self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+            self.filename=f"video_{self.camera_name}_{self.date}.webm" #Set filename
+            self.iniTicks = cv2.getTickCount() #Set initial time
+            #self.video_out = cv2.VideoWriter(self.tempfilename, cv2.VideoWriter_fourcc(*'XVID'), 12, (320,240))  # Resolution
+            self.video_out = cv2.VideoWriter(self.tempfilename, cv2.VideoWriter_fourcc(*'vp80'), 12, (320,240))
+            print(f"Recording {self.camera_name}")
+
+
+    def recordFrame(self, frame, timespan):
+
+        self.timespan = timespan
+        #time.sleep(0.083) #12fps      
+
+        #Print datetime on frame
+        frame = fn.add_datetime(frame)
+
+        #Record frame
+        self.video_out.write(frame)
+
+        #Breaks after 'duration' seconds
+        current_time = cv2.getTickCount()
+        time_passed = (current_time - self.iniTicks) / cv2.getTickFrequency()
+        #print(time_passed) #DEBUG
+        if time_passed > self.timespan:
+            self.stopRecording()
+            return
+        else:
+            self.recording = True
+
+
+
+    def stopRecording(self):
+        self.video_out.release()
+        self.recording = False
+        self.date = None
+        #rename file
+        os.rename(self.tempfilename, self.filename)
+        print(f"Recording finished {self.camera_name}")
+
+    def isRecording(self):
+        return self.recording
+    
     
     def _recordTimeLapseWEBM(self,url,timespan):
         #vp90 seem to work but accelerates video
         #vp80 seems to work ok
 
         self.url=url
-        #self.tempfilename = f"{self.camera_name}_alert.webm"
+        self.tempfilename = f"{self.camera_name}_alert.webm"
 
         #Init camera
         cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
         #Verify cam opening
         if not cap.isOpened():
             print("Error opening camera.")
-            return
+            exit()
 
         #Configure video recording
         #fourcc = cv2.VideoWriter_fourcc(*'XVID')
         fourcc = cv2.VideoWriter_fourcc(*'vp80')
-        
-        self.filename=f"{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
+        video_out = cv2.VideoWriter(f'alarm_{self.camera_name}.webm', fourcc, 12, (320,240))
 
-        video_out = cv2.VideoWriter(self.filename, fourcc, 12, (320,240))
+        newname=f"alarm_{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
 
-        
         #Graba la secuencia de video durante 10 segundos
         ini_time = cv2.getTickCount()
 
         #Recording loop
-        while self.recording:
+        while True:
 
             time.sleep(0.083) #12fps
             #Read frame
@@ -80,29 +122,16 @@ class VideoRecorder:
         video_out.release()
         print("Recording finished")
         self.recording = False #Recording finished
-        os.rename(self.filename, os.path.join(self.destfolder,self.filename)) #moves file to dest folder
+        os.rename(f"alarm_{self.camera_name}.webm", os.path.join(self.destfolder,newname))
 
 
 
-    def recordTimeLapse(self,timespan):
+    def recordTimeLapse(self,url,timespan):
         if self.recording:
             print("Busy recording")
             return
         print(f"Recording {self.camera_name}, {timespan} seconds")
         self.recording = True
-        thread = threading.Thread(target=self._recordTimeLapseWEBM, args=(self.url,timespan,))
+        thread = threading.Thread(target=self._recordTimeLapseWEBM, args=(url,timespan,))
         thread.start()
 
-
-
-    def isRecording(self):
-        return self.recording
-    
-    def stopRecording(self):
-        #This will break the recording loop
-        self.recording = False
-        print("Stopping recording")
-
-    def startRecording(self):
-        #Just record a very long video until stopRecording is called
-        self.recordTimeLapse(1000000)

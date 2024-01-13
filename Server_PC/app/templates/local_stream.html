@@ -17,41 +17,48 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="row">
-        {% for camera in cameras %}
-            <div class="column card" id="video">
-                <div class = "row">
+    <div class="card" style="background-color:rgb(202, 202, 202);">
+        <div class="row">
+            {% for camera in cameras %}
+                <div class="column card" id="video">
+                    <div class = "row">
 
-                    <div class="column">
-                        <div class="stream-container">
-                            <div class="column">
-                                <div class="tag-label">{{ camera.name }}</div>
-                                <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
-                            </div> 
+                        <div class="column">
+                            <div class="stream-container">
+                                <div class="column">
+                                    <div class="tag-label">{{ camera.name }}</div>
+                                    <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
+                                </div> 
+                            </div>
                         </div>
-                    </div>
-          
-                    <div class="column" id="data" style="margin-top:5px">
-                        <div class="row">
-                        <a href="/mask_app/{{ camera.name }}" class="buttongreen">Mask</a>
+            
+                        <div class="column" id="data" style="margin-top:5px">
+                            <div class="row">
+                                <a href="/mask_app/{{ camera.name }}" class="buttongreen">Mask</a>
+                            </div>
+                            <div class="row">
+                                <a href="#" id="record_{{camera.name}}" class="buttongreen" onclick="setRecord('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
+                            </div>
+                            {% if camera.isTriggerable== 1 %}
+                            <div class="row">
+                                <a href="#" id="alert_{{camera.name}}" class="buttongreen" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
+                            </div>
+                            {% endif %}
+                        
                         </div>
-                        {% if camera.isTriggerable== 1 %}
-                        <div class="row">
-                        <a href="#" id="alert_{{camera.name}}" class="buttongreen" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
-                        </div>
-                        {% endif %}
-                    
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-        
-    </div>
+            {% endfor %}
+            
+        </div>
     
-    <a href="/" class="buttongreen">Back</a>
- 
+        <a href="/" class="topmargin buttongreen center ">Back</a>
+    </div>
+
     <script>
         function setAlert(cameraName,cameraip, cameraport){
+            //Set alert button to red and send alert to camera
+            //If alert button is red, set it to green and send clear to camera
             var alertButton = document.getElementById("alert_"+cameraName);
             if (alertButton.innerHTML == "Alert"){
                 alertButton.innerHTML = "Clear";
@@ -64,6 +71,24 @@
                 fetch("http://" + cameraip + ":" + cameraport + "/clear")
             }
         }
+
+
+        function setRecord(cameraName,cameraip, cameraport){
+            //Set record button to red and send start recording to camera
+            //If record button is red, set it to green and send stop recording to camera
+            var recordButton = document.getElementById("record_"+cameraName);
+            if (recordButton.innerHTML == "Record"){
+                recordButton.innerHTML = "Stop";
+                recordButton.classList.replace("buttongreen","buttonred");
+                fetch("http://" + cameraip + ":" + cameraport + "/startrecording")
+            }
+            else{
+                recordButton.innerHTML = "Record";
+                recordButton.classList.replace("buttonred","buttongreen");
+                fetch("http://" + cameraip + ":" + cameraport + "/stoprecording")
+            }
+        }
+
         
     </script>   
 

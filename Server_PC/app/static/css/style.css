@@ -13,6 +13,7 @@ body {
     margin-bottom: 20px;
   }
 
+ 
 
   .button {
     display: inline-block;
@@ -23,6 +24,7 @@ body {
     font-size: 18px;
     border-radius: 5px;
     margin: 2px 2px 2px 2px;
+    text-align: center;
   }
 
 
@@ -36,8 +38,9 @@ body {
     font-size: 18px;
     border-radius: 5px;
     margin: 2px 2px 2px 2px;
-    width: 45px;
+    width: 60px;
     transition: background-color 0.3s, color 0.3s;
+    text-align: center;
   }
 
   .buttongreen:hover {
@@ -53,7 +56,8 @@ body {
     font-size: 18px;
     border-radius: 5px;
     margin: 2px 2px 2px 2px;
-    width: 45px
+    width: 60px;
+    text-align: center;
   }
 
   .buttonred:hover {
@@ -70,6 +74,13 @@ body {
     margin:auto;
   }
 
+  .topmargin {
+    margin-top: 20px;
+  }
+
+  .mainbutton{
+    width:85px;
+  }
 
 /*Will show a card with the class "card" */
   .card {
