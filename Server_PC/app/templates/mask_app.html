@@ -7,17 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
-    <style>
-
-    </style>
+    
 </head>
 <body>
-    <h1>Image Masking Application</h1>
+  
     
-    <div id="imageContainer" class="container">
+    <div id="imageContainer" class="card">
         <div class="row">
             <div class="col">
-                <div id="canvasHolder"></div>  
+                <div id="canvasHolder" class="stream-container"></div>  
             </div>
             <div class="col-2"> 
                 <div class="row">
@@ -32,7 +30,7 @@
             </div>
         </div>  
     </div>
-    <div class="row"><a href="#" class="buttongreen center" id="buttonBack">Back</a></div>
+    <div class="row"><a href="#" class="buttongreen center topmargin" id="buttonBack">Close</a></div>
     <script>
         //OnLoad event
         window.addEventListener("load", function() {
@@ -45,7 +43,7 @@
             // Goes back to the previous page
             var buttonBack = document.getElementById("buttonBack");
             buttonBack.addEventListener("click", (event) => {
-                window.history.back();
+                window.close();
             });
 
             loadFromCamera(); // Load the image from the camera

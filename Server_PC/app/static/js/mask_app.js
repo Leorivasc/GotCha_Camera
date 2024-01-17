@@ -12,13 +12,13 @@ function setup() {
   canvas.parent('canvasHolder');
   
   //show canvas
-  canvas.style('display', 'block');
-  canvas.style('margin', 'auto');
-  canvas.style('border', '1px solid black');
-  canvas.style('margin-top', '10px');
-  canvas.style('margin-bottom', '10px');
-  canvas.style('margin-left', 'auto');
-  canvas.style('margin-right', 'auto');
+  //canvas.style('display', 'block');
+  //canvas.style('margin', 'auto');
+  //canvas.style('border', '1px solid black');
+  //canvas.style('margin-top', '10px');
+  //canvas.style('margin-bottom', '10px');
+  //canvas.style('margin-left', 'auto');
+ // canvas.style('margin-right', 'auto');
 
 
   //document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
@@ -78,12 +78,12 @@ function invertColor(){
         mask.pixels[i] = 255;
         mask.pixels[i + 1] = 255;
         mask.pixels[i + 2] = 255;
-        mask.pixels[i + 3] = 255; //255 = opaque
+        mask.pixels[i + 3] = 1; //255 = opaque
       } else {
         mask.pixels[i] = 0;
         mask.pixels[i + 1] = 0;
         mask.pixels[i + 2] = 0;
-        mask.pixels[i + 3] = 255;//255 = opaque
+        mask.pixels[i + 3] = 155;//255 = opaque
       }
     }
     mask.updatePixels();

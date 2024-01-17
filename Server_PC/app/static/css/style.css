@@ -1,12 +1,12 @@
 body {
     text-align: center;
-    padding-top: 100px;
     font-family: Arial, sans-serif;
     background-color: #d1d1d1;
   }
   h1 {
     font-size: 36px;
     margin-bottom: 20px;
+    text-align: left;
   }
   p {
     font-size: 18px;
@@ -76,6 +76,7 @@ body {
 
   .topmargin {
     margin-top: 20px;
+    margin-bottom: 20px;
   }
 
   .mainbutton{
