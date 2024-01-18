@@ -63,6 +63,7 @@ class Three_Frame_Difference:
             #Apply camera configuration on each iteration. 
             N = int(camera['frameskip'])
             detectionarea = int(camera['detectionarea'])
+            detectionthreshold = int(camera['detectionthreshold'])
 
             # Renumber 2nd frame as 1st, 3rd frame as 2nd, and load new frame as 3rd
             frame1 = frame2.copy()
@@ -94,7 +95,7 @@ class Three_Frame_Difference:
             gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
 
             # Apply threshold to enhance differences
-            _, threshold_diff = cv2.threshold(gray_diff, 100, 255, cv2.THRESH_BINARY)
+            _, threshold_diff = cv2.threshold(gray_diff, detectionthreshold, 255, cv2.THRESH_BINARY)
 
             # Dilate to fill in holes
             threshold_diff = cv2.dilate(threshold_diff, np.ones((5, 5), np.uint8), iterations=2)
