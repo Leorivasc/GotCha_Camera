@@ -102,5 +102,5 @@ def clear():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=False, port=8000, bind_address='0.0.0.0')
 
