@@ -7,6 +7,7 @@
 
 from flask import Flask, render_template, Response, send_from_directory
 import cv2
+import time
 
 PAGE="""\
 <html>
@@ -39,6 +40,7 @@ isAlert = False #Mostly to comply with the API
 def generate_frames():
     while True:
         try:
+            time.sleep(0.083) #12fps
             # Lee un cuadro de la cámara
             success, frame = cap.read()
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) ## Color correct for cv2, or else it looks blue in some cameras (?)
