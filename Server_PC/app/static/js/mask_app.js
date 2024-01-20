@@ -29,6 +29,8 @@ function setup() {
 
   //get camera name
   camera_name = document.getElementById('cameraName').value;
+
+  loadFromCamera();
 }
 
 function loadFromCamera(){
