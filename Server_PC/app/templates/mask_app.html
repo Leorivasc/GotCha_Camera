@@ -34,7 +34,7 @@
     <div class="row"><a href="#" class="buttongreen center topmargin" id="buttonBack">Close</a></div>
     <script>
         //OnLoad event
-        document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('load',(event) => {
             console.log("OnLoad event")
             // Get the camera name and snapshot url from the server, simpler here
             var hostname = window.location.hostname;
