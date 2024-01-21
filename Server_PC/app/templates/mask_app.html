@@ -20,17 +20,17 @@
             <div class="col-2"> 
                 <div class="row">
                     <!--<input type="file" id="fileInput" accept=".jpg">-->
-                    <a href="#" class = 'buttongreen' id="loadFromCamera">Load</a>
+                    <a href="#" class = 'buttonblue' id="loadFromCamera">Load</a>
                         <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
                         <input type="hidden" id="snapShotURL" value = ":{{camera[0].mirrorport}}/snapshot">
-                    <a href="#" class = 'buttongreen' id="invertColor">Invert</a>
-                    <!--!--<a href="#" class = 'buttongreen' id="saveLocalButton">Save Mask Locally</a>-->
-                    <a href="#" class = 'buttongreen' id="uploadButton">Apply</a>
+                    <a href="#" class = 'buttonblue' id="invertColor">Invert</a>
+                    <!--!--<a href="#" class = 'buttonblue' id="saveLocalButton">Save Mask Locally</a>-->
+                    <a href="#" class = 'buttonblue' id="uploadButton">Apply</a>
                 </div>
             </div>
         </div>  
     </div>
-    <div class="row"><a href="#" class="buttongreen center topmargin" id="buttonBack">Close</a></div>
+    <div class="row"><a href="#" class="buttonblue center topmargin" id="buttonBack">Close</a></div>
     <script>
         //OnLoad event
         window.addEventListener("load", function() {

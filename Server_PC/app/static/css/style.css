@@ -6,7 +6,7 @@ body {
   h1 {
     font-size: 36px;
     margin-bottom: 20px;
-    text-align: left;
+    text-align: center;
   }
   p {
     font-size: 18px;
@@ -25,11 +25,14 @@ body {
     border-radius: 5px;
     margin: 2px 2px 2px 2px;
     text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
   }
 
 
 
-  .buttongreen {
+  .buttonblue {
     display: inline-block;
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -41,9 +44,12 @@ body {
     width: 60px;
     transition: background-color 0.3s, color 0.3s;
     text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
   }
 
-  .buttongreen:hover {
+  .buttonblue:hover {
     background-color: #3e8e41;
   }
 
@@ -58,12 +64,34 @@ body {
     margin: 2px 2px 2px 2px;
     width: 60px;
     text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
   }
 
   .buttonred:hover {
     background-color: #8e3e3e;
   }
 
+  .buttonblue {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3b6bdb;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 5px;
+    margin: 2px 2px 2px 2px;
+    width: 60px;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+  }
+
+  .buttonblue:hover {
+    background-color: #083280;
+  }
 
  /* Will center any element with the class "center" */
   .center {
@@ -92,6 +120,8 @@ body {
     border-radius: 8px;
     padding: 4px;
     margin: 4px;
+    border-style: solid;
+    border-width: 1px;
     
   }
 
@@ -104,7 +134,7 @@ body {
     width: 320px; 
     height: 240px; 
     background-color: #858585; 
-    border: 2px solid #ffd700; 
+    border: 2px solid #ff9102cf; 
     border-radius: 8px; /* Rounded borders */
     overflow: hidden; /* Cover if overflow */
   }
@@ -115,7 +145,7 @@ body {
     top: 0;
     /*left: 50%;*/
     /*transform: translateX(-50%); /* Move 50% of the width to the right */
-    background-color: #ffd700d3; /* Tab color */
+    background-color: #ff9102cf; /* Tab color */
     color: #000000; /* Text color */
     padding: 5px 10px; /* Adjust */
     border-bottom-left-radius: 0px; /* Rounded border */
