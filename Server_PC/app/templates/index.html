@@ -14,8 +14,9 @@
 
     <div class="row">
       <div class="center col-6 card " style="margin:auto">
-        <h1>GotCha!</h1>
-        <p>Surveillance server</p>
+        <img src="{{ url_for('static', filename='img/logo_small.jpg') }}"  class="logo">
+      
+        <p style="margin-top: 0px;">Surveillance server</p>
         <a href="/cameras_fast" class="buttonblue mainbutton">Raw Video</a>
         <a href="/local_stream" class="buttonblue mainbutton">Processed Video</a>
         <a href="/list_recordings" class="buttonblue mainbutton">List Recordings</a>

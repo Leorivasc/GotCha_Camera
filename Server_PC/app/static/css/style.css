@@ -186,3 +186,8 @@ body {
   .col-4 { flex: 0 0 33.33%; max-width: 33.33%; }
   .col-6 { flex: 0 0 50%; max-width: 50%; }
   .col-12 { flex: 0 0 100%; max-width: 100%; }
+
+  .logo-mini
+  {
+    float:right;
+  }

@@ -18,7 +18,10 @@
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
 </head>
 <body>
-    <h1 class="card">Processed Streams</h1>
+    <h1 class="card">
+        <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
+        Processed Streams
+    </h1>
     
     <div class="row">
         {% for camera in cameras %}
