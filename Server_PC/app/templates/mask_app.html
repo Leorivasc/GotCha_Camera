@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Masking Application</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/p5.js') }}"></script>
+   
     
 </head>
 <body>
@@ -33,7 +34,7 @@
     <div class="row"><a href="#" class="buttonblue center topmargin" id="buttonBack">Close</a></div>
     <script>
         //OnLoad event
-        window.addEventListener("load", function() {
+        window.addEventListener('load',(event) => {
             console.log("OnLoad event")
             // Get the camera name and snapshot url from the server, simpler here
             var hostname = window.location.hostname;
@@ -46,9 +47,9 @@
                 window.close();
             });
 
-            loadFromCamera(); // Load the image from the camera
+            //loadFromCamera(); // Load the image from the camera
 
-    });
+        });
     </script>
 </body>
 </html>
