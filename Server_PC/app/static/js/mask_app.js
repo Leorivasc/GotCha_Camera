@@ -34,9 +34,14 @@ function setup() {
 }
 
 function loadFromCamera(){
-  snapshoturl = document.getElementById('snapShotURL').value;
 
-  img = loadImage(snapshoturl, function() {
+  //lets make sure to keep the url updated
+  var hostname = window.location.hostname;
+  var snapshotroute = document.getElementById("snapShotRoute");
+  var snapshoturl = document.getElementById("snapShotURL");
+  snapshoturl.value = "http://"+ hostname + snapshotroute.value;
+  
+  img = loadImage(snapshoturl.value, function() {
     resizeCanvas(img.width, img.height);
     mask = createImage(img.width, img.height);
    

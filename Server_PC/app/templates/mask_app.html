@@ -23,7 +23,8 @@
                     <!--<input type="file" id="fileInput" accept=".jpg">-->
                     <a href="#" class = 'buttonblue' id="loadFromCamera">Load</a>
                         <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
-                        <input type="hidden" id="snapShotURL" value = ":{{camera[0].mirrorport}}/snapshot">
+                        <input type="hidden" id="snapShotRoute" value = ":{{camera[0].mirrorport}}/snapshot">
+                        <input type="hidden" id="snapShotURL" value = "">
                     <a href="#" class = 'buttonblue' id="invertColor">Invert</a>
                     <!--!--<a href="#" class = 'buttonblue' id="saveLocalButton">Save Mask Locally</a>-->
                     <a href="#" class = 'buttonblue' id="uploadButton">Apply</a>
@@ -35,19 +36,12 @@
     <script>
         //OnLoad event
         window.addEventListener('load',(event) => {
-            console.log("OnLoad event")
-            // Get the camera name and snapshot url from the server, simpler here
-            var hostname = window.location.hostname;
-            var snapshoturl = document.getElementById("snapShotURL");
-            snapshoturl.value = "http://"+ hostname + snapshoturl.value;
-
-            // Goes back to the previous page
+            // Close window
             var buttonBack = document.getElementById("buttonBack");
             buttonBack.addEventListener("click", (event) => {
                 window.close();
             });
 
-            //loadFromCamera(); // Load the image from the camera
 
         });
     </script>
