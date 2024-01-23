@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="1800">
     
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
@@ -32,7 +32,7 @@
                         <div class="stream-container">
                             <div class="column">
                                 <div class="tag-label">{{ camera.name }}</div>
-                                <img class="stream" width="640" height="480" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}" alt="Connecting...">
+                                <img class="stream" width="320" height="240" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}?r={{random_value}}" alt="Connecting...">
                             </div> 
                         </div>
                     </div>
@@ -59,7 +59,11 @@
 
     <a href="/" class="topmargin buttonblue center ">Back</a>
     
- 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+        });
+    </script>
 
 
 </body>

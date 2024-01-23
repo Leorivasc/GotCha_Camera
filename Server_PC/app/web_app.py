@@ -19,6 +19,7 @@ from classes.functions import * #helper functions
 import socket
 import os
 import glob
+import random
 
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
@@ -86,13 +87,14 @@ def video_feed(camera_id):
 #it redirects to 'mirror' ports.
 @app.route('/local_stream')
 def video_local_stream():
+    random_value = random.randint(1, 100) #To avoid caching
     cameras = read_config_all() #Refresh cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
     server_ip = socket.gethostbyname(host_name)
 
     #Send cameras and server data to the template
-    return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip)
+    return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip, random_value = random_value)
     
 
 

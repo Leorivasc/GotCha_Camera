@@ -1,10 +1,15 @@
+### This version does the full job of the three-frame difference algorithm
+### It is not used because it performs the three frame AND the alerting AND the recording
+### It was already refactored into different objects. This is just for reference
+
+
 import cv2
 import numpy as np
 import threading
 import time
-from . import functions as fn
-from .alerting import Alerting
-from .videorecorder import VideoRecorder
+from ..Server_PC.app.classes import functions as fn
+from ..Server_PC.app.classes.alerting import Alerting
+from ..Server_PC.app.classes.videorecorder import VideoRecorder
 
 
 
