@@ -41,7 +41,7 @@ function popupWindow(url, width, height) {
     const top = (screen.height - height) / 2;
 
     // Options
-    const opciones = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+    const opciones = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no`;
 
     // Open
     window.open(url, '_blank', opciones);
