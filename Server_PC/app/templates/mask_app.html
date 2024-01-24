@@ -11,7 +11,10 @@
     
 </head>
 <body>
-  
+    <h1 class="card">
+        <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
+        Masking app
+    </h1>
     
     <div id="imageContainer" class="card">
         <div class="row">
@@ -21,7 +24,7 @@
             <div class="col-2"> 
                 <div class="row">
                     <!--<input type="file" id="fileInput" accept=".jpg">-->
-                    <a href="#" class = 'buttonblue' id="loadFromCamera">Load</a>
+                    <a href="#" class = 'buttonblue' id="loadFromCamera">Reset</a>
                         <input type='hidden' id="cameraName" value = "{{ camera[0].name }}">
                         <input type="hidden" id="snapShotRoute" value = ":{{camera[0].mirrorport}}/snapshot">
                         <input type="hidden" id="snapShotURL" value = "">
@@ -29,6 +32,14 @@
                     <!--!--<a href="#" class = 'buttonblue' id="saveLocalButton">Save Mask Locally</a>-->
                     <a href="#" class = 'buttonblue' id="uploadButton">Apply</a>
                 </div>
+            </div>
+            <div class="col-3" style="font-size: 10px; text-align: left;">
+                <ul>
+                    <li>Make sure to paint those areas that are to be excluded from motion detection.</li>
+                    <li>To reset the mask, click on the "Reset" button.</li>
+                    <li>To invert the mask, click on the "Invert" button. The mask will be inverted and the excluded areas will be included in the motion detection.</li>
+                    <li>To apply the mask, click on the "Apply" button. The mask will be automatically applied to the camera.</li>
+                </ul>
             </div>
         </div>  
     </div>

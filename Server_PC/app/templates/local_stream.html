@@ -39,7 +39,7 @@
         
                     <div class="column" id="data" style="margin-top:5px">
                         <div class="row">
-                            <a href="#" class="buttonblue" onclick="popupWindow('/mask_app/{{ camera.name }}',670,370)">Mask</a>
+                            <a href="#" class="buttonblue" onclick="popupWindow('/mask_app/{{ camera.name }}',670,400)">Mask</a>
                         </div>
                         <div class="row">
                             <a href="#" id="record_{{camera.name}}" class="buttonblue" onclick="setRecord('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
@@ -49,7 +49,9 @@
                             <a href="#" id="alert_{{camera.name}}" class="buttonblue" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
                         </div>
                         {% endif %}
-                    
+                        <div class="row">
+                            <a href="#" class="buttonblue" onclick="popupWindow('/camera_config/{{camera.name}}',670,370)">Camera Config</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -59,10 +61,31 @@
 
     <a href="/" class="topmargin buttonblue center ">Back</a>
     
+
+    <!-- Floating window (future use)-->
+    <div class="draggable card" id="floating" style="display:none">
+        <div id="floatingheader" class="card-header">
+            <div class="row">
+
+                   Drag
+              
+            </div>
+        </div>    
+        <div id='floatingcontent'></div>
+    </div>
+
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
         });
+
+        //Part of the floating window (future use)
+        //dragElement(document.getElementById("floating"));
+        //var xx = document.getElementById("floatingheader");
+        //doGet("camera_config_inc/Pi2","",xx);
+        
     </script>
 
 

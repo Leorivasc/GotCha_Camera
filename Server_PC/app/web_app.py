@@ -157,5 +157,64 @@ def upload_file():
 
     return 'File not allowed'
 
+
+#-----------Config routes-----------------
+#Template for cameras config
+@app.route('/camera_config/<camera_name>')
+def cameras_config(camera_name):
+    try:
+        camera = read_config(camera_name)[0]
+    except:
+        return 'Camera not found'
+    
+    return render_template('camera_config.html', camera=camera)
+
+
+###TEST###
+@app.route('/camera_config_inc/<camera_name>')
+def cameras_config_inc(camera_name):
+    try:
+        camera = read_config(camera_name)[0]
+    except:
+        return 'Camera not found'
+    
+    return render_template('camera_config_inc.html', camera=camera)
+
+
+
+# Modify cameras config route (POST ONLY)
+@app.route('/modify_config', methods=['POST'])
+def modify_config():
+    #Verify right request
+    if 'name' not in request.form:
+        return 'Camera name not sent'
+
+    camera_name = request.form['name']
+    camera = read_config(camera_name)
+
+    #Check if camera exists
+    if not camera:
+        return 'Camera not found'
+
+
+
+    #Update config
+    data=request.form.to_dict()
+    ## traverse the data and change every 'on' to 1 and 'off' to 0 (checkboxes)
+    for key in data:
+        if data[key] == 'on':
+            data[key] = 1
+        elif data[key] == 'off':
+            data[key] = 0
+
+    ans = update_config(camera_name, data)
+
+    if ans:
+        return 'Config updated'
+    else:
+        return 'Error'
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, port=8080, host='0.0.0.0')

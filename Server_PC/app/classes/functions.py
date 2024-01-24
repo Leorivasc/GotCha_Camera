@@ -66,6 +66,22 @@ def read_config_all():
     connection.close_connection()
     return cameras
 
+def update_config(camera_name, data):
+    """Update a row given the camera name and the data to be updated.
+    Args:
+        camera_name (str): The name of the camera to be updated.
+        data (dict): The data to be updated.
+    Returns:
+        True if the update was successful, False otherwise.
+    """
+    connection = SQLiteDB()
+    connection.connect()
+    ans = connection.update_data("cameras", data, "name='"+camera_name+"'")
+    connection.close_connection()
+    return ans
+
+
+
 
 def add_datetime(frame):
     #Get date

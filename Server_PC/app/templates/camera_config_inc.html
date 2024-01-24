@@ -1,0 +1,131 @@
+<!-- This template is only to be used by inclusion in other templates. -->
+<!-- It is not a standalone template. -->
+<!-- Fails to run included javascript -->
+<!-- To be reviewed-->
+
+    <h1 class="card">
+        <img src="/static/img/logo_mini.jpg"  class="logo-mini">
+        Camera config
+    </h1>
+
+    <form action="/modify_config" method="POST">
+        <div class="card">
+            <div class="row">
+                <div class="col"> 
+                <table>
+                    <tr>
+                        <td><label for="name">Camera</label></td>
+                        <td><input type="text" id="xname" name="xname" value='{{ camera.name }}' disabled></td>
+                        <input type="hidden" id="name" name="name" value='{{ camera.name }}'>
+                    </tr>
+                    <tr>
+                        <td><label for="frameskip">Frameskip</label></td>
+                        <td><input type="text" id="frameskip" name="frameskip" value="{{ camera.frameskip }}"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="detectionarea">Detection Area</label></td>
+                        <td><input type="text" id="detectionarea" name="detectionarea" value="{{ camera.detectionarea }}"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="detectionthreshold">Detection Threshold</label></td>
+                        <td><input type="text" id="detectionthreshold" name="detectionthreshold" value="{{ camera.detectionthreshold }}"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="recordtime">Record Time</label></td>
+                        <td><input type="text" id="recordtime" name="recordtime" value="{{ camera.recordtime }}"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="alertlength">Alert Length</label></td>
+                        <td><input type="text" id="alertlength" name="alertlength" value="{{ camera.alertlength }}"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="isTriggerable">Is Triggerable</label></td>
+                        <td><input type="checkbox" id="isTriggerable" name="isTriggerable" {% if camera.isTriggerable %}checked{% endif %}></td>
+                        <input type="hidden" id="isTriggerable" name="isTriggerable" value="off">
+                    </tr>
+                    <tr>
+                        <td><label for="isEnabled">Is Enabled</label></td>
+                        <td><input type="checkbox" id="isEnabled" name="isEnabled" {% if camera.isEnabled %}checked{% endif %}></td>
+                        <input type="hidden" id="isEnabled" name="isEnabled" value="off">    
+                    </tr>
+                </table>
+                </div>
+            </div>
+        </div>
+       
+        <div id="result"></div>
+    </form>
+  
+        
+<script>
+    //OnLoad event
+    window.addEventListener('load',(event) => {
+        // Close window
+        var buttonBack = document.getElementById("buttonBack");
+        buttonBack.addEventListener("click", (event) => {
+            window.close();
+        });
+
+
+    });
+
+    function doPost() {
+        var form = document.querySelector('form');
+        var resultDiv = document.getElementById('result');
+
+        
+        event.preventDefault();
+        var formData = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                resultDiv.innerHTML = xhr.responseText;
+                setTimeout(function() {
+                    resultDiv.innerHTML = '';
+                }, 3000);
+            }
+        };
+        xhr.send(formData);
+
+    }
+
+    // Add event listener to listen for form modifications
+    var formElements = document.querySelectorAll('form input, form select, form textarea');
+    formElements.forEach(function(element) {
+        element.addEventListener('input', function() {
+            doPost();
+        });
+    });
+
+    // Data validation. Only allow numbers in the frameskip, detectionarea, detectionthreshold, recordtime and alertlength fields
+    // On any non-numeric input, replace the input with 0
+    var frameskip = document.getElementById('frameskip');
+    frameskip.addEventListener('input', function() {
+        frameskip.value = frameskip.value.replace(/[^0-9]/g, '0');
+    });
+
+    var detectionarea = document.getElementById('detectionarea');
+    detectionarea.addEventListener('input', function() {
+        detectionarea.value = detectionarea.value.replace(/[^0-9]/g, '0');
+    });
+
+    var detectionthreshold = document.getElementById('detectionthreshold');
+    detectionthreshold.addEventListener('input', function() {
+        detectionthreshold.value = detectionthreshold.value.replace(/[^0-9]/g, '0');
+    });
+
+    var recordtime = document.getElementById('recordtime');
+    recordtime.addEventListener('input', function() {
+        recordtime.value = recordtime.value.replace(/[^0-9]/g, '0');
+    });
+
+    var alertlength = document.getElementById('alertlength');
+    alertlength.addEventListener('input', function() {
+        alertlength.value = alertlength.value.replace(/[^0-9]/g, '0');
+    });
+
+
+
+    
+    </script>

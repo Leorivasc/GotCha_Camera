@@ -64,6 +64,19 @@ class SQLiteDB:
             self.connection.close()
             return result
 
+    #Update data
+    def update_data(self, table_name, data, condition=None):
+        query = f"UPDATE {table_name} SET "
+        query += ", ".join(f"{key} = '{value}'" for key, value in data.items()) #key = 'value' items
+        if condition:
+            query += f" WHERE {condition}"
+
+        self.cursor.execute(query)
+        self.connection.commit()
+        return True
+
+
+
 
     #Close connection
     def close_connection(self):
