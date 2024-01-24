@@ -20,7 +20,7 @@ class SQLiteDB:
 
     #Connect to DB file
     def connect(self): 
-        self.connection = sqlite3.connect(self.db_name)
+        self.connection = sqlite3.connect(self.db_name, timeout=5) #to prevent database is locked error
         self.cursor = self.connection.cursor()
 
     #Create table (str table_name, str comma separated column names)
