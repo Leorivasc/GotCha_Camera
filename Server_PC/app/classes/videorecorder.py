@@ -13,6 +13,7 @@ class VideoRecorder:
         self.date = None
         self.iniTicks = None
         self.filename = None
+        self.thumbnailname = None
         self.video_out = None
 
         self.tempfilename = ""
@@ -43,6 +44,7 @@ class VideoRecorder:
         fourcc = cv2.VideoWriter_fourcc(*'vp80')
         
         self.filename=f"{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
+        self.thumbnailname=self.filename.replace(".webm",".jpg")
 
         video_out = cv2.VideoWriter(self.filename, fourcc, 12, (320,240))
 
@@ -80,8 +82,11 @@ class VideoRecorder:
         video_out.release()
         print("Recording finished")
         self.recording = False #Recording finished
-        os.rename(self.filename, os.path.join(self.destfolder,self.filename)) #moves file to dest folder
-
+         #create thumbnail
+        self.createThumbnail(self.filename, self.thumbnailname)
+        #Move files to dest folder
+        os.rename(self.filename, os.path.join(self.destfolder,self.filename)) 
+        os.rename(self.thumbnailname, os.path.join(self.destfolder,self.thumbnailname)) 
 
 
     def recordTimeLapse(self,timespan):
@@ -106,3 +111,10 @@ class VideoRecorder:
     def startRecording(self):
         #Just record a very long video until stopRecording is called
         self.recordTimeLapse(1000000)
+
+    def createThumbnail(self, src, dest_file):
+        cap = cv2.VideoCapture(src)
+        success, image = cap.read()
+        if success:
+            cv2.imwrite(dest_file, image)
+        cap.release()

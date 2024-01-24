@@ -113,9 +113,15 @@ def file_list():
     # Gets the list of files in the uploads folder
     #files = os.listdir("recordings")
     os.chdir("recordings")
-    files = glob.glob("*.webm")
+    files = sorted(glob.glob("*.webm"))
+    thumbnails=sorted(glob.glob("*.jpg"))
+    #merge in a list of lists
+    filesdata = []
+    for file,thumbnail in zip(files,thumbnails):
+        filesdata.append([file,thumbnail])
+    
     os.chdir("..")
-    return render_template('list_recordings.html', files=files)
+    return render_template('list_recordings.html', filesdata=filesdata)
 
 #Downloads for recordings
 @app.route('/download/<filename>')
