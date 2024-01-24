@@ -38,11 +38,11 @@ class ProcessMovement:
         camera=fn.read_config(self.camera_name)[0] #only the 1st result just in case an error has two cameras with the same name
         self.camera_conf=camera #Save camera configuration to object attribute
         
-        self.url = f"http://{camera['ip_address']}:{camera['port']}" #url for the camera stream
+        self.url = f"http://{camera['ip_address']}:{camera['port']}{camera['path']}" #url for the camera stream
         
 
         #Open the stream
-        cap = cv2.VideoCapture(f"{self.url}/video_feed") 
+        cap = cv2.VideoCapture(self.url) 
         #cap.set(cv2.CAP_PROP_BUFFERSIZE, 12) #Set buffer size to 12 frames
 
         #Initialize the 3-frame difference algorithm

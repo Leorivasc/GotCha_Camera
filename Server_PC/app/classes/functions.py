@@ -136,7 +136,7 @@ def loopUntilRead(cap,url):
         print("Trying to reconnect...")
         try:
             cap.release()
-            cap = cv2.VideoCapture(f"{url}/video_feed") 
+            cap = cv2.VideoCapture(f"{url}") 
             _, frame = cap.read()
         except:
             print("Connection failed. Trying again...")
