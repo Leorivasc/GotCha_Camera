@@ -50,7 +50,18 @@ def read_config(camera_name):
     """
     connection = SQLiteDB()
     connection.connect()
-    camera = connection.query_data_dict("cameras","name='"+camera_name+"'")
+
+    camera=None
+    while camera is None:
+        try:
+            camera = connection.query_data_dict("cameras","name='"+camera_name+"'")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+
+            
+    
     connection.close_connection()
     return camera
 
@@ -62,7 +73,16 @@ def read_config_all():
     """
     connection = SQLiteDB()
     connection.connect()
-    cameras = connection.query_data_dict("cameras", "isEnabled=1")
+    cameras=None
+
+    while cameras is None:
+        try:
+            cameras = connection.query_data_dict("cameras", "isEnabled=1")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+    
     connection.close_connection()
     return cameras
 
@@ -76,7 +96,16 @@ def update_config(camera_name, data):
     """
     connection = SQLiteDB()
     connection.connect()
-    ans = connection.update_data("cameras", data, "name='"+camera_name+"'")
+    ans=False
+
+    while ans is False:
+        try:
+            ans = connection.update_data("cameras", data, "name='"+camera_name+"'")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+    
     connection.close_connection()
     return ans
 

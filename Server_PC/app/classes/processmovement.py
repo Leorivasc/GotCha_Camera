@@ -51,7 +51,12 @@ class ProcessMovement:
         while self.loopOK:
 
             #Get camera configuration AGAIN from DB so that changes are applied on each iteration LIVE
-            camera=fn.read_config(self.camera_name)[0] #only the 1st result just in case
+            #Depending on cpu speed (Pi server?) it may fail due to DB lock during config changes
+            try:
+                camera=fn.read_config(self.camera_name)[0] #only the 1st result just in case
+            except:
+                print("Error reading camera configuration from DB. We keep previous configuration until next iteration")
+
 
             #Apply camera configuration on each iteration. 
             N = int(camera['frameskip'])
