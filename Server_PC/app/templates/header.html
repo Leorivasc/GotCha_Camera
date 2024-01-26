@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>Processed Streams</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
@@ -18,3 +18,11 @@
 </head>
 
 <body>
+
+    <div class="topnav row" id="topnav">
+        <a class="nav" href="/">Home</a>
+        <a class="nav" href="/cameras_fast">Direct Video</a>
+        <a class="nav" href="/local_stream">Processed Video</a>
+        <a class="nav" href="/list_recordings">Recordings</a>
+        <a class="nav" href="/cam_setup">Camera Setup</a>
+    </div>

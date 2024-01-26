@@ -13,4 +13,24 @@
         {% endfor %}
     </ul>
 
+
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+           
+            //Top menu item selection
+            //Collects all elements from 'nav' class
+            var nav = document.getElementsByClassName("nav");
+            //Removes the 'active' class from all elements
+            for (var i = 0; i < nav.length; i++) {
+                nav[i].classList.remove("active");
+            }
+            //Adds the 'active' class to the current page
+            var current = document.getElementsByClassName("nav")[3];
+            current.classList.add("active");
+            
+        });
+    </script>
+    
 {% include 'footer.html' %}

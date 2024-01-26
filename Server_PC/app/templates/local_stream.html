@@ -22,18 +22,18 @@
         
                     <div class="column" id="data" style="margin-top:5px">
                         <div class="row">
-                            <a href="#" class="buttonblue" onclick="popupWindow('/mask_app/{{ camera.name }}',680,400)">Mask</a>
+                            <a href="#" class="button" onclick="popupWindow('/mask_app/{{ camera.name }}',680,400)">Mask</a>
                         </div>
                         <div class="row">
-                            <a href="#" id="record_{{camera.name}}" class="buttonblue" onclick="setRecord('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
+                            <a href="#" id="record_{{camera.name}}" class="button" onclick="setRecord('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
                         </div>
                         {% if camera.isTriggerable== 1 %}
                         <div class="row">
-                            <a href="#" id="alert_{{camera.name}}" class="buttonblue" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
+                            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
                         </div>
                         {% endif %}
                         <div class="row">
-                            <a href="#" class="buttonblue" onclick="popupWindow('/camera_config/{{camera.name}}',670,400)">Camera Config</a>
+                            <a href="#" class="button" onclick="popupWindow('/camera_config/{{camera.name}}',670,400)">Config</a>
                         </div>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
         
     </div>
 
-    <a href="/" class="topmargin buttonblue center ">Back</a>
+
     
 
     <!-- Floating window (future use)-->
@@ -61,7 +61,22 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+           
+            //Top menu item selection
+            //Collects all elements from 'nav' class
+            var nav = document.getElementsByClassName("nav");
+            //Removes the 'active' class from all elements
+            for (var i = 0; i < nav.length; i++) {
+                nav[i].classList.remove("active");
+            }
+            //Adds the 'active' class to the current page
+            var current = document.getElementsByClassName("nav")[2];
+            current.classList.add("active");
             
+
+
+
+
         });
 
         //Part of the floating window (future use)

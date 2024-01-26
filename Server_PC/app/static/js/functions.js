@@ -6,12 +6,12 @@ function setAlert(cameraName,cameraip, cameraport){
     var alertButton = document.getElementById("alert_"+cameraName);
     if (alertButton.innerHTML == "Alert"){
         alertButton.innerHTML = "Clear";
-        alertButton.classList.replace("buttonblue","buttonred");
+        alertButton.classList.replace("button","buttonred");
         fetch("http://" + cameraip + ":" + cameraport + "/alarm")
     }
     else{
         alertButton.innerHTML = "Alert";
-        alertButton.classList.replace("buttonred","buttonblue");
+        alertButton.classList.replace("buttonred","button");
         fetch("http://" + cameraip + ":" + cameraport + "/clear")
     }
 }
@@ -24,12 +24,12 @@ function setRecord(cameraName,cameraip, cameraport){
     var recordButton = document.getElementById("record_"+cameraName);
     if (recordButton.innerHTML == "Record"){
         recordButton.innerHTML = "Stop";
-        recordButton.classList.replace("buttonblue","buttonred");
+        recordButton.classList.replace("button","buttonred");
         fetch("http://" + cameraip + ":" + cameraport + "/startrecording")
     }
     else{
         recordButton.innerHTML = "Record";
-        recordButton.classList.replace("buttonred","buttonblue");
+        recordButton.classList.replace("buttonred","button");
         fetch("http://" + cameraip + ":" + cameraport + "/stoprecording")
     }
 }

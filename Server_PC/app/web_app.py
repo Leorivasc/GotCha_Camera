@@ -56,13 +56,6 @@ def index():
 
 
 
-#Camera streaming route (processed images, needs more workers)
-@app.route('/cameras_processed')
-def cameras_proxied():
-    return render_template('cameras_processed.html', cameras=cameras)
-
-
-
 #Camera streaming route (fast, directly from cameras)
 @app.route('/cameras_fast')
 def cameras_fast():
@@ -206,14 +199,25 @@ def modify_config():
 
     #Update config
     data=request.form.to_dict()
-    ## traverse the data and change every 'on' to 1 and 'off' to 0 (checkboxes)
+   
+    #Data validation before updating
     for key in data:
+
+         ## traverse the data and change every 'on' to 1 and 'off' to 0 (checkboxes)
         if data[key] == 'on':
             data[key] = 1
         elif data[key] == 'off':
             data[key] = 0
 
+        ##Make sure numeric values are not empty
+        if data[key] == '':
+                    data[key] = 0
+
+
+    #Perform the update
     ans = update_config(camera_name, data)
+
+        
 
     if ans:
         return 'Updated'

@@ -4,17 +4,35 @@
   <div class="container">
 
     <div class="row">
-      <div class="center col-6 card " style="margin:auto">
+      <div class="center col-6 card " style="margin:auto; margin-top:100px;">
         <img src="{{ url_for('static', filename='img/logo_small.jpg') }}"  class="logo">
       
         <p style="margin-top: 0px;">Surveillance server</p>
-        <a href="/cameras_fast" class="buttonblue mainbutton">Raw Video</a>
-        <a href="/local_stream" class="buttonblue mainbutton">Processed Video</a>
-        <a href="/list_recordings" class="buttonblue mainbutton">List Recordings</a>
+        
       </div>
     </div>  
 
 </div>
   
-{% include 'footer.html' %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+     
+      //Top menu item selection
+      //Collects all elements from 'nav' class
+      var nav = document.getElementsByClassName("nav");
+      //Removes the 'active' class from all elements
+      for (var i = 0; i < nav.length; i++) {
+          nav[i].classList.remove("active");
+      }
+      //Adds the 'active' class to the current page
+      var current = document.getElementsByClassName("nav")[0];
+      current.classList.add("active");
+      
 
+
+
+
+  });
+</script>
+
+{% include 'footer.html' %}

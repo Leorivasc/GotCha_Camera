@@ -3,7 +3,7 @@
 
    <h1 class="card">
         <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
-        Raw Cameras
+        Direct Video
     </h1>
     <div class="row">
         {% for camera in cameras %}
@@ -18,18 +18,26 @@
         
     </div>
     
-    <div class="row"><a href="#" class="buttonblue center topmargin" id="buttonBack">Back</a></div>
+
    
+        
     <script>
         //OnLoad event
         document.addEventListener("DOMContentLoaded", (event) => {
         
-            // Goes back to the previous page
-            var buttonBack = document.getElementById("buttonBack");
-            buttonBack.addEventListener("click", (event) => {
-                window.history.back();
-            });
+            //Top menu item selection
+            //Collects all elements from 'nav' class
+            var nav = document.getElementsByClassName("nav");
+            //Removes the 'active' class from all elements
+            for (var i = 0; i < nav.length; i++) {
+                nav[i].classList.remove("active");
+            }
+            //Adds the 'active' class to the current page
+            var current = document.getElementsByClassName("nav")[1];
+            current.classList.add("active");
+            
 
+    
     });
     </script>
 
