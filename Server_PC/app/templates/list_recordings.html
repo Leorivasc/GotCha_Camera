@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="1800">
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+{% include 'header.html' %}
 
-    <title>Processed Streams</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
-    <title>Recordings</title>
-</head>
-<body>
+
     <h1 class="card">Recordings list
         <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
     </h1>
@@ -26,5 +12,5 @@
             
         {% endfor %}
     </ul>
-</body>
-</html>
+
+{% include 'footer.html' %}

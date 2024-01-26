@@ -1,23 +1,6 @@
+{% include 'header.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
 
-<!--This page is used to display the local stream of the cameras passing through 'web_cam.py'-->
-<!--The page is refreshed every 30 minutes to avoid the stream to stop-->
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="1800">
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
-    <title>Processed Streams</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
-</head>
-<body>
     <h1 class="card">
         <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
         Processed Streams
@@ -50,7 +33,7 @@
                         </div>
                         {% endif %}
                         <div class="row">
-                            <a href="#" class="buttonblue" onclick="popupWindow('/camera_config/{{camera.name}}',670,370)">Camera Config</a>
+                            <a href="#" class="buttonblue" onclick="popupWindow('/camera_config/{{camera.name}}',670,400)">Camera Config</a>
                         </div>
                     </div>
                 </div>
@@ -89,7 +72,4 @@
     </script>
 
 
-</body>
-
-
-</html>
+{% include 'footer.html' %}

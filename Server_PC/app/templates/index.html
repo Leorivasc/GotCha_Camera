@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>GotCha!</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<style>
-  body {
-    padding-top: 100px;
-  }
-</style>
-<body>
+
+{% include 'header.html' %}
+
   <div class="container">
 
     <div class="row">
@@ -25,6 +16,5 @@
 
 </div>
   
-</body>
-</html>
+{% include 'footer.html' %}
 

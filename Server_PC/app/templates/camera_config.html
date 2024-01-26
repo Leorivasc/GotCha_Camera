@@ -1,21 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
 
 <!--This page is used to modify the configuration of a camera. The user can change the frameskip, the detection area, the detection threshold, the record time, the alert length, if the camera is triggerable and if it is enabled. The user can also go back to the cameras page.-->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
 
-    <title>Processed Streams</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
-</head>
-<body>
+{% include 'header.html' %}
 
     <h1 class="card">
         <img src="/static/img/logo_mini.jpg"  class="logo-mini">
@@ -62,6 +49,12 @@
                             <td><input type="checkbox" id="isEnabled" name="isEnabled" {% if camera.isEnabled %}checked{% endif %}></td>
                             <input type="hidden" id="isEnabled" name="isEnabled" value="off">    
                         </tr>
+                        <tr>
+                            <td><label for="recordProcessed">Record processed</label></td>
+                            <td><input type="checkbox" id="recordProcessed" name="recordProcessed" {% if camera.recordProcessed %}checked{% endif %}></td>
+                            <input type="hidden" id="recordProcessed" name="recordProcessed" value="off">    
+                        </tr>
+
                     </table>
                 </div>
 
@@ -73,7 +66,7 @@
             </div>
         </div>
        
-        <div id="result"></div>
+        <div class="saveconfirm" id="result"></div>
     </form>
     <div class="row"><a href="#" class="buttonblue center topmargin" id="buttonBack">Close</a></div>
 
@@ -105,7 +98,7 @@
                 resultDiv.innerHTML = xhr.responseText;
                 setTimeout(function() {
                     resultDiv.innerHTML = '';
-                }, 3000);
+                }, 1000);
             }
         };
         xhr.send(formData);
@@ -151,8 +144,6 @@
 
     
     </script>
-</body>
 
+{% include 'footer.html' %}
 
-    </script>
-</body>
