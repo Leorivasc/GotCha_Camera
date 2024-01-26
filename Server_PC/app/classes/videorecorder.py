@@ -4,12 +4,14 @@ import os
 import threading
 from . import functions as fn
 import time
+import socket
 
 class VideoRecorder:
     
-    def __init__(self, camera_name):
-        self.camera_name = camera_name
-        self.camera_config = fn.read_config(camera_name)[0]
+    def __init__(self, cameraName, processName=""):
+        self.cameraName = cameraName
+        self.processName = processName
+        self.cameraConfig = fn.read_config(cameraName)[0]
         self.date = None
         self.iniTicks = None
         self.filename = None
@@ -22,7 +24,7 @@ class VideoRecorder:
         #Get the path to the database file
         thisfolder = os.path.dirname(os.path.abspath(__file__))
         self.destfolder = os.path.join(thisfolder, '..', 'recordings')
-        self.url = f"http://{self.camera_config['ip_address']}:{self.camera_config['port']}"
+        self.url = f"http://{self.cameraConfig['ip_address']}:{self.cameraConfig['port']}"
 
     
     def _recordTimeLapseWEBM(self,url,timespan):
@@ -30,10 +32,10 @@ class VideoRecorder:
         #vp80 seems to work ok
 
         self.url=url
-        #self.tempfilename = f"{self.camera_name}_alert.webm"
+        #self.tempfilename = f"{self.cameraName}_alert.webm"
 
         #Init camera
-        cap = cv2.VideoCapture(f"{self.url}{self.camera_config['path']}")
+        cap = cv2.VideoCapture(f"{self.url}{self.cameraConfig['path']}")
         #Verify cam opening
         if not cap.isOpened():
             print("Error opening camera.")
@@ -43,7 +45,7 @@ class VideoRecorder:
         #fourcc = cv2.VideoWriter_fourcc(*'XVID')
         fourcc = cv2.VideoWriter_fourcc(*'vp80')
         
-        self.filename=f"{self.camera_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
+        self.filename=f"{self.processName}{self.cameraName}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
         self.thumbnailname=self.filename.replace(".webm",".jpg")
 
         video_out = cv2.VideoWriter(self.filename, fourcc, 12, (320,240))
@@ -65,7 +67,7 @@ class VideoRecorder:
 
             #Print datetime on frame
             frame = fn.add_datetime(frame)
-            frame = fn.add_text(frame,self.camera_name,10,20)
+            frame = fn.add_text(frame,self.cameraName,10,20)
 
             #Record frame
             video_out.write(frame)
@@ -93,11 +95,26 @@ class VideoRecorder:
         if self.recording:
             print("Busy recording")
             return
-        print(f"Recording {self.camera_name}, {timespan} seconds")
+        print(f"Recording {self.cameraName}, {timespan} seconds")
         self.recording = True
         thread = threading.Thread(target=self._recordTimeLapseWEBM, args=(self.url,timespan,))
         thread.start()
 
+
+    def recordProcessedTimeLapse(self,timespan):
+        if self.recording:
+            print("Busy recording")
+            return
+        print(f"Recording {self.cameraName}, {timespan} seconds")
+        self.recording = True
+
+        host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
+        server_ip = socket.gethostbyname(host_name)
+        #This is the LOCAL result of the processed video (the one with the bounding boxes)
+        processedurl = f"http://{server_ip}:{self.cameraConfig['mirrorport']}"
+        print(processedurl)
+        thread = threading.Thread(target=self._recordTimeLapseWEBM, args=(processedurl,timespan,))
+        thread.start()
 
 
     def isRecording(self):

@@ -211,3 +211,10 @@ body {
 
   }
 
+/*Used in camera_config.html save confirmation text*/
+  .saveconfirm{
+    position: absolute;
+    left: 300px;
+    top: 300px;
+    color: red
+  }

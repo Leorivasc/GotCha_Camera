@@ -26,8 +26,8 @@ class ProcessMovement:
 
         self.alerting= Alerting(self.camera_name) #Instantiate alerting handler object
         self.videoRecorder = VideoRecorder(self.camera_name) #Instantiate video recorder object
-        #self.savideorecorder = StandaloneVideoRecorder(self.url) #Instantiate standalone video recorder object
-
+        self.processedRecorder = VideoRecorder(self.camera_name,"Processed_") #Instantiate video recorder object for processed video
+        
         self.detectionclass = None
 
     def main_loop(self):
@@ -125,12 +125,18 @@ class ProcessMovement:
                     
                     cv2.rectangle(currentframe, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
                     
-                    if not self.alerting.isAlerting() and self.camera_conf['isTriggerable'] == 1:
+                    if not self.alerting.isAlerting() and camera['isTriggerable'] == 1:
                         self.alerting.startAlert() #Start alerting system
                     #self.videoRecorder.startRecording() #Start recording
 
                     if not self.videoRecorder.isRecording():
-                        self.videoRecorder.recordTimeLapse(self.camera_conf['recordtime']) #Start recording on its own thread
+                        self.videoRecorder.recordTimeLapse(camera['recordtime']) #Start recording on its own thread
+                        
+                        #Record processed images only if configured
+                        if camera['recordProcessed'] == 1:
+                            time.sleep(1) #Wait for the recording to start before starting the processed recording
+                            print("Recording processed video")
+                            self.processedRecorder.recordProcessedTimeLapse(camera['recordtime']) #Start recording on its own thread
 
                     continue #We don't want to trigger the alert again if there are more detections in this frame
 

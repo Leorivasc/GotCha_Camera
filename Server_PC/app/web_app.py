@@ -216,7 +216,7 @@ def modify_config():
     ans = update_config(camera_name, data)
 
     if ans:
-        return 'Config updated'
+        return 'Updated'
     else:
         return 'Error'
 
