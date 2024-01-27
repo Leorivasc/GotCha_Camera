@@ -31,6 +31,9 @@
                         <div class="row">
                             <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlarm('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}', 3600)">Alarm</a>
                         </div>
+                        <div class="row">
+                            <a href="#" id="restart_{{camera.name}}" class="button" onclick="sendRestart('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Restart</a>
+                        </div>
                         {% endif %}
                         <div class="row">
                             <a href="#" class="button" onclick="popupWindow('/camera_config/{{camera.name}}',670,400)">Config</a>

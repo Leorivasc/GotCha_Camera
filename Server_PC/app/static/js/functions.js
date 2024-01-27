@@ -37,6 +37,26 @@ function setRecord(cameraName,cameraip, cameraport){
     }
 }
 
+//Used in local_stream.html
+//Controls the alert buttons
+function sendRestart(cameraName,cameraip, cameraport){
+    //Set record button to red and send start recording to camera
+    //When return is completed, set record button to normal
+    var recordButton = document.getElementById("restart_"+cameraName);
+    recordButton.classList.replace("button","buttonred");
+    fetch("http://" + cameraip + ":" + cameraport + "/restart")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            recordButton.classList.replace("buttonred","button");
+        });
+   
+}
+
+
+
+
 //Opens a popup window with an url
 function popupWindow(url, width, height) {
     // Center position
