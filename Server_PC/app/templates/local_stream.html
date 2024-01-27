@@ -29,7 +29,7 @@
                         </div>
                         {% if camera.isTriggerable== 1 %}
                         <div class="row">
-                            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlarm('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}', 3600)">Alarm</a>
+                            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlarm('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}', 300)">Alarm</a>
                         </div>
                         <div class="row">
                             <a href="#" id="restart_{{camera.name}}" class="button" onclick="sendRestart('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Restart</a>
