@@ -1,18 +1,21 @@
 //Used in local_stream.html
 //Controls the alert buttons
-function setAlert(cameraName,cameraip, cameraport){
+function setAlarm(cameraName,cameraip, cameraport,seconds){
     //Set alert button to red and send alert to camera
     //If alert button is red, set it to green and send clear to camera
     var alertButton = document.getElementById("alert_"+cameraName);
-    if (alertButton.innerHTML == "Alert"){
+    if (alertButton.innerHTML == "Alarm"){
         alertButton.innerHTML = "Clear";
         alertButton.classList.replace("button","buttonred");
-        fetch("http://" + cameraip + ":" + cameraport + "/alarm")
+        fetch("http://" + cameraip + ":" + cameraport + "/alarm/" + seconds)
+        
+        
     }
     else{
-        alertButton.innerHTML = "Alert";
+        alertButton.innerHTML = "Alarm";
         alertButton.classList.replace("buttonred","button");
         fetch("http://" + cameraip + ":" + cameraport + "/clear")
+        
     }
 }
 

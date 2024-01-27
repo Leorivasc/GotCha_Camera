@@ -131,8 +131,9 @@ def mask_app(camera_name):
     host_name = socket.gethostname()
     server_ip = socket.gethostbyname(host_name)
     camera = read_config(camera_name)
+    loadP5=1 #Load p5.js library
 
-    return render_template('mask_app.html', camera=camera, host_name = host_name, server_ip = server_ip)
+    return render_template('mask_app.html', camera=camera, host_name = host_name, server_ip = server_ip, loadP5=loadP5)
 
 # Mask upload route
 @app.route('/upload_mask', methods=['POST'])

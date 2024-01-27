@@ -8,7 +8,7 @@
     
     <div class="row">
         {% for camera in cameras %}
-            <div class="column card" id="video">
+            <div class="column card" id="video_{{ camera.name }}">
                 <div class = "row">
 
                     <div class="column">
@@ -29,7 +29,7 @@
                         </div>
                         {% if camera.isTriggerable== 1 %}
                         <div class="row">
-                            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlert('{{camera.name}}','{{camera.ip_address}}','{{camera.port}}')">Alert</a>
+                            <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlarm('{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}', 3600)">Alarm</a>
                         </div>
                         {% endif %}
                         <div class="row">
@@ -37,6 +37,9 @@
                         </div>
                     </div>
                 </div>
+
+                
+                    
             </div>
         {% endfor %}
         
@@ -76,8 +79,9 @@
 
 
 
-
         });
+
+
 
         //Part of the floating window (future use)
         //dragElement(document.getElementById("floating"));

@@ -8,27 +8,30 @@ from . import functions as fn
 from .alerting import Alerting
 from .videorecorder import VideoRecorder
 from .threeframe import ThreeFrame
-
+import json
 
 class ProcessMovement:
 
-    def __init__(self, camera_name):
+    def __init__(self, camera_name, recorder_obj, processedrecorder_obj, alert_obj):
         self.camera_name = camera_name
         self.last_frame = None   #To store the last frame
         self.frame_thread = None #To control the thread from within the function
         self.frame_lock = threading.Lock()
         self.loopOK=True         #To control the restarting of the loop upon desconnection from cammera
-        self.foreverLoop=True   #To control the forever loop
+        #self.foreverLoop=True   #To control the forever loop
        
         self.camera_conf = fn.read_config(self.camera_name)[0] #Get camera configuration from DB using the camera name as key
-        self.url = f"http://{self.camera_conf['ip_address']}:{self.camera_conf['port']}" #url for the camera stream
+        #self.url = f"http://{self.camera_conf['ip_address']}:{self.camera_conf['port']}" #url for the camera
 
 
-        self.alerting= Alerting(self.camera_name) #Instantiate alerting handler object
-        self.videoRecorder = VideoRecorder(self.camera_name) #Instantiate video recorder object
-        self.processedRecorder = VideoRecorder(self.camera_name,"Processed_") #Instantiate video recorder object for processed video
-        
-        self.detectionclass = None
+        #self.alerting= Alerting(self.camera_name) #Instantiate alerting handler object
+        self.alerting= alert_obj #Reuses the alerting object from the main script
+        #self.videoRecorder = VideoRecorder(self.camera_name) #Instantiate video recorder object
+        self.videoRecorder = recorder_obj #Reuses the recorder object from the main script
+        #self.processedRecorder = VideoRecorder(self.camera_name,"Processed_") #Instantiate video recorder object for processed video
+        self.processedRecorder = processedrecorder_obj #Reuses the recorder object from the main script
+
+
 
     def main_loop(self):
 
@@ -155,8 +158,8 @@ class ProcessMovement:
             
         cap.release()
 
-        if self.foreverLoop:
-            self.restartLoop() 
+        #if self.foreverLoop:
+        #    self.restartLoop() 
 
 
 
@@ -165,9 +168,9 @@ class ProcessMovement:
 
 
         if self.frame_thread is None:
-            self.frame_thread = threading.Thread(target=self.three_frame_difference_loop)
+            self.frame_thread = threading.Thread(target=self.main_loop)
             self.loopOK=True
-            self.foreverLoop=True
+            #self.foreverLoop=True
             self.frame_thread.start()
             
             #self.frame_thread.join() #HANGS LOOP
@@ -214,7 +217,7 @@ class ProcessMovement:
                     b'\r\n' + frame_bytes + b'\r\n')    
 
 
-    def snapshot(self):
+    def getSnapshot(self):
         """Return the last frame as a JPEG image."""
         with self.frame_lock:
             if self.last_frame is None:
@@ -224,3 +227,13 @@ class ProcessMovement:
             frame_bytes = buffer.tobytes()
 
         return frame_bytes
+    
+    def getState(self):
+        """Return the object state."""
+        return self.loopOK
+
+    def getStateXX(self):
+        """Return the object state."""
+        response = {"loopOK": self.loopOK, "isRecording": self.videoRecorder.isRecording(),"isProcessedrecording": self.processedRecorder.isRecording(),"isAlerting": self.alerting.isAlerting()}
+        responseJSON = json.dumps(response)
+        return responseJSON

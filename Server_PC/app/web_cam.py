@@ -22,25 +22,28 @@ import os
 from flask_cors import CORS
 import classes.functions as fn
 from classes.videorecorder import VideoRecorder
+from classes.alerting import Alerting
 from classes.processmovement import ProcessMovement
+import json
 
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
 
 
 
+#----- Camera image and recording routes--------------------
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(cam_obj.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(processor_cam_obj.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/snapshot')
 def snapshot():
     #response.headers.add('Access-Control-Allow-Origin', '*')
-    #return Response(cam_obj.snapshot(), mimetype='image/jpeg')
+    #return Response(processor_cam_obj.snapshot(), mimetype='image/jpeg')
 
-    response = Response(cam_obj.snapshot(), mimetype='image/jpeg')
+    response = Response(processor_cam_obj.getSnapshot(), mimetype='image/jpeg')
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
@@ -60,21 +63,103 @@ def stoprecording():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+#-----Trigger actions routes--------------------
+@app.route('/alarm/<int:seconds>')
+def alarm(seconds):
+    alert_obj.startAlert(seconds)
+    response = Response("Manual alert triggered")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/clear')
+def clear():
+    alert_obj.stopAlert()
+    response = Response("Manual alert cleared")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+## -------Test routes ------------
+@app.route('/restart')
+def restart():
+    processor_cam_obj.restartLoop()
+    response = Response("Loop restarted")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+@app.route('/stop')
+def stop():
+    processor_cam_obj.stopLoop()
+    response = Response("Loop stopped")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+##--- Object state routes ------
+def getstateJSON():
+    
+        states = {
+            "loopOK": processor_cam_obj.getState(), 
+            "videoIsRecording": recorder_obj.isRecording(),
+            "processedVideoIsRecording": processedRecorder_obj.isRecording() ,
+            "isAlerting": alert_obj.isAlerting()
+            }
+        
+        statesJSON = json.dumps(states)   
+        return statesJSON
+
+def getStateHTML():
+    # Parse the JSON data
+    states = json.loads(getstateJSON())
+
+    # Create the HTML table
+    table_html = "<table>"
+    table_html += "<tr><th>Loop OK</th><th>Video Is Recording</th><th>Processed Video Is Recording</th><th>Is Alerting</th></tr>"
+    table_html += f"<tr><td>{states['loopOK']}</td><td>{states['videoIsRecording']}</td><td>{states['processedVideoIsRecording']}</td><td>{states['isAlerting']}</td></tr>"
+    table_html += "</table>"
+
+    return table_html
+
+
+@app.route('/getstate')
+#gets state in json format
+def getstate():
+
+    statesJSON=getstateJSON()
+    response = Response(statesJSON)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Content-Type', 'application/json')
+    return response
+
+
+
+@app.route('/getstatehtml')
+#gets state in html format
+def getstatehtml():
+    response = Response(getStateHTML())
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Content-Type', 'text/html')
+    return response
+
 
 #### Init portion ####
-
-
 #Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
 cam_env = os.getenv('CAMERA')
 print(f"START Camera: {cam_env}")
 cam=fn.read_config(cam_env)[0] #Read rest of the camera configuration from DB. Only the 1st result just in case.S
 
-cam_obj = ProcessMovement(cam['name']) #Create object to handle the camera
-
+#Instantiate objects for 'this' camera. Videorecorder and alerting. 
 recorder_obj = VideoRecorder(cam['name']) #Create object to handle the video recorder
+processedRecorder_obj = VideoRecorder(cam['name'],"Processed_") #Create object to handle the video recorder for processed video
+alert_obj = Alerting(cam['name']) #Create object to handle the alerting
+
+#Instantiate processor object for 'this' camera. ProcessMovement. Uses the recorder and alerting objects
+processor_cam_obj = ProcessMovement(cam['name'], recorder_obj,processedRecorder_obj ,alert_obj) #Create object to handle the camera
+
+
 
 #Start thread to read frames
-frame_thread = threading.Thread(target=cam_obj.main_loop)
+frame_thread = threading.Thread(target=processor_cam_obj.main_loop)
 frame_thread.daemon = True
 if not frame_thread.is_alive():
     print("Starting thread")

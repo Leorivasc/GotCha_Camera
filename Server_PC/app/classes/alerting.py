@@ -25,18 +25,22 @@ class Alerting:
 
 
 
-    def startAlert(self):
+    def startAlert(self, seconds=None):
 
         self.camera_conf = fn.read_config(self.camera_name)[0] #Refresh configuration from DB (in case it has changed)
         
+        #To allow triggering a different alert length than the camera default
+        if seconds is None:
+            seconds = self.camera_conf['alertlength']
+
         conn_ok, alertstatus = fn.do_get(f"{self.url}/status")
         alertstatus=json.loads(alertstatus) #Reads JSON status from camera
 
         #If camera is connected and alert is not active, send alarm
         if conn_ok and alertstatus['alert'] == "False":
-                print(f"Movement detected in camera {self.camera_conf['name']}. Sending alarm. {str(self.camera_conf['alertlength'])} seconds")
+                print(f"Movement detected in camera {self.camera_conf['name']}. Sending alarm. {str(seconds)} seconds")
                 fn.do_get(f"{self.url}/alarm") #Send alarm to camera
-                self._run_timer(self.camera_conf['alertlength'], self.stopAlert) #Start timer to stop alarm
+                self._run_timer(seconds, self.stopAlert) #Start timer to stop alarm
         else:
             #print("Movement detected but alarm already active")
             pass

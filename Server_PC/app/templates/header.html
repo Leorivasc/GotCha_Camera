@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/p5.js') }}"></script>
+    {% if loadP5 == 1 %}
+        <script src="{{ url_for('static', filename='js/p5.js') }}"></script>
+    {% endif %}
     <title>GotCha</title>
 </head>
 
