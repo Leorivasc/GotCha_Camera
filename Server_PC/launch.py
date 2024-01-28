@@ -14,7 +14,7 @@ from app import *
 #Change current dir to app. It all happens in the app folder
 os.chdir("app")
 #Prepare and read cameras config database
-cameras = read_config_all() #Read all enabled cameras
+cameras = read_config_all("isEnabled=1") #Read all enabled cameras
 
 
 #Prepare gunicorn command

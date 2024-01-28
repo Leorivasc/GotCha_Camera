@@ -49,7 +49,7 @@ def read_config(camera_name):
         Camera information row as dict.
     """
     connection = SQLiteDB()
-    connection.connect()
+
 
     camera=None
     while camera is None:
@@ -61,29 +61,27 @@ def read_config(camera_name):
             time.sleep(1)
 
             
-    
-    connection.close_connection()
     return camera
 
 
-def read_config_all():
+def read_config_all(condition=None):
     """Read all the cameras configuration from database by using SQLiteDB class.
     Returns:
         Camera information rows as dict.
     """
     connection = SQLiteDB()
-    connection.connect()
+
     cameras=None
 
     while cameras is None:
         try:
-            cameras = connection.query_data_dict("cameras", "isEnabled=1")
+            cameras = connection.query_data_dict("cameras", condition)
         except:
             #If the database is locked, wait 1 second and try again
             print("Database locked. Waiting 1 second...")
             time.sleep(1)
     
-    connection.close_connection()
+
     return cameras
 
 def update_config(camera_name, data):
@@ -95,7 +93,7 @@ def update_config(camera_name, data):
         True if the update was successful, False otherwise.
     """
     connection = SQLiteDB()
-    connection.connect()
+
     ans=False
 
     while ans is False:
@@ -106,11 +104,28 @@ def update_config(camera_name, data):
             print("Database locked. Waiting 1 second...")
             time.sleep(1)
     
-    connection.close_connection()
+
     return ans
 
 
+def new_camera(data):
+    connection = SQLiteDB()
 
+    #Insert the camera
+    id = connection.insert_data("cameras", data)
+
+    #Update the camera name with mirror port 5000+id
+    connection.update_data("cameras", {"mirrorport":5000+id}, "id="+str(id))
+
+    return id
+
+def delete_camera(camera_name):
+    connection = SQLiteDB()
+
+    #Delete the camera
+    ans = connection.delete_data("cameras", "name='"+camera_name+"'")
+
+    return ans
 
 def add_datetime(frame):
     #Get date

@@ -24,7 +24,6 @@ import random
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
 
-
 #Generates the frames to be served locally
 def generate_frames(camera_url):
     cap = cv2.VideoCapture(camera_url)
@@ -46,8 +45,6 @@ def generate_frames(camera_url):
 
 ###################################
 #-----------Routes----------------#
-
-cameras = read_config_all()
 
 #entry point
 @app.route('/')
@@ -81,7 +78,7 @@ def video_feed(camera_id):
 @app.route('/local_stream')
 def video_local_stream():
     random_value = random.randint(1, 100) #To avoid caching
-    cameras = read_config_all() #Refresh cameras list and config
+    cameras = read_config_all("isEnabled=1") #Refresh enabled cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
     server_ip = socket.gethostbyname(host_name)
@@ -161,7 +158,7 @@ def upload_file():
 #-----------Config routes-----------------
 #Template for cameras config
 @app.route('/camera_config/<camera_name>')
-def cameras_config(camera_name):
+def camera_config(camera_name):
     try:
         camera = read_config(camera_name)[0]
     except:
@@ -171,8 +168,9 @@ def cameras_config(camera_name):
 
 
 ###TEST###
+##To use with floating div. Not used
 @app.route('/camera_config_inc/<camera_name>')
-def cameras_config_inc(camera_name):
+def camera_config_inc(camera_name):
     try:
         camera = read_config(camera_name)[0]
     except:
@@ -198,7 +196,7 @@ def modify_config():
 
 
 
-    #Update config
+    #Manage as dict
     data=request.form.to_dict()
    
     #Data validation before updating
@@ -225,7 +223,74 @@ def modify_config():
     else:
         return 'Error'
 
+#Route to ALL cameras config
+@app.route('/cameras_setup')
+def cameras_setup():
+    cameras = read_config_all() #Get all cameras
+    return render_template('cameras_setup.html', cameras=cameras)
 
+
+#Route to add new cameras (POST ONLY)
+@app.route('/add_camera', methods=['POST'])
+def add_camera():
+    #Verify right request
+    if 'name' not in request.form:
+        return 'Camera name not sent'
+
+    camera_name = request.form['name']
+    camera = read_config(camera_name)
+
+    #Check if camera exists
+    if camera:
+        return 'Camera already exists'
+
+    #Manage as dict
+    data=request.form.to_dict()
+   
+    #Data validation before updating
+    for key in data:
+    
+        #Make sure numeric values are not empty
+        if data[key] == '':
+            return "Some empty values"
+
+
+
+
+
+    #Perform the update
+    ans = new_camera(data)
+
+    if ans:
+        return 'Added'
+    else:
+        return 'Error'
+
+
+@app.route('/delete_camera', methods=['POST'])
+def delete_camera():
+    #Verify right request
+    if 'name' not in request.form:
+        return 'Camera name not sent'
+
+    camera_name = request.form['name']
+    camera = read_config(camera_name)
+
+    #Check if camera exists
+    if not camera:
+        return 'Camera not found'
+
+    #Perform the update
+    ans = delete_camera(camera_name)
+
+    if ans:
+        return 'Deleted'
+    else:
+        return 'Error'
+
+
+
+cameras = read_config_all("isEnabled=1") #Only enabled cameras
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, port=8080, host='0.0.0.0')

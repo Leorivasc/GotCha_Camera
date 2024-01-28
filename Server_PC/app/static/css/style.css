@@ -265,3 +265,40 @@ body {
     text-align: center;
     border-radius: 5px;
   }
+
+
+  /* Estilo para la tabla */
+table {
+  border-collapse: collapse; /* Combina los bordes de las celdas */
+  width: 100%; /* Ancho total de la tabla */
+  font-size: smaller;
+  overflow-x: auto;
+}
+
+/* Estilo para todas las celdas */
+th {
+  border: 1px solid #000; /* Borde de 1px sólido negro */
+  padding: 8px; /* Espaciado interno de las celdas */
+  text-align: center; /* Alineación del texto a la izquierda */
+  background-color: #8f8f8f;
+}
+
+td {
+  border: 1px solid #000; /* Borde de 1px sólido negro */
+  padding: 8px; /* Espaciado interno de las celdas */
+  text-align: left; /* Alineación del texto a la izquierda */
+}
+
+/* Estilo para las filas pares */
+tr:nth-child(even) {
+  background-color: #f2f2f2; /* Color de fondo para filas pares */
+}
+
+/* Estilo para las filas impares */
+tr:nth-child(odd) {
+  background-color: #fff; /* Color de fondo para filas impares */
+}
+
+.input_textbox{
+  margin: 2px;
+}
