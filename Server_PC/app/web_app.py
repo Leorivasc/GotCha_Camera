@@ -104,7 +104,9 @@ def file_list():
     #files = os.listdir("recordings")
     os.chdir("recordings")
     files = sorted(glob.glob("*.webm"))
-    thumbnails=sorted(glob.glob("*.jpg"))
+    thumbnails = []
+    for file in files:
+        thumbnails.append(file.replace(".webm",".jpg"))
     #merge in a list of lists
     filesdata = []
     for file,thumbnail in zip(files,thumbnails):
