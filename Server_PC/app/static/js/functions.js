@@ -1,8 +1,11 @@
 //Used in local_stream.html
 //Controls the alert buttons
-function setAlarm(cameraName,cameraip, cameraport,seconds){
+function setAlarm(event,cameraName,cameraip, cameraport,seconds){
     //Set alert button to red and send alert to camera
     //If alert button is red, set it to green and send clear to camera
+
+    event.preventDefault(); //prevent from scrolling to top of page
+
     var alertButton = document.getElementById("alert_"+cameraName);
     if (alertButton.innerHTML == "Alarm"){
         alertButton.innerHTML = "Clear";
@@ -21,9 +24,12 @@ function setAlarm(cameraName,cameraip, cameraport,seconds){
 
 //Used in local_stream.html
 //Controls the alert buttons
-function setRecord(cameraName,cameraip, cameraport){
+function setRecord(event,cameraName,cameraip, cameraport){
     //Set record button to red and send start recording to camera
     //If record button is red, set it to green and send stop recording to camera
+
+    event.preventDefault(); //prevent from scrolling to top of page
+
     var recordButton = document.getElementById("record_"+cameraName);
     if (recordButton.innerHTML == "Record"){
         recordButton.innerHTML = "Stop";
@@ -39,9 +45,12 @@ function setRecord(cameraName,cameraip, cameraport){
 
 //Used in local_stream.html
 //Controls the alert buttons
-function sendRestart(cameraName,cameraip, cameraport){
+function sendRestart(event, cameraName,cameraip, cameraport){
     //Set record button to red and send start recording to camera
     //When return is completed, set record button to normal
+
+    event.preventDefault(); //prevent from scrolling to top of page
+    
     var recordButton = document.getElementById("restart_"+cameraName);
     recordButton.classList.replace("button","buttonred");
     fetch("http://" + cameraip + ":" + cameraport + "/restart")

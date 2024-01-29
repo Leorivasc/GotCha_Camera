@@ -148,6 +148,7 @@ body {
     border: 2px solid #ff9102cf; 
     border-radius: 8px; /* Rounded borders */
     overflow: hidden; /* Cover if overflow */
+   
   }
 
   /* Tag */
@@ -168,6 +169,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background-image: url("/static/img/no_signal.gif");
   }
 
 
