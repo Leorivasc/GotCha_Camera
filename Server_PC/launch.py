@@ -12,6 +12,9 @@ from app.classes.functions import *
 from app import *
 
 #Change current dir to app. It all happens in the app folder
+#get current working directory
+cwd = os.getcwd()
+os.chdir(cwd)
 os.chdir("app")
 #Prepare and read cameras config database
 cameras = read_config_all("isEnabled=1") #Read all enabled cameras
