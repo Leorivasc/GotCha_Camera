@@ -3,7 +3,7 @@
 Create the file: 
 
 ```
-/etc/systemd/system/gotchacam.service
+/etc/systemd/system/gotchaweb.service
 ```
 
 With the followig content and modify to fit your setup
@@ -35,8 +35,8 @@ WantedBy=multi-user.target
 Then run:
 
 ```
-sudo systemctl enable gotchacam
-sudo systemctl start gotchacam
+sudo systemctl enable gotchaweb
+sudo systemctl start gotchaweb
 ```
 
 To apply changes:
