@@ -10,14 +10,22 @@ With the followig content and modify to fit your setup
 
 ```
 [Unit]
-Description=GotCha Camera Service
+Description=GotCha Web Service
 After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/<your_path_to_venv>/bin/python3 /<path_to_script>/stream_server_actions.py
+
+WorkingDirectory=<Path to>/Server_PC
+
+#Two paths here, the one pointing to libraries, the other for executables (gunicorn)
+Environment="PATH=<Path to VENV>/lib/python3.11/site-packages:<Path to VENV>/bin"
+
+
+ExecStart=<Path to VENV>/bin/python3 <Path to>/Server_PC/launch.py
 Restart=always
-User=<user>
+User=leo
+Group=leo
 
 [Install]
 WantedBy=multi-user.target
