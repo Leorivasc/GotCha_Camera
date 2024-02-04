@@ -1,0 +1,14 @@
+#Please customize to target system
+
+[Unit]
+Description=GotCha Camera Service
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/leo/VENV/bin/python3 /home/leo/CamTests/camera/stream_server_actions.py
+Restart=always
+User=leo
+
+[Install]
+WantedBy=multi-user.target
