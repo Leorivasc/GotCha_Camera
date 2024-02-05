@@ -153,10 +153,11 @@ def add_datetime(frame):
     font = cv2.FONT_HERSHEY_SIMPLEX
     bottom_left_corner = (10, frame.shape[0] - 10)
     font_scale = 0.5
-    font_color = (0, 255, 0)  # Verde
+    font_color = (11, 127, 217)  # Orange
     line_type = 1
 
     #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, (0,0,0), 3) #Shadow
     cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
     return frame
 
@@ -166,10 +167,11 @@ def add_text(frame, text, x,y):
     font = cv2.FONT_HERSHEY_SIMPLEX
     bottom_left_corner = (x,y)
     font_scale = 0.5
-    font_color = (0, 255, 0)  # Verde
+    font_color = (11, 127, 217)  # Orange
     line_type = 1
 
     #Put text
+    cv2.putText(frame, text, bottom_left_corner, font, font_scale, (0,0,0), 3) #Shadow
     cv2.putText(frame, text, bottom_left_corner, font, font_scale, font_color, line_type)
     return frame
 
