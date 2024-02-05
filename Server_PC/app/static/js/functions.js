@@ -67,7 +67,8 @@ function sendRestart(event, cameraName,cameraip, cameraport){
 
 
 //Opens a popup window with an url
-function popupWindow(url, width, height) {
+function popupWindow(event,url, width, height) {
+    event.preventDefault(); //prevent from scrolling to top of page
     // Center position
     const left = (screen.width - width) / 2;
     const top = (screen.height - height) / 2;

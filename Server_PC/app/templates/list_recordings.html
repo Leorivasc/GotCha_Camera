@@ -8,7 +8,7 @@
     <ul class="card">
         {% for duple in filesdata %}
             
-            <a href="{{ url_for('download_file', filename=duple[0]) }}"><img src="{{ url_for('download_file', filename=duple[1]) }}" alt="image" width="160" height="120"></a>
+            <a href="#" onclick="popupWindow(event,'{{ url_for('download_file', filename=duple[0]) }}',330,250)"><img src="{{ url_for('download_file', filename=duple[1]) }}" alt="image" width="160" height="120"></a>
             
         {% endfor %}
     </ul>

@@ -22,7 +22,7 @@
         
                     <div class="column" id="data" style="margin-top:5px">
                         <div class="col-4">
-                            <a href="#" class="button" onclick="popupWindow('/mask_app/{{ camera.name }}',680,400)">Mask</a>
+                            <a href="#" class="button" onclick="popupWindow(event,'/mask_app/{{ camera.name }}',680,400)">Mask</a>
                         </div>
                         <div class="col-4">
                             <a href="#" id="record_{{camera.name}}" class="button" onclick="setRecord(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
@@ -36,7 +36,7 @@
                             <a href="#" id="restart_{{camera.name}}" class="button" onclick="sendRestart(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Restart</a>
                         </div>
                         <div class="col-4">
-                            <a href="#" class="button" onclick="popupWindow('/camera_config/{{camera.name}}',670,400)">Config</a>
+                            <a href="#" class="button" onclick="popupWindow(event,'/camera_config/{{camera.name}}',670,400)">Config</a>
                         </div>
                     </div>
                 </div>
