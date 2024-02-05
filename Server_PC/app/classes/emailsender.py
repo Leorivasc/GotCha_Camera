@@ -43,11 +43,11 @@ class EmailSender:
                               html=body) #Sends as html
             
             if attachment: #Attach image if available (for alerts)
-                with self.app.open_resource(attachment) as fp:
-                    try:
+                try:
+                    with self.app.open_resource(attachment) as fp:
                         message.attach(attachment, "image/jpeg", fp.read())
-                    except Exception as e:
-                        print(f"Error attaching file: {e} video still recording?")
+                except Exception as e:
+                    print(f"Error attaching file: {e} video still recording?")
             
             print(f"Sending email...")
             self.mail.send(message)
