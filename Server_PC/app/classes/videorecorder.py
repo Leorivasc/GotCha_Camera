@@ -14,7 +14,7 @@ class VideoRecorder:
         self.cameraConfig = fn.read_config(cameraName)[0]
         self.date = None
         self.iniTicks = None
-        self.filename = None
+        self.videofilename = None
         self.thumbnailname = None
         self.video_out = None
 
@@ -45,10 +45,10 @@ class VideoRecorder:
         #fourcc = cv2.VideoWriter_fourcc(*'XVID')
         fourcc = cv2.VideoWriter_fourcc(*'vp80')
         
-        self.filename=f"{self.processName}{self.cameraName}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
-        self.thumbnailname=self.filename.replace(".webm",".jpg")
+        self.videofilename=f"{self.processName}{self.cameraName}_{datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')}.webm"
+        self.thumbnailname=self.videofilename.replace(".webm",".jpg")
 
-        video_out = cv2.VideoWriter(self.filename, fourcc, 12, (320,240))
+        video_out = cv2.VideoWriter(self.videofilename, fourcc, 12, (320,240))
 
         
         #Graba la secuencia de video durante 10 segundos
@@ -85,9 +85,9 @@ class VideoRecorder:
         print("Recording finished")
         self.recording = False #Recording finished
          #create thumbnail
-        self.createThumbnail(self.filename, self.thumbnailname)
+        self.createThumbnail(self.videofilename, self.thumbnailname)
         #Move files to dest folder
-        os.rename(self.filename, os.path.join(self.destfolder,self.filename)) 
+        os.rename(self.videofilename, os.path.join(self.destfolder,self.videofilename)) 
         os.rename(self.thumbnailname, os.path.join(self.destfolder,self.thumbnailname)) 
 
 
@@ -140,4 +140,12 @@ class VideoRecorder:
     def getLastThumbnailName(self):
         #Returns the last thumbnail created
         return self.thumbnailname
+    
+    def getLastVideoName(self):
+        #Returns the last video created
+        return self.videofilename
+    
+    def getLastThumbnailPath(self):
+        #Absolute path to the last thumbnail (to prevent the '..' in the path)
+        return os.path.abspath(os.path.join(self.destfolder,self.thumbnailname))
     

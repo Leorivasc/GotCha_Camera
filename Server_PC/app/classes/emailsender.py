@@ -27,12 +27,12 @@ class EmailSender:
         self.app.config['MAIL_DEFAULT_SENDER'] = self.email_conf['MAIL_DEFAULT_SENDER']
         self.mail.init_app(self.app)
 
-    def _send(self, recipient, subject, body):
-        '''Envía un correo electrónico al destinatario con el asunto y el cuerpo especificados. No utilices este método directamente, utiliza send() en su lugar.
+    def _send(self, recipient, subject, body, attachment=None):
+        '''Sends an email to the recipient with the specified subject and body. Do not use this method directly, use send() instead.
         Args:
-            recipient (str): La dirección de correo electrónico del destinatario.
-            subject (str): El asunto del correo electrónico.
-            body (str): El cuerpo del correo electrónico.'''
+            recipient (str): The email address of the recipient.
+            subject (str): The subject of the email.
+            body (str): The body of the email.'''
         
 
 
@@ -40,15 +40,25 @@ class EmailSender:
             message = Message(subject=subject,
                               sender=f"Gotcha Security System <{self.email_conf['MAIL_DEFAULT_SENDER']}>",
                               recipients=[recipient],
-                              body=body)
-            print("Sending email...")
+                              html=body) #Sends as html
+            
+            if attachment: #Attach image if available (for alerts)
+                with self.app.open_resource(attachment) as fp:
+                    try:
+                        message.attach(attachment, "image/jpeg", fp.read())
+                    except Exception as e:
+                        print(f"Error attaching file: {e} video still recording?")
+            
+            print(f"Sending email...")
             self.mail.send(message)
+            print(f"Email sent to {recipient}")
 
-    def send(self, recipient, subject, body):
-        '''Envía un correo electrónico al destinatario con el asunto y el cuerpo especificados en un hilo separado (ÚSALO)
+
+    def send(self, recipient, subject, body, attachment=None):
+        '''Sends an email to the recipient with the specified subject and body in a separate thread (USE THIS)
         Args:
-            recipient (str): La dirección de correo electrónico del destinatario.
-            subject (str): El asunto del correo electrónico.
-            body (str): El cuerpo del correo electrónico.'''
-        thread = threading.Thread(target=self._send, args=(recipient, subject, body))
+            recipient (str): The email address of the recipient.
+            subject (str): The subject of the email.
+            body (str): The body of the email.'''
+        thread = threading.Thread(target=self._send, args=(recipient, subject, body, attachment))
         thread.start()

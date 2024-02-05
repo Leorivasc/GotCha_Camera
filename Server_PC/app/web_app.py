@@ -81,7 +81,8 @@ def video_local_stream():
     cameras = read_config_all("isEnabled=1") #Refresh enabled cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
-    server_ip = socket.gethostbyname(host_name)
+    #server_ip = socket.gethostbyname(host_name)
+    server_ip=request.host.split(':')[0] #Safer way to get the server IP
 
     #Send cameras and server data to the template
     return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip, random_value = random_value)

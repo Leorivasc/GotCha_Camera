@@ -8,10 +8,11 @@ from .emailsender import EmailSender
 class Alerting:
     """This class implements an alerting system handler."""
 
-    def __init__(self, camera_name, app, recorder_obj):
+    def __init__(self, camera_name, app, recorder_obj,server_url):
         self.camera_name = camera_name
         self.camera_conf = fn.read_config(self.camera_name)[0] #Get camera configuration from DB using the camera name as key
         self.url = f"http://{self.camera_conf['ip_address']}:{self.camera_conf['port']}" #url for the camera stream
+        self.server_url = server_url
         self.isalerting = False
         self.recorder_obj = recorder_obj
         self.body = ""
@@ -64,9 +65,16 @@ class Alerting:
         #print(f"StopAlert() ALERTSTATUS:{alertstatus['alert']}") #Debug
 
         #Send email. At this point, video and thumbnail are already saved
-        self.body = self.body + f" Last image: {self.recorder_obj.getLastThumbnailName()}"
-        print (self.body)
-        self.email.send(self.camera_conf['emailAlert'], "Security Alert", self.body)
+        last_video = self.recorder_obj.getLastVideoName()
+        last_thumbnail = self.recorder_obj.getLastThumbnailName()
+        #Get the path to the last thumbnail
+        last_thumbnail_path = self.recorder_obj.getLastThumbnailPath()
+
+        self.body = self.body + f" <a href='{self.server_url}/download/{last_video}'>Watch video here</a><p>The Gotcha Security Team."
+
+        #Send email with the last thumbnail if present
+        #(Only if alert is longer than recording time)
+        self.email.send(self.camera_conf['emailAlert'], "Security Alert", self.body, last_thumbnail_path)
 
         #If camera is connected and alert is active, STOP alarm
         if conn_ok: #and alertstatus['alert'] == "True":
