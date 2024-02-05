@@ -43,7 +43,7 @@ class Alerting:
         conn_ok, alertstatus = fn.do_get(f"{self.url}/status")
         alertstatus=json.loads(alertstatus) #Reads JSON status from camera
 
-        print(f"StartAlert() ALERTSTATUS:{alertstatus['alert']}") #Debug
+        #print(f"StartAlert() ALERTSTATUS:{alertstatus['alert']}") #Debug
 
         #If camera is connected and alert is not active, send alarm
         if conn_ok and alertstatus['alert'] == "False":
@@ -53,14 +53,15 @@ class Alerting:
 
                 self._run_timer(seconds, self.stopAlert) #Start timer to stop alarm
         else:
-            print("Movement detected but alarm already active. Dropped.")
+            print(f"Already alerting..{self.camera_conf['name']}")
             
     
 
     def stopAlert(self):
         conn_ok, alertstatus = fn.do_get(f"{self.url}/status")
         alertstatus=json.loads(alertstatus) #Reads JSON status from camera
-        print(f"StopAlert() ALERTSTATUS:{alertstatus['alert']}") #Debug
+        
+        #print(f"StopAlert() ALERTSTATUS:{alertstatus['alert']}") #Debug
 
         #Send email. At this point, video and thumbnail are already saved
         self.body = self.body + f" Last image: {self.recorder_obj.getLastThumbnailName()}"
