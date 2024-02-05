@@ -7,8 +7,8 @@
 
 #This version works for a single camera. The name must be passed as an environment variable
 #The camera name must be in the database. The script will read the rest of the configuration from the database
-#The processed stream will be available at http://localhost:<mirrorport>/video_feed
-#The mirrorport is also read from the database
+#The processed stream will be available at http://<server_host>:<mirrorport>/video_feed
+#The mirrorport is also read from the database and it should be unique for each camera, in the range 5000-5000+<number_of_cameras>
 
 
 # TO RUN:
@@ -16,7 +16,7 @@
 # where cameraname is the name of the camera in the database
 
 
-from flask import Flask, render_template, Response
+from flask import Flask, Response
 import threading
 import os
 from flask_cors import CORS
@@ -151,7 +151,9 @@ cam=fn.read_config(cam_env)[0] #Read rest of the camera configuration from DB. O
 #Instantiate objects for 'this' camera. Videorecorder and alerting. 
 recorder_obj = VideoRecorder(cam['name']) #Create object to handle the video recorder
 processedRecorder_obj = VideoRecorder(cam['name'],"Processed_") #Create object to handle the video recorder for processed video
-alert_obj = Alerting(cam['name']) #Create object to handle the alerting
+#Create object to handle the alerting. Notice app context is passed to the email sender
+#It will also use the recorder object to gain access to last thumbnails and video files if needed
+alert_obj = Alerting(cam['name'],app,recorder_obj) 
 
 #Instantiate processor object for 'this' camera. ProcessMovement. Uses the recorder and alerting objects
 processor_cam_obj = ProcessMovement(cam['name'], recorder_obj,processedRecorder_obj ,alert_obj) #Create object to handle the camera

@@ -128,9 +128,10 @@ class ProcessMovement:
                     
                     cv2.rectangle(currentframe, (x, y), (x+w, y+h), (0,0,255), 1) #Red rectangle
                     
-                    if not self.alerting.isAlerting() and camera['isTriggerable'] == 1:
+                    if camera['isTriggerable'] == 1:
+                        #Alerting takes care of repeated alerts
                         self.alerting.startAlert() #Start alerting system
-                    #self.videoRecorder.startRecording() #Start recording
+                    
 
                     if not self.videoRecorder.isRecording():
                         self.videoRecorder.recordTimeLapse(camera['recordtime']) #Start recording on its own thread

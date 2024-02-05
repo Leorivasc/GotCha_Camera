@@ -138,8 +138,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             relay.turn_on()       #Turn relay on (lights?)
             led.set_frequency(10) #Set blinking freq
             led.start_blinking()  #Starts led blinking
-            self.send_html_response("ALARM!")
             isAlert=True
+            self.send_html_response("ALARM!")
+            
 
         #Clears alarm mode
         elif self.path=='/clear':
@@ -150,8 +151,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             else:
                 led.set_frequency(0.5) #Set blinking freq    
             led.start_blinking()  #Starts led blinking
-            self.send_html_response("ALL CLEAR!")
             isAlert=False
+            self.send_html_response("ALL CLEAR!")
+            
 
         #----Entry point, returns the default index.html----#
         #Returns Index.html

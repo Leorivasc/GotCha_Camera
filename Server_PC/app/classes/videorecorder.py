@@ -135,3 +135,9 @@ class VideoRecorder:
         if success:
             cv2.imwrite(dest_file, image)
         cap.release()
+
+
+    def getLastThumbnailName(self):
+        #Returns the last thumbnail created
+        return self.thumbnailname
+    

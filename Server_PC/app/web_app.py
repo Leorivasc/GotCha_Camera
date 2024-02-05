@@ -1,7 +1,7 @@
-# This is the main file that runs the server
-# It is responsible for serving the html templates and the video feed
+# This is the main file that runs the main web server
+# It is responsible for serving the html templates and the video feeds
 # It also contains the list of cameras that will be served
-# It serves the main page at localhost:8080
+# It serves the main page at http://<server_ip>:8080
 
 # Start the server with:
 # python3 web_app.py for TESTING

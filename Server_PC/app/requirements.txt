@@ -1,8 +1,11 @@
+    wheel
     opencv-python
     flask
+    flask-mail
+    flask-cors
     gunicorn
     gevent
     pygame
     requests
-    flask-cors
+    
     

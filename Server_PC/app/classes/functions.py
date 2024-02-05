@@ -63,6 +63,23 @@ def read_config(camera_name):
             
     return camera
 
+def read_email_config():
+    """Read the email configuration from database by using SQLiteDB class.
+    Returns:
+        Email information row as dict.
+    """
+    connection = SQLiteDB()
+
+    email=None
+    while email is None:
+        try:
+            email = connection.query_data_dict("email", "id=1") #There is only one row in the email table
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+
+    return email
 
 def read_config_all(condition=None):
     """Read all the cameras configuration from database by using SQLiteDB class.
