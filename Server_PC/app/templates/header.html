@@ -11,8 +11,13 @@
 
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/w2ui-2.0.min.css') }}">
+
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mask_app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/w2ui-2.0.min.js') }}"></script>
+
     {% if loadP5 == 1 %}
         <script src="{{ url_for('static', filename='js/p5.js') }}"></script>
     {% endif %}

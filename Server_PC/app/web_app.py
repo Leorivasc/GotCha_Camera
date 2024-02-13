@@ -20,6 +20,7 @@ import socket
 import os
 import glob
 import random
+import json
 
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
@@ -133,6 +134,7 @@ def mask_app(camera_name):
     camera = read_config(camera_name)
     loadP5=1 #Load p5.js library
 
+    #Notice flag to allow the loading of p5.js library
     return render_template('mask_app.html', camera=camera, host_name = host_name, server_ip = server_ip, loadP5=loadP5)
 
 # Mask upload route
@@ -190,14 +192,13 @@ def modify_config():
     if 'name' not in request.form:
         return 'Camera name not sent'
 
-    camera_name = request.form['name']
+    camera_name = request.form['name'] #Get camera name
     camera = read_config(camera_name)
 
     #Check if camera exists
-    if not camera:
+    if not camera and request.form['name']==None:
+        #Camera not found but it is a new camera or a camera renaming. We rely on id here
         return 'Camera not found'
-
-
 
     #Manage as dict
     data=request.form.to_dict()
@@ -290,6 +291,93 @@ def delete_camera():
         return 'Deleted'
     else:
         return 'Error'
+
+
+
+#Route to return all cameras as JSON
+@app.route('/getcameras_conf')
+def getcameras_conf():
+    cameras = read_config_all()
+    jcameras = jsonify(cameras)
+    jcameras.status_code=200
+    return jcameras
+
+
+
+
+# Route to handle configuration modification requests from W2UI
+@app.route('/w2ui_db', methods=['GET','POST'])
+def w2ui_db():
+    
+    method = request.method
+    records = read_config_all()
+    requested = json.loads(request.args.get('request'))
+    
+    #If method was GET, return the database
+    if method == 'GET':
+        
+
+        if requested['limit']:
+            limit = int(requested['limit'])
+            records = records[:limit]
+
+            response = {'status': 'success', 'total': len(records), 'records': records}
+            return response, 200
+
+
+        elif requested['changes']:
+            response = {'status': 'success'}
+            return jsonify(response), 200
+            
+
+    #If method was POST, handle the request
+    #notice this request also has a 'request' key in request.args data
+    elif method == 'POST':
+        data = request.form.to_dict()
+
+
+        if requested == 'get-records':
+            # Get the records from the database and send them back to the client
+            records = read_config_all()
+            response = {'status': 'success', 'total': len(records), 'records': records}
+            return jsonify(response), 200
+        
+        elif requested['action'] == 'save':
+            # Save the record to the database
+            #record = data.get('record')
+            #recid = record.get('recid')
+            #column = data.get('column')
+            #value = data.get('value')
+
+            # Send a response back to the client, indicating whether the operation was successful
+            response = {'status': 'success', 'message': 'Record saved successfully'}
+            return response, 200
+
+        elif requested == 'delete':
+            # Delete the record from the database
+            recid = data.get('recid')
+
+            # Send a response back to the client, indicating whether the operation was successful
+            response = {'status': 'success', 'message': 'Record deleted successfully'}
+            return jsonify(response), 200
+        
+        elif requested == 'update':
+            # Update the record in the database
+            recid = data.get('recid')
+            record = data.get('record')
+            
+            # Send a response back to the client, indicating whether the operation was successful
+            response = {'status': 'success', 'message': 'Record updated successfully'}
+            return jsonify(response), 200
+
+        elif requested == 'none':
+            return {"status" : "success"},200
+        
+        else:
+            # Send a response back to the client, indicating that the request was not recognized
+            response = {'status': 'error', 'message': 'Request not recognized'}
+            return jsonify(response), 400
+
 
 
 

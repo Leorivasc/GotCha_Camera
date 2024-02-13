@@ -150,3 +150,42 @@ function readAndShow(url, params, divdestination) {
        });
 }
 
+//Sends POST data to an url, then calls a callback function
+//Will convert data to a URL-encoded string and send as if it was a form
+function sendPost(data, url, callback) {
+    // Create an instance of XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+
+    // Convert the data to a URL-encoded string
+    let formData = '';
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            formData += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+        }
+    }
+    formData = formData.slice(0, -1); // Remove the trailing '&'
+
+    // Configure the POST request
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // Set content type as form data
+
+    // Handle the 'load' event that fires when the request is complete
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) { // Check if the request was successful
+            // Execute the callback with a success message
+            callback('POST request completed successfully!');
+        } else {
+            // Execute the callback with an error message
+            callback('Error while making the POST request!');
+        }
+    };
+
+    // Handle the 'error' event that fires when there is an error in the request
+    xhr.onerror = function () {
+        // Execute the callback with an error message
+        callback('Error while making the POST request!');
+    };
+
+    // Send the request with the form data
+    xhr.send(formData);
+}

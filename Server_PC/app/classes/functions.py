@@ -101,8 +101,12 @@ def read_config_all(condition=None):
 
     return cameras
 
+
 def update_config(camera_name, data):
     """Update a row given the camera name and the data to be updated.
+    Notice that NAME is used as key to reference cameras, but whenever CAMERA NAME
+    is modified, we must use the id to reference the camera (w2ui grid specially)
+
     Args:
         camera_name (str): The name of the camera to be updated.
         data (dict): The data to be updated.
@@ -112,13 +116,22 @@ def update_config(camera_name, data):
     connection = SQLiteDB()
 
     ans=False
+    condition = "" #To be sent to the update_data function
+
+    #Whenever camera name is modified, we can't use it as condition, we must use the id
+    if data['id'] is not None:
+        condition = "id="+str(data['id'])
+        del data['id'] #Remove any operation on the id column
+    else:
+        condition = "name="+camera_name
+
 
     while ans is False:
         try:
-            ans = connection.update_data("cameras", data, "name='"+camera_name+"'")
-        except:
+            ans = connection.update_data("cameras", data, condition)
+        except Exception as e:
             #If the database is locked, wait 1 second and try again
-            print("Database locked. Waiting 1 second...")
+            print("Error updating. Waiting 1 second...")
             time.sleep(1)
     
 
