@@ -1,10 +1,10 @@
 body {
-    text-align: center;
+    
     font-family: Arial, sans-serif;
     background-color: #d1d1d1;
   }
   h1 {
-    font-size: 36px;
+    font-size: 20px;
     margin-bottom: 20px;
     text-align: center;
   }
@@ -18,10 +18,10 @@ body {
   .button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #333;
-    color: white;
+    background-color: #e8e8ee;
+    color: #676767;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 12px;
     border-radius: 5px;
     margin: 2px 2px 2px 2px;
     width: 60px;
@@ -29,7 +29,8 @@ body {
     text-align: center;
     border-style: solid;
     border-width: 1px;
-    border-color: #000000;
+    border-color: #676767;
+    box-sizing: content-box; /* To override w3 boxing */
   }
 
   .button:hover {
@@ -59,19 +60,10 @@ body {
   }
 
   .buttonred {
-    display: inline-block;
-    padding: 10px 20px;
+   
     background-color: #c92b33;
     color: white;
-    text-decoration: none;
-    font-size: 18px;
-    border-radius: 5px;
-    margin: 2px 2px 2px 2px;
-    width: 60px;
-    text-align: center;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #000000;
+    
   }
 
   .buttonred:hover {
@@ -120,13 +112,14 @@ body {
   .card {
     /*box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);*/
     margin: 10 10 10 10;
-    text-align: center;
+    /*text-align: center;*/
     background-color: whitesmoke;
     border-radius: 4px;
     padding: 4px;
     margin: 4px;
     border-style: solid;
     border-width: 1px;
+    border-color: #676767;
     
   }
 
@@ -206,7 +199,12 @@ body {
 
   .logo-mini
   {
-    float:right;
+    position: fixed;
+    top:2px;
+    right:4px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: #000000;
   }
 
   .label {
@@ -247,7 +245,7 @@ body {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 12px;
   }
   
   .topnav a:hover {
@@ -256,7 +254,7 @@ body {
   }
   
   .topnav a.active {
-    background-color: #ff9102cf;
+    background-color: #e8e8ee;
     color: black;
   }
 
@@ -304,3 +302,4 @@ body {
 .input_textbox{
   margin: 2px;
 }
+

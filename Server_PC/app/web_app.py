@@ -207,9 +207,9 @@ def modify_config():
     for key in data:
 
          ## traverse the data and change every 'on' to 1 and 'off' to 0 (checkboxes)
-        if data[key] == 'on':
+        if data[key] == 'on' or data[key] == 'true':
             data[key] = 1
-        elif data[key] == 'off':
+        elif data[key] == 'off' or data[key] == 'false':
             data[key] = 0
 
         ##Make sure numeric values are not empty

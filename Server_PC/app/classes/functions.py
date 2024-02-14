@@ -119,20 +119,23 @@ def update_config(camera_name, data):
     condition = "" #To be sent to the update_data function
 
     #Whenever camera name is modified, we can't use it as condition, we must use the id
-    if data['id'] is not None:
-        condition = "id="+str(data['id'])
+    
+    if data.get('id') is not None:
+        condition = "id='"+str(data['id'])+"'"
         del data['id'] #Remove any operation on the id column
     else:
-        condition = "name="+camera_name
+        condition = "name="+"'"+camera_name+"'"
 
 
-    while ans is False:
+    tries=0
+    while ans is False and tries<5: ##Will try 5 times before giving up
         try:
             ans = connection.update_data("cameras", data, condition)
         except Exception as e:
             #If the database is locked, wait 1 second and try again
             print("Error updating. Waiting 1 second...")
             time.sleep(1)
+            
     
 
     return ans

@@ -1,8 +1,7 @@
 {% include 'header.html' %}
 
 
-    <h1 class="card">
-        <img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini">
+    <h1 class="card">       
         Processed Streams
     </h1>
     
@@ -36,7 +35,7 @@
                             <a href="#" id="restart_{{camera.name}}" class="button" onclick="sendRestart(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Restart</a>
                         </div>
                         <div class="col-4">
-                            <a href="#" class="button" onclick="popupWindow(event,'/camera_config/{{camera.name}}',680,520)">Config</a>
+                            <a href="#" class="button" onclick="popupWindow(event,'/camera_config/{{camera.name}}',680,450)">Config</a>
                         </div>
                     </div>
                 </div>
@@ -49,7 +48,6 @@
     </div>
 
 
-    
 
     <!-- Floating window (future use)-->
     <div class="draggable card" id="floating" style="display:none">
@@ -85,11 +83,84 @@
         });
 
 
+        //Controls the alert buttons
+        function setAlarm(event,cameraName,cameraip, cameraport,seconds){
+            //Set alert button to red and send alert to camera
+            //If alert button is red, set it to green and send clear to camera
 
-        //Part of the floating window (future use)
-        //dragElement(document.getElementById("floating"));
-        //var xx = document.getElementById("floatingheader");
-        //doGet("camera_config_inc/Pi2","",xx);
+            event.preventDefault(); //prevent from scrolling to top of page
+
+            var button = document.getElementById("alert_"+cameraName);
+            if (button.innerHTML == "Alarm"){
+                button.innerHTML = "Clear";
+                changeToRed(button);
+                fetch("http://" + cameraip + ":" + cameraport + "/alarm/" + seconds)
+                
+                
+            }
+            else{
+                button.innerHTML = "Alarm";
+                changeToNormal(button);
+                fetch("http://" + cameraip + ":" + cameraport + "/clear")
+                
+            }
+        }
+
+      
+        //Controls the alert buttons
+        function setRecord(event,cameraName,cameraip, cameraport){
+            //Set record button to red and send start recording to camera
+            //If record button is red, set it to green and send stop recording to camera
+
+            event.preventDefault(); //prevent from scrolling to top of page
+
+            var button = document.getElementById("record_"+cameraName);
+            if (button.innerHTML == "Record"){
+                button.innerHTML = "Stop";
+                changeToRed(button);
+                fetch("http://" + cameraip + ":" + cameraport + "/startrecording")
+            }
+            else{
+                button.innerHTML = "Record";
+                changeToNormal(button);
+                fetch("http://" + cameraip + ":" + cameraport + "/stoprecording")
+            }
+        }
+
+        //Used in local_stream.html
+        //Controls the alert buttons
+        function sendRestart(event, cameraName,cameraip, cameraport){
+            //Set record button to red and send start recording to camera
+            //When return is completed, set record button to normal
+
+            event.preventDefault(); //prevent from scrolling to top of page
+            
+            var button = document.getElementById("restart_"+cameraName);
+            changeToRed(button);
+            fetch("http://" + cameraip + ":" + cameraport + "/restart")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    changeToNormal(button);
+                });
+        
+        }
+
+        //Applies red color to button
+        function changeToRed(button){
+            button.classList.add("buttonred");
+        }
+
+        //Removes red color from button
+        function changeToNormal(button){
+            button.classList.remove("buttonred");
+        }
+
+                //Part of the floating window (future use)
+                //dragElement(document.getElementById("floating"));
+                //var xx = document.getElementById("floatingheader");
+                //doGet("camera_config_inc/Pi2","",xx);
         
     </script>
 
