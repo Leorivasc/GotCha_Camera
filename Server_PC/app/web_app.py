@@ -57,6 +57,9 @@ def index():
 #Camera streaming route (fast, directly from cameras)
 @app.route('/cameras_fast')
 def cameras_fast():
+
+    cameras=read_config_all("isEnabled=1") #Only enabled cameras
+    
     return render_template('cameras_fast.html', cameras=cameras)
 
 
