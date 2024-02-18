@@ -109,10 +109,10 @@ function sendPost(data, url, callback) {
     xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) { // Check if the request was successful
             // Execute the callback with a success message
-            callback('POST request completed successfully!');
+            callback(this.responseText);  //Will return the response text
         } else {
             // Execute the callback with an error message
-            callback('Error while making the POST request!');
+            callback('Error');
         }
     };
 

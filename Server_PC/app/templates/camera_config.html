@@ -1,5 +1,9 @@
 
-<!--This page is used to modify the configuration of a single camera. The user can change the frameskip, the detection area, the detection threshold, the record time, the alert length, if the camera is triggerable and if it is enabled. The user can also go back to the cameras page.-->
+<!--
+    This page is used to modify the configuration of a single camera. 
+    The user can change the frameskip, the detection area, the detection threshold, 
+    the record time, the alert length, if the camera is triggerable and if it is enabled.
+-->
 
 
 {% include 'header.html' %}
@@ -8,10 +12,12 @@
         Camera config
     </h1>
 
-    <form action="/modify_config" method="POST">
-        <div class="card">
-            <div class="row">
-                <div class="col-6"> 
+    
+    <div class="card">
+        <div class="w3-row">
+            <div class="w3-col s12 m6 l6"> 
+
+                <form action="/modify_config" method="POST">
                     <table style="text-align: left;">
                         <tr>
                             <td><label for="name">Camera</label></td>
@@ -55,29 +61,35 @@
                         </tr>
 
                     </table>
-                </div>
+                </form>
+            </div>
 
-                <div class="col-4" style="text-align: left; margin-left: 5px; font-size: 10px;">
-                    Modify the configuration of the camera here.<br>
-                    Values are stored as they are entered.<br>
-                    <ul>
-                        <li>Frameskip: The number of frames to skip between each detection.</li>
-                        <li>Detection Area: The area in pixels of the image to detect motion in.</li>
-                        <li>Detection Threshold: The threshold for motion detection (lower is more sensitive).</li>
-                        <li>Record Time: The time to record after motion is detected.</li>
-                        <li>Alert Length: The time to keep alert after motion is detected (relay).</li>
-                        <li>Is Triggerable: If the camera can be triggered by the system.</li>
-                        <li>Is Enabled: If the camera is enabled.</li>
-                        <li>Record Processed: If the camera should record processed images.</li>
-                    </ul>
+            <div class="w3-col s12 m6 l6" style="text-align: left; padding-left: 5px; font-size: 10px;">
+                <b>Camera fine tuning</b>
+                <br>
+                Camera sensitivity parameters.<br>
+                Saving is automatic.<br>
+                <ul>
+                    <li>Frameskip: The number of frames to skip between each detection.</li>
+                    <li>Detection Area: The area in pixels of the image to detect motion in.</li>
+                    <li>Detection Threshold: The threshold for motion detection (lower is more sensitive).</li>
+                    <li>Record Time: The time to record after motion is detected.</li>
+                    <li>Alert Length: The time to keep alert after motion is detected (relay).</li>
+                    <li>Is Triggerable: If the camera can be triggered by the system.</li>
+                    <li>Is Enabled: If the camera is enabled.</li>
+                    <li>Record Processed: If the camera should record processed images.</li>
+                </ul>
 
-                </div>
             </div>
         </div>
-       
+
         <div class="saveconfirm" id="result"></div>
-    </form>
-    <div class="row"><a href="#" class="button center topmargin" id="buttonBack">Close</a></div>
+
+    </div>
+       
+        
+   
+    <div class="row"><a href="#" class="button center topmargin" id="buttonClose">Close</a></div>
 
 
         
@@ -85,8 +97,8 @@
     //OnLoad event
     window.addEventListener('load',(event) => {
         // Close window
-        var buttonBack = document.getElementById("buttonBack");
-        buttonBack.addEventListener("click", (event) => {
+        var buttonClose = document.getElementById("buttonClose");
+        buttonClose.addEventListener("click", (event) => {
             window.close();
         });
 
@@ -108,17 +120,26 @@
         xhr.open('POST', form.action);
         xhr.onload = function() {
             if (xhr.status === 200) {
-                resultDiv.innerHTML = xhr.responseText;
-                setTimeout(function() {
-                    resultDiv.innerHTML = '';
-                }, 1000);
+                //resultDiv.innerHTML = xhr.responseText; // success, show the result             
+                //setTimeout(function() {
+                //    resultDiv.innerHTML = ''; // clear the result after one second
+                //}, 1000);                     // here
+            }else{
+                w2popup.open({
+                    title: 'Error',
+                    width: 300,
+                    height: 200,
+                    text: xhr.responseText,
+                    
+                });
             }
         };
         xhr.send(formData);
 
     }
 
-    // Add event listener to listen for form modifications
+    // Add event listener to listen for form modifications,
+    // and call doPost() on any modification
     var formElements = document.querySelectorAll('form input, form select, form textarea');
     formElements.forEach(function(element) {
         element.addEventListener('input', function() {
@@ -126,7 +147,8 @@
         });
     });
 
-    // Data validation. Only allow numbers in the frameskip, detectionarea, detectionthreshold, recordtime and alertlength fields
+    // Data validation. Only allow numbers in the frameskip, detectionarea, 
+    // detectionthreshold, recordtime and alertlength fields
     // On any non-numeric input, replace the input with 0
     var frameskip = document.getElementById('frameskip');
     frameskip.addEventListener('input', function() {

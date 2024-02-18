@@ -101,20 +101,23 @@ class SQLiteDB:
 
 
     #Delete data
-    def delete_data(self, table_name, condition=None):
+    def delete_data(self, table_name, condition):
         self.connect()
-        query = f"DELETE FROM {table_name}"
-        if condition:
-            query += f" WHERE {condition}"
+
+        #Allow only id and name as condition
+        if condition.startswith("id=") or condition.startswith("name="): 
+            query = f"DELETE FROM {table_name} WHERE {condition} LIMIT 1" #LIMIT 1 to force only one row to be deleted each call
+        else:
+            return False
 
         self.cursor.execute(query)
         self.connection.commit()
 
-        affected_rows = self.cursor.rowcount
+        affected_rows = self.cursor.rowcount #Should always be 1
 
         self.close_connection()
 
-        if affected_rows == 0:
+        if affected_rows == 0: #nothing was deleted
             return False
         else:
             return True

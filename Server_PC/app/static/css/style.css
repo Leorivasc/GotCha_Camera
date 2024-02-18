@@ -223,8 +223,8 @@ body {
 /*Used in camera_config.html save confirmation text*/
   .saveconfirm{
     position: absolute;
-    left: 300px;
-    top: 300px;
+    left: 48%;
+    top: 315px;
     font-size: small;
     color: red
   }
@@ -237,6 +237,7 @@ body {
     background-color: #333;
     transition: background-color 0.3s, color 0.3s;
     border-radius: 6px;
+    margin: 4px
   }
   
   .topnav a {

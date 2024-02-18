@@ -152,10 +152,10 @@ def new_camera(data):
 
     return id
 
-def delete_camera(camera_name):
+def remove_camera(camera_name):
     connection = SQLiteDB()
 
-    #Delete the camera
+    #Delete the camera by name
     ans = connection.delete_data("cameras", "name='"+camera_name+"'")
 
     return ans

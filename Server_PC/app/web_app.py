@@ -25,7 +25,10 @@ import json
 app = Flask(__name__)
 CORS(app) #To allow cross-origin requests
 
-#Generates the frames to be served locally
+
+
+#-----------Camera streaming functions-----------------
+#Generates the frames to be served locally (/video_feed/<camera_id> route)
 def generate_frames(camera_url):
     cap = cv2.VideoCapture(camera_url)
     
@@ -44,7 +47,7 @@ def generate_frames(camera_url):
                    b'\r\n' + frame_bytes + b'\r\n')
     cap.release()
 
-###################################
+############################################
 #-----------Routes----------------#
 
 #entry point
@@ -54,7 +57,9 @@ def index():
 
 
 
-#Camera streaming route (fast, directly from cameras)
+#-----------Camera streaming routes-----------------
+
+#Camera streaming route (fast, obtains directly from cameras)
 @app.route('/cameras_fast')
 def cameras_fast():
 
@@ -64,8 +69,9 @@ def cameras_fast():
 
 
 
+#Same as above, but
 #Video feed route for camera with id=camera_id (PROXY direct from cameras)
-#NOT USED (only for testing)
+#NOT USED (only for testing, generates overhead and slow response)
 @app.route('/video_feed/<int:camera_id>')
 def video_feed(camera_id):
     camera = cameras[camera_id]
@@ -77,31 +83,23 @@ def video_feed(camera_id):
 
 
 #Video feed route for processed video using three frame difference
-#i.e. the video feed is processed by the web_cam.py script, so it has the mask and border drawings
-#it redirects to 'mirror' ports.
+#i.e. the video feeds are processed by the web_cam.py script for each camera. It has the mask and border drawings applied
+#Those streams are served by the web_cam.py script in their mirror ports (5000+camera_id)
 @app.route('/local_stream')
 def video_local_stream():
-    random_value = random.randint(1, 100) #To avoid caching
-    cameras = read_config_all("isEnabled=1") #Refresh enabled cameras list and config
+    random_value = random.randint(1, 100)     #Added as GET to avoid caching
+    cameras = read_config_all("isEnabled=1")  #Refresh enabled cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
     #server_ip = socket.gethostbyname(host_name)
-    server_ip=request.host.split(':')[0] #Safer way to get the server IP
+    server_ip=request.host.split(':')[0]      #Safer way to get the server IP
 
-    #Send cameras and server data to the template
+    #Send cameras and server data to the template for rendering
     return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip, random_value = random_value)
     
 
 
-#Return a JSON array with the current cameras list
-@app.route('/getcameras')
-def getcameras():
-    jcameras = jsonify(cameras)
-    jcameras.status_code=200
-    return jcameras
-
-
-#-----------Recordings routes-----------------
+#-----------Recordings business routes-----------------
 #Listing of camera recordings
 @app.route('/list_recordings')
 def file_list():
@@ -128,7 +126,8 @@ def download_file(filename):
 
 
 #-----------Mask app-----------------
-#Mask app
+#Mask app. This is a route to the mask app for a specific camera
+#To be used from the local_stream.html template to open the mask app in a popup window
 @app.route('/mask_app/<camera_name>')
 def mask_app(camera_name):
      #Get server IP to present links properly
@@ -164,7 +163,25 @@ def upload_file():
 
 
 #-----------Config routes-----------------
-#Template for cameras config
+#Route to ALL cameras config (table edition)
+#Will respond with a simple text value
+
+@app.route('/cameras_setup')
+def cameras_setup():
+    cameras = read_config_all() #Get all cameras
+    return render_template('cameras_setup.html', cameras=cameras)
+
+
+#Route to return all cameras as JSON
+@app.route('/getcameras_conf')
+def getcameras_conf():
+    cameras = read_config_all()
+    jcameras = jsonify(cameras)
+    jcameras.status_code=200
+    return jcameras
+
+
+#Template for cameras config (popups from the config button in the local_stream page)
 @app.route('/camera_config/<camera_name>')
 def camera_config(camera_name):
     try:
@@ -175,8 +192,8 @@ def camera_config(camera_name):
     return render_template('camera_config.html', camera=camera)
 
 
-###TEST###
-##To use with floating div. Not used
+
+#(TEST) To use with floating div. Not used
 @app.route('/camera_config_inc/<camera_name>')
 def camera_config_inc(camera_name):
     try:
@@ -189,6 +206,9 @@ def camera_config_inc(camera_name):
 
 
 # Modify cameras config route (POST ONLY)
+# This route is used to modify the configuration of a camera.
+# Used from the cameras_setup.html template and the camera_config.html template
+
 @app.route('/modify_config', methods=['POST'])
 def modify_config():
     #Verify right request
@@ -217,27 +237,76 @@ def modify_config():
 
         ##Make sure numeric values are not empty
         if data[key] == '':
-                    data[key] = 0
+            data[key] = 0
 
 
     #Perform the update
     ans = update_config(camera_name, data)
 
+   #Return message to the client
+    if ans:
+        return 'Saved'
+    else:
+        return 'Server error'
+
+
+
+
+# Route to handle configuration modification requests from W2UI table
+# This route handles both GET and POST requests,since W2UI sends requests using both methods
+# The request is sent as a JSON string in the 'request' key of the request.args data
+# The request is parsed and the appropriate action is taken
+    
+@app.route('/w2ui_db', methods=['GET','POST'])
+def w2ui_db():
+    
+    #Get the request method and values
+    method = request.method
+    records = read_config_all()
+    requested = json.loads(request.args.get('request'))
+    
+    #If method was GET, i.e. the request was sent as a query string
+    #which is the case when W2UI sends every request
+    if method == 'GET':
+        #Just return the full list of records (default limits to 100)
+        if requested['limit']:
+            limit = int(requested['limit'])
+            records = records[:limit]
+
+            #Return the full list of records in W2UI format
+            response = {'status': 'success', 'total': len(records), 'records': records}
+            return response, 200
+
+    #If method was POST, handle the request
+    #notice this request also has a 'request' key in request.args data
+    elif method == 'POST':
+        data = request.form.to_dict()
+        action=requested['action']
+
+        #Handle the delete request
+        if action=='delete':
+             #Assuming recid is in the form "recid-<id>" (from the table), +1 because it is 0-indexed
+            recid = int(requested['recid'][0].split('-')[1])  
+            cam_name = records[recid]['name']
+            delted = remove_camera(records[recid]['name'])
+            response = {'status': 'success'}
+            return jsonify(response), 200
+
+        elif requested == 'get-records':
+            # Get the records from the database and send them back to the client
+            records = read_config_all()
+            response = {'status': 'success', 'total': len(records), 'records': records}
+            return jsonify(response), 200
+        
         
 
-    if ans:
-        return 'Updated'
-    else:
-        return 'Error'
-
-#Route to ALL cameras config
-@app.route('/cameras_setup')
-def cameras_setup():
-    cameras = read_config_all() #Get all cameras
-    return render_template('cameras_setup.html', cameras=cameras)
 
 
-#Route to add new cameras (POST ONLY)
+#-----------Camera management routes-----------------
+#Route to add new cameras (POST ONLY). 
+#To be used from the W2UI table in the cameras_setup.html template.
+#These handle the custom JS event handlers to add and delete cameras
+        
 @app.route('/add_camera', methods=['POST'])
 def add_camera():
     #Verify right request
@@ -261,11 +330,7 @@ def add_camera():
         if data[key] == '':
             return "Some empty values"
 
-
-
-
-
-    #Perform the update
+    #Perform the insertion
     ans = new_camera(data)
 
     if ans:
@@ -273,7 +338,7 @@ def add_camera():
     else:
         return 'Error'
 
-
+#Remove camera (POST ONLY)
 @app.route('/delete_camera', methods=['POST'])
 def delete_camera():
     #Verify right request
@@ -297,93 +362,20 @@ def delete_camera():
 
 
 
-#Route to return all cameras as JSON
-@app.route('/getcameras_conf')
-def getcameras_conf():
-    cameras = read_config_all()
-    jcameras = jsonify(cameras)
-    jcameras.status_code=200
-    return jcameras
 
 
 
 
-# Route to handle configuration modification requests from W2UI
-@app.route('/w2ui_db', methods=['GET','POST'])
-def w2ui_db():
-    
-    method = request.method
-    records = read_config_all()
-    requested = json.loads(request.args.get('request'))
-    
-    #If method was GET, return the database
-    if method == 'GET':
-        
-
-        if requested['limit']:
-            limit = int(requested['limit'])
-            records = records[:limit]
-
-            response = {'status': 'success', 'total': len(records), 'records': records}
-            return response, 200
 
 
-        elif requested['changes']:
-            response = {'status': 'success'}
-            return jsonify(response), 200
-            
-
-    #If method was POST, handle the request
-    #notice this request also has a 'request' key in request.args data
-    elif method == 'POST':
-        data = request.form.to_dict()
+#-----------Error handling-----------------
+#Error handling
+@app.errorhandler(404)
+def page_not_found(e):
+    return 'Not found', 404
 
 
-        if requested == 'get-records':
-            # Get the records from the database and send them back to the client
-            records = read_config_all()
-            response = {'status': 'success', 'total': len(records), 'records': records}
-            return jsonify(response), 200
-        
-        elif requested['action'] == 'save':
-            # Save the record to the database
-            #record = data.get('record')
-            #recid = record.get('recid')
-            #column = data.get('column')
-            #value = data.get('value')
-
-            # Send a response back to the client, indicating whether the operation was successful
-            response = {'status': 'success', 'message': 'Record saved successfully'}
-            return response, 200
-
-        elif requested == 'delete':
-            # Delete the record from the database
-            recid = data.get('recid')
-
-            # Send a response back to the client, indicating whether the operation was successful
-            response = {'status': 'success', 'message': 'Record deleted successfully'}
-            return jsonify(response), 200
-        
-        elif requested == 'update':
-            # Update the record in the database
-            recid = data.get('recid')
-            record = data.get('record')
-            
-            # Send a response back to the client, indicating whether the operation was successful
-            response = {'status': 'success', 'message': 'Record updated successfully'}
-            return jsonify(response), 200
-
-        elif requested == 'none':
-            return {"status" : "success"},200
-        
-        else:
-            # Send a response back to the client, indicating that the request was not recognized
-            response = {'status': 'error', 'message': 'Request not recognized'}
-            return jsonify(response), 400
-
-
-
-
+#-----------Main-----------------
 cameras = read_config_all("isEnabled=1") #Only enabled cameras
 
 if __name__ == '__main__':
