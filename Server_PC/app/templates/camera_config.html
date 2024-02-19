@@ -8,9 +8,6 @@
 
 {% include 'header.html' %}
 
-    <h1 class="card">
-        Camera config
-    </h1>
 
     
     <div class="card">
@@ -89,19 +86,14 @@
        
         
    
-    <div class="row"><a href="#" class="button center topmargin" id="buttonClose">Close</a></div>
+   
 
 
         
 <script>
     //OnLoad event
     window.addEventListener('load',(event) => {
-        // Close window
-        var buttonClose = document.getElementById("buttonClose");
-        buttonClose.addEventListener("click", (event) => {
-            window.close();
-        });
-
+        
         //Make topnav invisible
         var nav = document.getElementById("topnav");
         nav.style.display = "none";

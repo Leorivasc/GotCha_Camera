@@ -5,14 +5,17 @@
         Recordings list
     </h1>
 
-    <ul class="card">
+    <div class="row">
         {% for duple in filesdata %}
-            
-            <a href="#" onclick="popupWindow(event,'{{ url_for('download_file', filename=duple[0]) }}',330,250)"><img src="{{ url_for('download_file', filename=duple[1]) }}" alt="image" width="160" height="120"></a>
-            
+        
+            <div class="card col {{ duple[0] }}" name="">
+                <a href="#" onclick="popupVideo(event,'{{ url_for('download_file', filename=duple[0]) }}',640,520)"><img src="{{ url_for('download_file', filename=duple[1]) }}" alt="image" width="160" height="120"></a>
+                
+            </div>
+            <img class="img_thrashcan {{ duple[0] }}" src="/static/img/thrash.png" alt="delete" width="24" height="24" onclick="deleteFile(event, '{{ duple[0] }}')">
         {% endfor %}
-    </ul>
-
+  
+    </div>  
 
 
     
@@ -31,6 +34,37 @@
             current.classList.add("active");
             
         });
+
+        
+        function deleteFile(event,filename){
+            w2popup.open({
+                title: 'Confirm',
+                text: 'Are you sure you want to delete this file?',
+                actions: {
+                    Ok(event) {
+                        return fetch("/delete_recording/" + filename)
+                                    .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP error! Status: ${response.status}`);
+                                    }
+                                        //Hide elements (class = filename)
+                                        for (i of document.getElementsByClassName(filename)){
+                                            i.style.display = "none";
+                                        }
+                                        w2popup.close()
+                                });
+                    
+                    },
+
+                    Cancel(event) {
+                    w2popup.close()
+                    }
+                }
+            });
+        }
+
+
+
     </script>
     
 {% include 'footer.html' %}

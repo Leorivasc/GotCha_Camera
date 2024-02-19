@@ -182,7 +182,7 @@ body {
 
   .col {
     box-sizing: border-box;
-    padding: 0 15px; /* Espacio entre las columnas */
+    /*padding: 0 15px;  Espacio entre las columnas */
   }
 
   /* Ejemplo de clases para columnas */
@@ -302,5 +302,19 @@ body {
 
 .input_textbox{
   margin: 2px;
+}
+
+.img_thrashcan{
+  position: relative;
+  bottom: -114px;
+  right: 25px;
+  margin:-12px;
+  cursor:pointer;
+  background-image: url("/static/img/trash_gray.png");
+}
+
+/*thrash can hover*/
+.img_thrashcan:hover{
+  background-image: url("/static/img/trash_orange.png");
 }
 

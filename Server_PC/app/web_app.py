@@ -125,6 +125,29 @@ def download_file(filename):
     return send_from_directory("recordings", filename)
 
 
+#Removing a recording
+@app.route('/delete_recording/<filename>')
+def delete_recording(filename):
+    try:
+        #Recordings directory
+        recordings_dir = 'recordings'
+        
+        #Full relative path to the file
+        file_path = os.path.join(recordings_dir, filename)
+        thumbnail_path = os.path.join(recordings_dir, filename.replace(".webm",".jpg"))
+
+        #Make sure the file exists
+        if os.path.exists(file_path):
+            #Remove the video and the thumbnail
+            os.remove(file_path)
+            os.remove(thumbnail_path)
+            return "ok", 200
+        else:
+            return "File not found", 404
+    except Exception as e:
+        return f"Error removing {str(e)}", 500
+
+
 #-----------Mask app-----------------
 #Mask app. This is a route to the mask app for a specific camera
 #To be used from the local_stream.html template to open the mask app in a popup window

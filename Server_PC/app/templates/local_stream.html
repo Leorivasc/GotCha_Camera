@@ -7,35 +7,35 @@
     
     <div class="row">
         {% for camera in cameras %}
-            <div class="column card" id="video_{{ camera.name }}">
+            <div class="col card" id="video_{{ camera.name }}">
                 <div class = "row">
 
-                    <div class="column">
+                    <div class="">
                         <div class="stream-container">
-                            <div class="column">
+                            <div class="col">
                                 <div class="tag-label">{{ camera.name }}</div>
                                 <img class="stream" width="320" height="240" src="http://{{server_ip}}:{{camera.mirrorport}}{{camera.path}}?r={{random_value}}" alt="Connecting...">
                             </div> 
                         </div>
                     </div>
         
-                    <div class="column" id="data" style="margin-top:5px">
-                        <div class="col-4">
-                            <a href="#" class="button" onclick="popupWindow(event,'/mask_app/{{ camera.name }}',680,400)">Mask</a>
+                    <div class="" id="data" style="margin-top:5px">
+                        <div class="">
+                            <a href="#" class="button" onclick="popupWindow(event,'/mask_app/{{ camera.name }}',680,330,'Mask Creation')">Mask</a>
                         </div>
-                        <div class="col-4">
+                        <div class="">
                             <a href="#" id="record_{{camera.name}}" class="button" onclick="setRecord(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Record</a>
                         </div>
                         {% if camera.isTriggerable== 1 %}
-                        <div class="col-4">
+                        <div class="">
                             <a href="#" id="alert_{{camera.name}}" class="button" onclick="setAlarm(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}', 300)">Alarm</a>
                         </div>
                         {% endif %}
-                        <div class="col-4">
+                        <div class="">
                             <a href="#" id="restart_{{camera.name}}" class="button" onclick="sendRestart(event,'{{camera.name}}','{{server_ip}}','{{camera.mirrorport}}')">Restart</a>
                         </div>
-                        <div class="col-4">
-                            <a href="#" class="button" onclick="popupWindow(event,'/camera_config/{{camera.name}}',680,450)">Config</a>
+                        <div class="">
+                            <a href="#" class="button" onclick="popupWindow(event,'/camera_config/{{camera.name}}',710,350, 'Camera Fine Tuning')">Config</a>
                         </div>
                     </div>
                 </div>
@@ -157,10 +157,9 @@
             button.classList.remove("buttonred");
         }
 
-                //Part of the floating window (future use)
-                //dragElement(document.getElementById("floating"));
-                //var xx = document.getElementById("floatingheader");
-                //doGet("camera_config_inc/Pi2","",xx);
+
+
+        
         
     </script>
 

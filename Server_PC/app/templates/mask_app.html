@@ -1,9 +1,6 @@
 
 {% include 'header.html' %}
 
-    <h1 class="card">
-        Masking app
-    </h1>
     
     <div id="imageContainer" class="card">
         <div class="row">
@@ -32,16 +29,11 @@
             </div>
         </div>  
     </div>
-    <div class="row"><a href="#" class="button center topmargin" id="buttonBack">Close</a></div>
+   
     <script>
         //OnLoad event
         window.addEventListener('load',(event) => {
-            // Close window
-            var buttonBack = document.getElementById("buttonBack");
-            buttonBack.addEventListener("click", (event) => {
-                window.close();
-            });
-
+            
             //Make topnav invisible
             var nav = document.getElementById("topnav");
             nav.style.display = "none";

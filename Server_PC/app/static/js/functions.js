@@ -2,8 +2,8 @@
 
 
 
-//Opens a popup window with an url
-function popupWindow(event,url, width, height) {
+//Opens a popup window with an url. New browser window
+function popupWindow_new(event,url, width, height) {
     event.preventDefault(); //prevent from scrolling to top of page
     // Center position
     const left = (screen.width - width) / 2;
@@ -15,6 +15,28 @@ function popupWindow(event,url, width, height) {
     // Open
     window.open(url, '_blank', opciones);
 }
+
+//Opens an url in a W2UI popup
+function popupWindow(event, url, width, height, head_title) {
+    w2popup.open({
+        title: head_title,
+        body: '<iframe src="' + url + '" width="100%" height="100%" frameborder=0></iframe>',
+        width: width,
+        height: height
+    });
+}
+
+
+//open webm videos in a w2ui popup
+function popupVideo(event, url, width, height) {
+    w2popup.open({
+        title: 'Video Player',
+        body: '<video width="100%" height="100%" controls><source src="' + url + '" type="video/webm"></video>',
+        width: width,
+        height: height
+    });
+}
+
 
 function dragElement(elmnt) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
