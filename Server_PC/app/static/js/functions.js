@@ -20,7 +20,7 @@ function popupWindow_new(event,url, width, height) {
 function popupWindow(event, url, width, height, head_title) {
     w2popup.open({
         title: head_title,
-        body: '<iframe src="' + url + '" width="100%" height="100%" frameborder=0></iframe>',
+        body: '<iframe src="' + url + '" width="100%" height="99%" frameborder=0 style="overflow:hidden"></iframe>',
         width: width,
         height: height
     });

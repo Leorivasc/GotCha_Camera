@@ -10,17 +10,56 @@
 <div class="w3-row">
 
 
-    <div class="card" style="width: 80%; margin: 0 auto">
-            
-            
-
-                <div class="">
-                    <div id="main" style="width: 100%;height: 500px;"></div>         
-                </div>
-
-               
+    <div class=" w3-col l8 m12 s12 card">
+ 
+        <div id="main" style="width: 100%;height: 500px;"></div>         
+ 
     </div>
-            
+
+    <div class=" w3-col l3 m12 s12 card">
+        <div class="w3-container">
+            <h1 style="text-align: left;">Camera setup information</h1>
+            <p class="regulartext">
+                To add a camera, click on the 'Add' button on the top right corner of the grid. 
+                A form will appear to fill in the camera details. 
+                <br>
+                <br>
+                <b>Fields:</b>
+                <br>
+                <br>
+                <b>Name:</b> The name of the camera.
+                <br>
+                <b>IP Address:</b> The IP address of the camera.
+                <br>
+                <b>Port:</b> The port of the camera.
+                <br>
+                <b>Stream Path:</b> The path of the stream.
+                <br>
+                <b>Email Alert:</b> The email to send alerts to.
+                <br>
+                <br>
+                <br>
+                <b>Setup Notes:</b>
+                <br>
+                <br>          
+                - The 'IP Address' field must be a valid IP address.
+                <br>
+                - The 'Port' field must be a number between 1024 and 65536.
+                <br>
+                - The 'Stream Path' field must be a valid path for the remote camera stream.
+                <br>
+                - The 'Email Alert' field must be a valid email address.
+                <br>
+                - The 'Name' field must be a valid name.
+                <br>
+                - The 'Mirror port' field is assigned upon camera addition, non modifiable and is shown for information and testing purposes only.
+                <br>
+                - Hover over the field names to see the field descriptions.
+                <b>Changes are saved automatically.</b>
+
+
+            </p>
+        </div>
     
     
 </div>   
@@ -47,9 +86,6 @@
 
     
 
-   
-
-
     //GRID
     //Credit: https://w2ui.com
     let ans;
@@ -66,9 +102,7 @@
            
         ]
     },
-    
-    
-    
+      
     grid: {
         name: 'grid',
         url: '/w2ui_db',
@@ -83,19 +117,19 @@
         },
         columns: [
             { field: 'id', text: 'ID', size: '50px', sortable: true, hidden: true},
-            { field: 'name', text: 'Name', size: '100px',  editable: { type: 'text' }},
-            { field: 'ip_address', text: 'IP Address', size: '100px',  editable: { type: 'ipAddress' }  },
-            { field: 'port', text: 'Port', size: '50px', editable: { type: 'int' } },
-            { field: 'path', text: 'Stream Path', size: '100px',  editable: { type: 'text' }  },
-            { field: 'emailAlert', text: 'Alert Email to', size: '150px',  editable: { type: 'email' }  },
-            { field: 'frameskip', text: 'Frame skip', size: '80px', editable: { type: 'int',min:0,max:10 } },
-            { field: 'detectionarea', text: 'Area det.', size: '80px', editable: { type: 'int',min:0,max:76800 } },
-            { field: 'detectionthreshold', text: 'Threshold', size: '90px', editable: { type: 'int',min:0,max:255 } },
-            { field: 'recordtime', text: 'Rec.Time', size: '80px', editable: { type: 'int',min:0,max:86400 } },
-            { field: 'alertlength', text: 'Alert len.', size: '80px', editable: { type: 'int',min:0,max:86400 } },
-            { field: 'mirrorport', text: 'Mirror port', size: '80px' },
-            { field: 'isTriggerable', text: 'Triggerable', size: '85px', editable: { type: 'checkbox'} },
-            { field: 'isEnabled', text: 'Enabled', size: '70px',  editable: { type: 'checkbox' }  }
+            { field: 'name', text: 'Name', size: '100px',  editable: { type: 'text' }, tooltip:"Camera name tag. Must be unique."},
+            { field: 'ip_address', text: 'IP Address', size: '100px',  editable: { type: 'ipAddress' }, tooltip:"Camera IP address"},
+            { field: 'port', text: 'Port', size: '50px', editable: { type: 'int' }, tooltip:"Camera tcp port"},
+            { field: 'path', text: 'Stream Path', size: '100px',  editable: { type: 'text' }, tooltip:"Camera stream path (e.g. /video_feed)"},
+            { field: 'emailAlert', text: 'Email', size: '150px',  editable: { type: 'email' }, tooltip:"Email to send alerts to"},
+            { field: 'frameskip', text: 'Frame skip', size: '80px', editable: { type: 'int',min:0,max:10 }, tooltip:"Frames to skip from video (improves performance)"  },
+            { field: 'detectionarea', text: 'Det. Area', size: '90px', editable: { type: 'int',min:0,max:76800 }, tooltip:"Detection area threshold in pixels" },
+            { field: 'detectionthreshold', text: 'Threshold', size: '90px', editable: { type: 'int',min:0,max:255 }, tooltip:"Detection threshold contrast (0-255)"},
+            { field: 'recordtime', text: 'Rec.Time', size: '80px', editable: { type: 'int',min:0,max:86400 }, tooltip:"Video recording time in seconds after movement detected" },
+            { field: 'alertlength', text: 'Alert len.', size: '80px', editable: { type: 'int',min:0,max:86400 }, tooltip:"Alerting state length in seconds (lights/relay hardware)" },
+            { field: 'mirrorport', text: 'Mirror port', size: '80px', tooltip:"System internal use. Do not edit."},
+            { field: 'isTriggerable', text: 'Triggerable', size: '85px', editable: { type: 'checkbox'}, tooltip:"Activates or deactivates motion detection alerts" },
+            { field: 'isEnabled', text: 'Enabled', size: '70px',  editable: { type: 'checkbox' }, tooltip:"Enables or disables a camera"}
         ],
         //A field was modified
         onChange: function(event) {
@@ -160,9 +194,9 @@
             style: 'border: 0px; background-color: transparent;',
             fields: [
                 { field: 'name', type: 'text', required: true, html: { label: 'Name' } },
-                { field: 'port', type: 'int', required: true, html: { label: 'Port' } },
                 { field: 'ip_address', type: 'ipAddress', required: true, html: { label: 'IP address' } },
-                { field: 'path', type: 'text', required: true, html: { label: 'Path' } },
+                { field: 'port', type: 'int', required: true, html: { label: 'Port' } },
+                { field: 'path', type: 'text', required: true, html: { label: 'Stream Path' } },
                 { field: 'emailAlert', type: 'email', required: true, html: { label: 'Email Alert' } }
             ],
             actions: {
