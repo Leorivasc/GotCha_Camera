@@ -147,3 +147,59 @@ function sendPost(data, url, callback) {
     // Send the request with the form data
     xhr.send(formData);
 }
+
+
+function loginPopup(event){
+    event.preventDefault();
+    w2popup.open({
+        title: 'Login',
+        body:   '<div class="w2ui-centered">' +
+                    '<form class="w2ui-reset w2ui-login-form">' +
+                        '<div class="w2ui-field">' +
+                            '<label>Username:</label>' +
+                            '<div><input id="user" type="text" style="width: 100%;"></div>' +
+                        '</div>' +
+                        '<div class="w2ui-field">' +
+                            '<label>Password:</label>' +
+                            '<div><input id="password" type="password" style="width: 100%;"></div>' +
+                        '</div>' +
+                    '</form>' +
+                '</div>',
+
+
+        actions: ['Ok'],
+        width: 320,
+        height: 200,
+        modal: true,
+        showClose: true,
+       
+        
+    })
+    .close(evt => {
+        console.log('popup clsoed')
+    })
+    .ok((evt) => {
+        var name = document.getElementById('user').value ;
+        var pass = document.getElementById('password').value ;
+        
+        sendPost({user: name, password: pass}, '/login', 
+                    function(response){
+                        if (response=="Ok"){
+                            w2popup.close()
+                            location.reload()
+                        }else{
+                            w2popup.open({
+                                title: 'Error',
+                                text: response,
+                                width: 350,
+                                height: 150,
+                            })
+                        }
+                    })
+
+        w2popup.close()
+    })
+
+
+
+}

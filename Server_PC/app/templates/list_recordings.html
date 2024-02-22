@@ -12,8 +12,12 @@
                 <a href="#" onclick="popupVideo(event,'{{ url_for('download_file', filename=duple[0]) }}',640,520)"><img src="{{ url_for('download_file', filename=duple[1]) }}" alt="image" width="160" height="120"></a>
                 
             </div>
+            {# ONLY ADMIN DELETES RECORDINGS #}
+            {% if cookiedata[0] == "admin" %}
             <img class="img_thrashcan {{ duple[0] }}" src="/static/img/thrash.png" alt="delete" width="24" height="24" onclick="deleteFile(event, '{{ duple[0] }}')">
-        {% endfor %}
+            {% endif %}
+        
+            {% endfor %}
   
     </div>  
 

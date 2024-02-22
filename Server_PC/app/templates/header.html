@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    {# REMINDER #}
+    {# Since this template is used to render all other pages, cookiedata has to be passed, even if not used #}
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="1800">
@@ -27,11 +31,25 @@
 
 <body>
 
+    {# MENU SHOW/HIDE ITEMS DEPENDING ON LOGIN#}
+
     <div class="topnav row" id="topnav">
-        <a class="nav" href="/">Home</a>
-        <a class="nav" href="/cameras_fast">Direct Video</a>
-        <a class="nav" href="/local_stream">Processed Video</a>
-        <a class="nav" href="/list_recordings">Recordings</a>
-        <a class="nav" href="/cameras_setup">Camera Setup</a>
-    </div>
+
+                        <a class="nav" href="/">Home</a>
+                        <a class="nav" href="/cameras_fast">Direct Video</a>
+                        <a class="nav" href="/local_stream">Processed Video</a>
+                        <a class="nav" href="/list_recordings">Recordings</a>
+    {% if cookiedata[0] == "admin" %}  <a class="nav" href="/cameras_setup">Camera Setup</a>   {% endif %}
+        
+            {# LOGIN MENUITEM #}
+            {% if cookiedata[0] == "Guest" %}
+                <a class="login" href="#" onclick="loginPopup(event)">Login</a>
+            {% else %}
+                <a class="login" href="/logout">Logout {{ cookiedata[0] }} </a>
+            
+            {% endif %}
+     </div>
+        
+
+
     <!--<img src="{{ url_for('static', filename='img/logo_mini.jpg') }}"  class="logo-mini"> -->

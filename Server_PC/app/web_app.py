@@ -11,7 +11,7 @@
 #Those streams are local and must be created through the web_cam.py script
 #This server mostly proxies the streams, so that cameras are not affected by the workers problem
 
-from flask import Flask, render_template, Response, jsonify, send_from_directory
+from flask import Flask, render_template, Response, jsonify, send_from_directory, make_response, redirect
 import cv2
 from flask import request
 from flask_cors import CORS
@@ -53,7 +53,11 @@ def generate_frames(camera_url):
 #entry point
 @app.route('/')
 def index():
-    return render_template('index.html')
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
+    return render_template('index.html', 
+                           cookiedata=cookiedata)
 
 
 
@@ -63,9 +67,14 @@ def index():
 @app.route('/cameras_fast')
 def cameras_fast():
 
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
     cameras=read_config_all("isEnabled=1") #Only enabled cameras
     
-    return render_template('cameras_fast.html', cameras=cameras)
+    return render_template('cameras_fast.html', 
+                           cameras=cameras, 
+                           cookiedata=cookiedata)
 
 
 
@@ -87,7 +96,11 @@ def video_feed(camera_id):
 #Those streams are served by the web_cam.py script in their mirror ports (5000+camera_id)
 @app.route('/local_stream')
 def video_local_stream():
-    random_value = random.randint(1, 100)     #Added as GET to avoid caching
+
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+    #Get a random value to avoid caching
+    random_value = random.randint(1, 100) 
     cameras = read_config_all("isEnabled=1")  #Refresh enabled cameras list and config
     #Get server IP to present links properly
     host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
@@ -95,7 +108,12 @@ def video_local_stream():
     server_ip=request.host.split(':')[0]      #Safer way to get the server IP
 
     #Send cameras and server data to the template for rendering
-    return render_template('local_stream.html', cameras=cameras, host_name = host_name, server_ip = server_ip, random_value = random_value)
+    return render_template('local_stream.html', 
+                           cameras=cameras, 
+                           host_name = host_name, 
+                           server_ip = server_ip, 
+                           random_value = random_value, 
+                           cookiedata=cookiedata)
     
 
 
@@ -103,6 +121,10 @@ def video_local_stream():
 #Listing of camera recordings
 @app.route('/list_recordings')
 def file_list():
+
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
     # Gets the list of files in the uploads folder
     #files = os.listdir("recordings")
     os.chdir("recordings")
@@ -116,7 +138,10 @@ def file_list():
         filesdata.append([file,thumbnail])
     
     os.chdir("..")
-    return render_template('list_recordings.html', filesdata=filesdata)
+    return render_template('list_recordings.html', 
+                           filesdata=filesdata,
+                           cookiedata=cookiedata)
+
 
 #Downloads for recordings
 @app.route('/download/<filename>')
@@ -153,6 +178,10 @@ def delete_recording(filename):
 #To be used from the local_stream.html template to open the mask app in a popup window
 @app.route('/mask_app/<camera_name>')
 def mask_app(camera_name):
+
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
      #Get server IP to present links properly
     host_name = socket.gethostname()
     server_ip = socket.gethostbyname(host_name)
@@ -160,7 +189,13 @@ def mask_app(camera_name):
     loadP5=1 #Load p5.js library
 
     #Notice flag to allow the loading of p5.js library
-    return render_template('mask_app.html', camera=camera, host_name = host_name, server_ip = server_ip, loadP5=loadP5)
+    return render_template('mask_app.html', 
+                           camera=camera, 
+                           host_name = host_name, 
+                           server_ip = server_ip, 
+                           loadP5=loadP5,
+                           cookiedata=cookiedata)
+
 
 # Mask upload route
 @app.route('/upload_mask', methods=['POST'])
@@ -191,8 +226,14 @@ def upload_file():
 
 @app.route('/cameras_setup')
 def cameras_setup():
-    cameras = read_config_all() #Get all cameras
-    return render_template('cameras_setup.html', cameras=cameras)
+
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+    #Get all cameras
+    cameras = read_config_all() 
+    return render_template('cameras_setup.html', 
+                           cameras=cameras, 
+                           cookiedata=cookiedata)
 
 
 #Route to return all cameras as JSON
@@ -207,24 +248,18 @@ def getcameras_conf():
 #Template for cameras config (popups from the config button in the local_stream page)
 @app.route('/camera_config/<camera_name>')
 def camera_config(camera_name):
+
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
     try:
         camera = read_config(camera_name)[0]
     except:
         return 'Camera not found'
     
-    return render_template('camera_config.html', camera=camera)
-
-
-
-#(TEST) To use with floating div. Not used
-@app.route('/camera_config_inc/<camera_name>')
-def camera_config_inc(camera_name):
-    try:
-        camera = read_config(camera_name)[0]
-    except:
-        return 'Camera not found'
-    
-    return render_template('camera_config_inc.html', camera=camera)
+    return render_template('camera_config.html', 
+                           camera=camera,
+                           cookiedata=cookiedata)
 
 
 
@@ -384,9 +419,56 @@ def delete_camera():
         return 'Error'
 
 
+#-------User login/logout routes, functions-----------------
+#Admin login route
+@app.route('/login', methods=['POST'])
+def login():
+
+    #Verify right request
+    if 'password' not in request.form:
+        return 'Password not sent'
+
+    user = request.form['user']
+    password = request.form['password']
+
+    #Check user
+    if not is_user(user):
+        return "User/password incorrect"
+
+    #Check password (password is stored in hashed form in the database)
+    storedpass= get_pass(user)[0]['password']
+    password = md5hash(password) #Hash the password
+    if password==storedpass:
+        resp = make_response("Ok")
+        resp.set_cookie('data', password,max_age=86400) #Set cookie with the hashed password
+        resp.set_cookie('user', user,max_age=86400)     #Same for username
+        return resp
+    else:
+        return "User/password incorrect"
+        
+
+@app.route('/logout')
+def logout():
+    resp = make_response(redirect('/') )
+    resp.delete_cookie('user')
+    resp.delete_cookie('data')
+    resp.headers['Location'] = '/'
+    resp.status_code = 302
+    return resp
 
 
+#Read cookie and return a given 'else' value if not found
+def read_user_cookie():
+    #Read cookies
+    data = request.cookies.get('data')
+    user = request.cookies.get('user')
+        
+    #If any not found, return a default value
+    if data is None or user is None:
+        data='0'
+        user='Guest'
 
+    return (user, data)
 
 
 

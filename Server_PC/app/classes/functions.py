@@ -7,7 +7,7 @@ import requests
 from .sqlitedb import SQLiteDB
 import datetime
 import time
-
+import hashlib
 
 
 def do_get(url):
@@ -101,6 +101,74 @@ def read_config_all(condition=None):
 
     return cameras
 
+
+def read_users():
+    """Read all the users from database by using SQLiteDB class.
+    Returns:
+        Users information rows as dict.
+    """
+    connection = SQLiteDB()
+
+    users=None
+
+    while users is None:
+        try:
+            users = connection.query_data_dict("users")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+    
+
+    return users
+
+def is_user(username):
+    """Check if the specified user exists in the database by using SQLiteDB class.
+    Args:
+        username (str): The name of the user to be checked.
+    Returns:
+        True if the user exists, False otherwise.
+    """
+    connection = SQLiteDB()
+
+    user=None
+
+    while user is None:
+        try:
+            user = connection.query_data_dict("users","username='"+username+"' LIMIT 1")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+    
+
+    if user == []:
+        return False
+    else:
+        return True
+
+
+def get_pass(username):
+    """Read the password of the specified user from database by using SQLiteDB class.
+    Args:
+        username (str): The name of the user to be read.
+    Returns:
+        User information row as dict.
+    """
+    connection = SQLiteDB()
+
+    user=None
+
+    while user is None:
+        try:
+            user = connection.query_data_dict("users","username='"+username+"'")
+        except:
+            #If the database is locked, wait 1 second and try again
+            print("Database locked. Waiting 1 second...")
+            time.sleep(1)
+    
+
+    return user
 
 def update_config(camera_name, data):
     """Update a row given the camera name and the data to be updated.
@@ -223,4 +291,11 @@ def loopUntilRead(cap,url):
             if _:
                 print("Connection reestablished")                
                 return (True,frame,cap)
+
+
+# Credit: https://stackoverflow.com/questions/5297448/how-to-get-md5-sum-of-a-string-using-python
+def md5hash(string):
+    '''Return the md5 hash of the string'''
+
+    return hashlib.md5(string.encode('utf-8')).hexdigest()
 
