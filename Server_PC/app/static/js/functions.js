@@ -29,6 +29,7 @@ function popupWindow(event, url, width, height, head_title) {
 
 //open webm videos in a w2ui popup
 function popupVideo(event, url, width, height) {
+    event.preventDefault(); //prevent from scrolling to top of page
     w2popup.open({
         title: 'Video Player',
         body: '<video width="100%" height="100%" controls><source src="' + url + '" type="video/webm"></video>',

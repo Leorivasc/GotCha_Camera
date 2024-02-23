@@ -285,9 +285,11 @@ body {
   /* Estilo para la tabla */
 .table_stripped {
   border-collapse: collapse; /* Combina los bordes de las celdas */
-  width: 100%; /* Ancho total de la tabla */
+  
+  width: 90%; /* Ancho total de la tabla */
   font-size: smaller;
   overflow-x: auto;
+
 }
 
 /* Estilo para todas las celdas */
@@ -295,13 +297,15 @@ body {
   border: 1px solid #000; /* Borde de 1px sólido negro */
   padding: 8px; /* Espaciado interno de las celdas */
   text-align: center; /* Alineación del texto a la izquierda */
-  background-color: #8f8f8f;
+  background-color: #ddd;
+  border-color: #d1d1d1;
 }
 
 .td_stripped {
   border: 1px solid #000; /* Borde de 1px sólido negro */
   padding: 8px; /* Espaciado interno de las celdas */
   text-align: left; /* Alineación del texto a la izquierda */
+  border-color: #d1d1d1;
 }
 
 /* Estilo para las filas pares */

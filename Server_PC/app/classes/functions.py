@@ -101,6 +101,29 @@ def read_config_all(condition=None):
 
     return cameras
 
+def update_email_config(data):
+    """Update the email configuration from database by using SQLiteDB class.
+    Args:
+        data (dict): The data to be updated.
+    Returns:
+        True if the update was successful, False otherwise.
+    """
+    connection = SQLiteDB()
+
+    ans=False
+
+    tries=0
+    while ans is False and tries<5: ##Will try 5 times before giving up
+        try:
+            ans = connection.update_data("email", data, "id=1") #There is only one row in the email table
+        except Exception as e:
+            #If the database is locked, wait 1 second and try again
+            print("Error updating. Waiting 1 second...")
+            time.sleep(1)
+            
+    
+
+    return ans
 
 def read_users():
     """Read all the users from database by using SQLiteDB class.
@@ -275,7 +298,7 @@ def loopUntilRead(cap,url):
         url (str): The URL to which the request will be performed.
     """
     #Loop to reconnect if connection is lost. It will loop until a frame is read again
-    print("Connection lost?")
+    print(f"Connection lost to {url}.")
     _=False
 
     while not _:

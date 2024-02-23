@@ -224,14 +224,19 @@ def upload_file():
 #Route to ALL cameras config (table edition)
 #Will respond with a simple text value
 
-@app.route('/cameras_setup')
+@app.route('/sys_setup')
 def cameras_setup():
 
     #Read cookie presence
     cookiedata=read_user_cookie()
+
+    # Check user role. Here is more sensible to check admin access
+    if cookiedata[0] != 'admin':
+        return 'Unauthorized access. Please login first.'
+
     #Get all cameras
     cameras = read_config_all() 
-    return render_template('cameras_setup.html', 
+    return render_template('sys_setup.html', 
                            cameras=cameras, 
                            cookiedata=cookiedata)
 
@@ -307,8 +312,44 @@ def modify_config():
     else:
         return 'Server error'
 
+#Route to return the email configuration as JSON
+@app.route('/get_smtp_conf')
+def get_smtp_conf():
+    smtp_conf = read_email_config()
+    return jsonify(smtp_conf)
 
 
+#Route to modify the email configuration (POST ONLY)
+@app.route('/modify_smtp_conf', methods=['POST'])
+def modify_smtp_conf():
+    #Manage as dict
+    data=request.form.to_dict()
+   
+    #Data validation before updating
+    for key in data:
+
+        ##check for empty values
+        print(data[key])
+        if data[key] == '' or data[key] is None or data[key] == 'Null' or data[key] == 'null' or data[key] == 'undefined':
+            return "Some empty values"
+
+         ## traverse the data and change every 'on' to 1 and 'off' to 0 (checkboxes)
+        if data[key] == 'on' or data[key] == 'true':
+            data[key] = 1
+        elif data[key] == 'off' or data[key] == 'false':
+            data[key] = 0
+
+        ##Make sure numeric values are not empty
+        if data[key] == '':
+            data[key] = 0
+
+    #Perform the update
+    ans = update_email_config(data)
+
+    if ans:
+        return 'Modified'
+    else:
+        return 'Server error'
 
 # Route to handle configuration modification requests from W2UI table
 # This route handles both GET and POST requests,since W2UI sends requests using both methods
