@@ -133,7 +133,7 @@ class ProcessMovement:
                         self.alerting.startAlert() #Start alerting system
                     
 
-                    if not self.videoRecorder.isRecording():
+                    if camera['isTriggerable'] == 1 and not self.videoRecorder.isRecording():
                         self.videoRecorder.recordTimeLapse(camera['recordtime']) #Start recording on its own thread
                         
                         #Record processed images only if configured
