@@ -143,7 +143,7 @@ def file_list():
                            cookiedata=cookiedata)
 
 
-#Downloads for recordings
+#Downloads for recordings (allow visualizing and downloading the recordings)
 @app.route('/download/<filename>')
 def download_file(filename):
     # Manejar las descargas de archivos
@@ -153,6 +153,11 @@ def download_file(filename):
 #Removing a recording
 @app.route('/delete_recording/<filename>')
 def delete_recording(filename):
+
+    #Verify user        
+    if not verify_credentials():
+        return 'Unauthorized access. Please login first.'
+    
     try:
         #Recordings directory
         recordings_dir = 'recordings'
@@ -179,6 +184,10 @@ def delete_recording(filename):
 @app.route('/mask_app/<camera_name>')
 def mask_app(camera_name):
 
+    #Verify user        
+    if not verify_credentials():
+        return 'Unauthorized access. Please login first.'
+
     #Read cookie presence
     cookiedata=read_user_cookie()
 
@@ -200,6 +209,11 @@ def mask_app(camera_name):
 # Mask upload route
 @app.route('/upload_mask', methods=['POST'])
 def upload_file():
+
+    #Verify user        
+    if not verify_credentials():
+        return 'Unauthorized access. Please login first.'
+
     #Verify right request
     if 'mask' not in request.files:
         return 'File not sent'
@@ -231,8 +245,10 @@ def cameras_setup():
     cookiedata=read_user_cookie()
 
     # Check user role. Here is more sensible to check admin access
-    if cookiedata[0] != 'admin':
-        return 'Unauthorized access. Please login first.'
+    if not verify_credentials('admin'):
+        resp = make_response(redirect('/')) #Redirect to main page
+        return resp
+  
 
     #Get all cameras
     cameras = read_config_all() 
@@ -248,6 +264,8 @@ def getcameras_conf():
     jcameras = jsonify(cameras)
     jcameras.status_code=200
     return jcameras
+
+
 
 
 #Template for cameras config (popups from the config button in the local_stream page)
@@ -274,6 +292,11 @@ def camera_config(camera_name):
 
 @app.route('/modify_config', methods=['POST'])
 def modify_config():
+
+    # Check user role. Here is more sensible to check admin access
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
     #Verify right request
     if 'name' not in request.form:
         return 'Camera name not sent'
@@ -315,6 +338,11 @@ def modify_config():
 #Route to return the email configuration as JSON
 @app.route('/get_smtp_conf')
 def get_smtp_conf():
+
+    #Verify user (admin only)
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
     smtp_conf = read_email_config()
     return jsonify(smtp_conf)
 
@@ -322,6 +350,11 @@ def get_smtp_conf():
 #Route to modify the email configuration (POST ONLY)
 @app.route('/modify_smtp_conf', methods=['POST'])
 def modify_smtp_conf():
+
+    #Verify user        
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
     #Manage as dict
     data=request.form.to_dict()
    
@@ -408,6 +441,11 @@ def w2ui_db():
         
 @app.route('/add_camera', methods=['POST'])
 def add_camera():
+
+    #Verify user
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
     #Verify right request
     if 'name' not in request.form:
         return 'Camera name not sent'
@@ -440,6 +478,11 @@ def add_camera():
 #Remove camera (POST ONLY)
 @app.route('/delete_camera', methods=['POST'])
 def delete_camera():
+
+    #Verify user
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
     #Verify right request
     if 'name' not in request.form:
         return 'Camera name not sent'
@@ -488,12 +531,14 @@ def login():
         return "User/password incorrect"
         
 
+#Logout route
+#This route deletes the user and data cookies
 @app.route('/logout')
 def logout():
-    resp = make_response(redirect('/') )
+    resp = make_response(redirect(request.referrer) )
     resp.delete_cookie('user')
     resp.delete_cookie('data')
-    resp.headers['Location'] = '/'
+    resp.headers['Location'] = request.referrer
     resp.status_code = 302
     return resp
 
@@ -511,6 +556,25 @@ def read_user_cookie():
 
     return (user, data)
 
+#Compare cookie data against stored user/passeword to verify valid credentials
+def verify_credentials(testuser='admin'):
+    #Read cookies
+    data = request.cookies.get('data')
+    user = request.cookies.get('user')
+
+    #If any not found, return a default value
+    if data is None or user is None:
+        return False
+    
+    #if the user is not the testuser, return False
+    if user != testuser:
+        return False
+
+    dbpass=get_pass(user)[0]['password']
+    if data == dbpass:
+        return True  #User is logged in and verified
+    else:
+        return False #Stored password does not match the one in the database
 
 
 
