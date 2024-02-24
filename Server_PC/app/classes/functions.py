@@ -171,8 +171,8 @@ def is_user(username):
         return True
 
 
-def get_pass(username):
-    """Read the password of the specified user from database by using SQLiteDB class.
+def get_user(username):
+    """Read info of the specified user from database by using SQLiteDB class.
     Args:
         username (str): The name of the user to be read.
     Returns:
@@ -192,6 +192,32 @@ def get_pass(username):
     
 
     return user
+
+def update_password(username, password):
+    """Update the password of the specified user from database by using SQLiteDB class.
+    Args:
+        username (str): The name of the user to be updated.
+        password (str): The new password.
+    Returns:
+        True if the update was successful, False otherwise.
+    """
+    connection = SQLiteDB()
+
+    ans=False
+
+    tries=0
+    while ans is False and tries<5: ##Will try 5 times before giving up
+        try:
+            ans = connection.update_data("users", {"password":password}, "username='"+username+"'")
+        except Exception as e:
+            #If the database is locked, wait 1 second and try again
+            print("Error updating. Waiting 1 second...")
+            time.sleep(1)
+            
+    
+
+    return ans
+
 
 def update_config(camera_name, data):
     """Update a row given the camera name and the data to be updated.

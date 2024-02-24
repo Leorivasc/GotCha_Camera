@@ -22,6 +22,30 @@
                 <div id="mail" style="width: 100%;height: 70px;"></div>         
             </div>
 
+            <div class="card" id="admin_pass">
+                <h1 style="text-align: left;">Change Admin Password</h1>
+                <form action="/change_password" method="post">
+                <table class="" style="width: 50%; text-align: left;">
+                    <tr>
+                        <th style="width: 180px;">Current Password</th>
+                        <td><input type="password" id="currentPassword" placeholder="Enter current password"></td>
+                    </tr>
+                    <tr>
+                        <th>New Password</th>
+                        <td><input type="password" id="newPassword" placeholder="Enter new password"></td>
+                    </tr>
+                    <tr>
+                        <th>Repeat New Password</th>
+                        <td><input type="password" id="repeatNewPassword" placeholder="Repeat new password"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;"><button type="button" id="submitbutton" class="btn btn-primary" style="margin:8px" >Submit</button></td>
+                    </tr>
+                </table>
+                </form>
+            </div>
+                
+
         </div>
     </div>    
     <div class=" w3-col l3 m12 s12" id="helptext">
@@ -34,7 +58,6 @@
                 <br>
                 <b>Fields:</b>
                 <br>
-                <br>
                 <b>Name:</b> The name of the camera.
                 <br>
                 <b>IP Address:</b> The IP address of the camera.
@@ -44,7 +67,6 @@
                 <b>Stream Path:</b> The path of the stream.
                 <br>
                 <b>Email Alert:</b> The email to send alerts to.
-                <br>
                 <br>
                 <br>
                 <b>Setup Notes:</b>
@@ -64,7 +86,8 @@
                 <br>
                 - Hover over the field names to see the field descriptions.
                 <br><b>Changes are saved automatically.</b>
-
+                <br>
+                <br>
 
             </p>
         </div>
@@ -87,6 +110,27 @@
         //Adds the 'active' class to the current page
         var current = document.getElementsByClassName("nav")[4];
         current.classList.add("active");
+
+
+        //Change password button event listener
+        var submitButton = document.getElementById("submitbutton");
+        submitButton.addEventListener('click', (event) => {
+            //Collect the form data
+            var currentPassword = document.getElementById("currentPassword").value;
+            var newPassword = document.getElementById("newPassword").value;
+            var repeatNewPassword = document.getElementById("repeatNewPassword").value;
+            if (newPassword != repeatNewPassword){
+                w2alert("New passwords do not match");
+                return;
+            }
+            var data = {
+                "currentPassword": currentPassword,
+                "newPassword": newPassword
+            }
+            sendPost(data, "/change_admin_password", function(response){
+                                    w2alert(response);
+            });
+        });
     });
 
     

@@ -520,7 +520,7 @@ def login():
         return "User/password incorrect"
 
     #Check password (password is stored in hashed form in the database)
-    storedpass= get_pass(user)[0]['password']
+    storedpass= get_user(user)[0]['password']
     password = md5hash(password) #Hash the password
     if password==storedpass:
         resp = make_response("Ok")
@@ -570,12 +570,47 @@ def verify_credentials(testuser='admin'):
     if user != testuser:
         return False
 
-    dbpass=get_pass(user)[0]['password']
+    dbpass=get_user(user)[0]['password']
     if data == dbpass:
         return True  #User is logged in and verified
     else:
         return False #Stored password does not match the one in the database
 
+#Route to change Admin password
+@app.route('/change_admin_password', methods=['POST'])
+def change_password():
+    
+    #Verify user
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+
+    #Verify right requests
+    if 'currentPassword' not in request.form:
+        return 'Current password not sent'
+
+    if 'newPassword' not in request.form:
+        return 'New password not sent'
+
+    #Check that old password matches with the stored one
+    oldpassword = request.form['currentPassword']
+    oldpassword = md5hash(oldpassword)
+    storedpass= get_user('admin')[0]['password']
+    if oldpassword != storedpass:
+        return "Old password incorrect"
+    
+    #Get new password    
+    newpassword = request.form['newPassword']
+    
+    #Hash the new password for storing
+    password = md5hash(newpassword)
+
+    #Perform the update
+    ans = update_password('admin', password)
+
+    if ans:
+        return 'Password updated'
+    else:
+        return 'Error storing new password'
 
 
 #-----------Error handling-----------------
