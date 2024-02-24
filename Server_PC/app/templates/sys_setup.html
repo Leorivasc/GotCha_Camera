@@ -311,7 +311,7 @@ var email_info = new w2grid({
 function validateSMTPFields(name, value) {
        
        // Regular expressions for validation
-       var nameRegex = /^[a-zA-Z\s]+$/;
+       var nameRegex = /^[a-zA-Z0-9\s]+$/;
        var portRegex = /^\d+$/;
        var hostRegex = /^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$/;
        var ipAddressRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
@@ -351,7 +351,7 @@ function validateSMTPFields(name, value) {
  function validateFields(name, value) {
        
        // Regular expressions for validation
-       var nameRegex = /^[a-zA-Z\s]+$/;
+       var nameRegex = /^[a-zA-Z0-9\s]+$/;
        var portRegex = /^\d+$/;
        var ipAddressRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
        var pathRegex = /^\/[a-zA-Z0-9_\/]*$|^\/$/;
