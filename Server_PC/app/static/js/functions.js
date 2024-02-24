@@ -1,8 +1,13 @@
+///Common functions for the web templates
 
 
-
-
-//Opens a popup window with an url. New browser window
+/**
+ * Opens a new browser window with the provided url
+ * @param {*} event 
+ * @param {*} url 
+ * @param {*} width 
+ * @param {*} height 
+ */
 function popupWindow_new(event,url, width, height) {
     event.preventDefault(); //prevent from scrolling to top of page
     // Center position
@@ -16,7 +21,14 @@ function popupWindow_new(event,url, width, height) {
     window.open(url, '_blank', opciones);
 }
 
-//Opens an url in a W2UI popup
+/**
+ * Opens an url in a W2UI draggable popup
+ * @param {*} event 
+ * @param {*} url 
+ * @param {*} width 
+ * @param {*} height 
+ * @param {*} head_title 
+ */
 function popupWindow(event, url, width, height, head_title) {
     w2popup.open({
         title: head_title,
@@ -27,7 +39,13 @@ function popupWindow(event, url, width, height, head_title) {
 }
 
 
-//open webm videos in a w2ui popup
+/**
+ * Open webm videos in a w2ui popup
+ * @param {*} event 
+ * @param {*} url 
+ * @param {*} width 
+ * @param {*} height 
+ */
 function popupVideo(event, url, width, height) {
     event.preventDefault(); //prevent from scrolling to top of page
     w2popup.open({
@@ -40,16 +58,19 @@ function popupVideo(event, url, width, height) {
 
 
 
-
-
-//UNUSED (local_stream.html) Reads url and show in divdestination
-//Promise part of the function. use readAndShow() below
+/**
+ * UNUSED Reads url and returns promise
+ * Promise part of the function. use readAndShow() below
+ * @param {*} url 
+ * @param {*} params 
+ * @returns 
+ */
 function doGet(url, params) {
-   // Construir la URL con los parámetros
+   // Build the full URL
    const queryParams = new URLSearchParams(params).toString();
    const fullUrl = `${url}?${queryParams}`;
 
-   // Retornar la promesa de la solicitud GET
+   // Return promise
    return fetch(fullUrl)
        .then(response => {
            if (!response.ok) {
@@ -59,7 +80,12 @@ function doGet(url, params) {
        });
 }
 
-//UNUSED Reads an url and loads into a div
+/**
+ * UNUSED Reads an url and loads into a div
+ * @param {*} url 
+ * @param {*} params 
+ * @param {*} divdestination 
+ */
 function readAndShow(url, params, divdestination) {
    doGet(url, params, divdestination)
        .then(text => {
@@ -70,7 +96,12 @@ function readAndShow(url, params, divdestination) {
        });
 }
 
-//Sends POST data to an url, then calls a callback function
+/**
+ * Sends POST data to an url, then calls a callback function
+ * @param {*} data 
+ * @param {*} url 
+ * @param {*} callback 
+ */
 //Will convert data to a URL-encoded string and send as if it was a form
 function sendPost(data, url, callback) {
     // Create an instance of XMLHttpRequest
@@ -111,6 +142,11 @@ function sendPost(data, url, callback) {
 }
 
 
+
+/**
+ * Pop ups the login form
+ * @param {*} event 
+ */
 function loginPopup(event){
     event.preventDefault();
     w2popup.open({
@@ -133,8 +169,7 @@ function loginPopup(event){
         width: 320,
         height: 200,
         modal: true,
-        showClose: true,
-       
+        showClose: true,     
         
     })
     .close(evt => {

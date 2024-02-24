@@ -11,6 +11,13 @@ from .threeframe import ThreeFrame
 import json
 
 class ProcessMovement:
+    """Class to process movement in a video stream and trigger alerts and recordings.
+    Args:
+        camera_name (str): The name of the camera.
+        recorder_obj (VideoRecorder): The VideoRecorder object to use for recording.
+        processedrecorder_obj (VideoRecorder): The VideoRecorder object to use for processed video recording.
+        alert_obj (Alerting): The Alerting object to use for alerting.
+    """
 
     def __init__(self, camera_name, recorder_obj, processedrecorder_obj, alert_obj):
         self.camera_name = camera_name
@@ -33,8 +40,13 @@ class ProcessMovement:
 
 
 
-    def main_loop(self):
-
+    def _main_loop(self):
+        '''
+        Main method to process the video stream and detect movement. 
+        It implements the movemente detection loop using the provided frame processing algorithm (ThreeFrame class here)
+        It applies the mask, the threshold and the detection area to a unique frame stream. Must be run multiple times for multiple cameras. See 'web_cam.py'
+        To be run in a separate thread.
+        '''
 
 
         #Get camera configuration from DB using the camera name as key
@@ -159,19 +171,18 @@ class ProcessMovement:
             
         cap.release()
 
-        #if self.foreverLoop:
-        #    self.restartLoop() 
+
 
 
 
     def startLoop(self):
-        """Start the three-frame difference loop on a new thread."""
-
+        """Stars the three-frame difference loop on a new thread."""
 
         if self.frame_thread is None:
-            self.frame_thread = threading.Thread(target=self.main_loop)
+            self.frame_thread = threading.Thread(target=self._main_loop)
             self.loopOK=True
             #self.foreverLoop=True
+            print(f"Starting processmovement thread for {self.camera_name}")
             self.frame_thread.start()
             
             #self.frame_thread.join() #HANGS LOOP
@@ -182,11 +193,17 @@ class ProcessMovement:
             
 
 
+
+
+
     def stopLoop(self):
         """Stop the three-frame difference loop."""
         self.loopOK=False
         #self.frame_thread.join()
         self.frame_thread = None   
+
+
+
 
 
     def restartLoop(self):
@@ -197,7 +214,11 @@ class ProcessMovement:
         self.startLoop()
 
 
+
+
+
     def generate_frames(self):
+        """Generate the frames to be sent to the web client."""
         while True:
             with self.frame_lock:
                 if self.last_frame is None:
@@ -218,8 +239,13 @@ class ProcessMovement:
                     b'\r\n' + frame_bytes + b'\r\n')    
 
 
+
+
+
     def getSnapshot(self):
-        """Return the last frame as a JPEG image."""
+        """Return the last frame as a JPEG image (used from the mask app).
+        Returns:
+            bytes: The last frame as a JPEG image."""
         with self.frame_lock:
             if self.last_frame is None:
                 return None
@@ -229,12 +255,10 @@ class ProcessMovement:
 
         return frame_bytes
     
+
+
+
     def getState(self):
-        """Return the object state."""
+        """Returns the object state."""
         return self.loopOK
 
-    def getStateXX(self):
-        """Return the object state."""
-        response = {"loopOK": self.loopOK, "isRecording": self.videoRecorder.isRecording(),"isProcessedrecording": self.processedRecorder.isRecording(),"isAlerting": self.alerting.isAlerting()}
-        responseJSON = json.dumps(response)
-        return responseJSON

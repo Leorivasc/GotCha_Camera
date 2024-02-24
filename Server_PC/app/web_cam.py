@@ -143,11 +143,17 @@ def getstatehtml():
     return response
 
 
+
+
+
+
 #### Init portion ####
 #Gets the arguments from the -e flag on gunicorn ( -e camera=cameraname)
+
 cam_env = os.getenv('CAMERA')
 print(f"START Camera: {cam_env}")
 cam=fn.read_config(cam_env)[0] #Read rest of the camera configuration from DB. Only the 1st result just in case.S
+
 
 #Get server IP to present links properly (gallery and email links)
 host_name = socket.gethostname()+".local"
@@ -155,9 +161,11 @@ server_ip = socket.gethostbyname(host_name)
 web_app_port = 8080 #Default port for the web app (hardcoded)
 web_app_url = f"http://{server_ip}:{web_app_port}" #URL for the web app
 
+
 #Instantiate objects for 'this' camera. Videorecorder and alerting. 
 recorder_obj = VideoRecorder(cam['name']) #Create object to handle the video recorder
 processedRecorder_obj = VideoRecorder(cam['name'],"Processed_") #Create object to handle the video recorder for processed video
+
 
 #Create object to handle the alerting. Notice app context is passed to the email sender
 #It will also use the recorder object to gain access to last thumbnails and video files if needed
@@ -166,15 +174,15 @@ alert_obj = Alerting(cam['name'],app,recorder_obj, web_app_url)
 
 #Instantiate processor object for 'this' camera. ProcessMovement. Uses the recorder and alerting objects
 processor_cam_obj = ProcessMovement(cam['name'], recorder_obj,processedRecorder_obj ,alert_obj) #Create object to handle the camera
+processor_cam_obj.startLoop() #Start the loop to process frames
 
 
-
-#Start thread to read frames
-frame_thread = threading.Thread(target=processor_cam_obj.main_loop)
+""" #Start thread to read frames
+frame_thread = threading.Thread(target=processor_cam_obj._main_loop)
 frame_thread.daemon = True
 if not frame_thread.is_alive():
     print("Starting thread")
-    frame_thread.start()
+    frame_thread.start() """
 
 
 

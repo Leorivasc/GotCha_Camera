@@ -40,6 +40,9 @@ def do_get(url):
         return((False,f"Bad request: {e}"))
 
 
+
+
+
 def read_config(camera_name):
 
     """Read the cameras configuration from database by using SQLiteDB class.
@@ -63,6 +66,10 @@ def read_config(camera_name):
             
     return camera
 
+
+
+
+
 def read_email_config():
     """Read the email configuration from database by using SQLiteDB class.
     Returns:
@@ -80,6 +87,10 @@ def read_email_config():
             time.sleep(1)
 
     return email
+
+
+
+
 
 def read_config_all(condition=None):
     """Read all the cameras configuration from database by using SQLiteDB class.
@@ -100,6 +111,10 @@ def read_config_all(condition=None):
     
 
     return cameras
+
+
+
+
 
 def update_email_config(data):
     """Update the email configuration from database by using SQLiteDB class.
@@ -125,6 +140,10 @@ def update_email_config(data):
 
     return ans
 
+
+
+
+
 def read_users():
     """Read all the users from database by using SQLiteDB class.
     Returns:
@@ -144,6 +163,10 @@ def read_users():
     
 
     return users
+
+
+
+
 
 def is_user(username):
     """Check if the specified user exists in the database by using SQLiteDB class.
@@ -171,6 +194,9 @@ def is_user(username):
         return True
 
 
+
+
+
 def get_user(username):
     """Read info of the specified user from database by using SQLiteDB class.
     Args:
@@ -192,6 +218,10 @@ def get_user(username):
     
 
     return user
+
+
+
+
 
 def update_password(username, password):
     """Update the password of the specified user from database by using SQLiteDB class.
@@ -217,6 +247,8 @@ def update_password(username, password):
     
 
     return ans
+
+
 
 
 def update_config(camera_name, data):
@@ -258,7 +290,19 @@ def update_config(camera_name, data):
     return ans
 
 
+
+
+
 def new_camera(data):
+    """Insert a new camera in the database.
+    It will automatically assign a mirror port to the camera consisting of 5000+id.
+    Considered UNIQUE in the database because that port will be used to mirror the camera stream.
+
+    Args:
+        data (dict): The data to be inserted.
+    Returns:
+        The id of the camera if the insert was successful, False otherwise.
+    """
     connection = SQLiteDB()
 
     #Insert the camera
@@ -269,7 +313,17 @@ def new_camera(data):
 
     return id
 
+
+
+
+
 def remove_camera(camera_name):
+    """Remove the camera from the database.
+    Args:
+        camera_name (str): The name of the camera to be removed.
+    Returns:
+        True if the delete was successful, False otherwise.
+    """
     connection = SQLiteDB()
 
     #Delete the camera by name
@@ -277,12 +331,22 @@ def remove_camera(camera_name):
 
     return ans
 
+
+
+
 def add_datetime(frame):
+    '''Add the current date and time to the frame. It will be used to display the date and time on the video stream.
+    Args:
+        frame (np.array): The frame to which the date and time will be added.
+    Returns:
+        The frame with the date and time added.
+        '''
+
     #Get date
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    #Configurar el texto
+    #Configure font
     font = cv2.FONT_HERSHEY_SIMPLEX
     bottom_left_corner = (10, frame.shape[0] - 10)
     font_scale = 0.5
@@ -295,8 +359,21 @@ def add_datetime(frame):
     return frame
 
 
+
+
+
 def add_text(frame, text, x,y):
-    #Configurar el texto
+    '''Add a text to the frame. It will be used to display the date and time on the video stream.
+    Args:
+        frame (np.array): The frame to which the date and time will be added.
+        text (str): The text to be added.
+        x (int): The x coordinate of the text.
+        y (int): The y coordinate of the text.
+    Returns:
+        The frame with the text added.
+    '''
+
+    #Configure font
     font = cv2.FONT_HERSHEY_SIMPLEX
     bottom_left_corner = (x,y)
     font_scale = 0.5
@@ -306,16 +383,30 @@ def add_text(frame, text, x,y):
     #Put text
     cv2.putText(frame, text, bottom_left_corner, font, font_scale, (0,0,0), 3) #Shadow
     cv2.putText(frame, text, bottom_left_corner, font, font_scale, font_color, line_type)
+    
     return frame
 
 
+
+
+
 def createMask(camera_name):
-    """Create a mask image for the specified camera name under masks/ directory. With name mask_<camera_name>.jpg"""
+    """Create a mask image for the specified camera name under masks/ directory. With name mask_<camera_name>.jpg
+    It will create a black image with the same resolution as the camera stream to be used as default mask.
+    It is automatically stored in the masks/ directory.
+
+    Args:
+        camera_name (str): The name of the camera to be used as the mask name.
+    """
+
     image = np.zeros((240,320),dtype=np.uint8)
     #image[:120,:]=1 #Top half of the image is '1', bottom half is '0' (image looks black)
     image[:]=1 #All image is '1' (image looks black and makes no effect on the analysis)
     cv2.imwrite(f'masks/mask_{camera_name}.jpg', image)
     
+
+
+
 def loopUntilRead(cap,url):
     """This function checks the connection to the camera and restarts the loop if connection is lost.
     It must be run on its own thread so that it does not block the main thread
@@ -344,7 +435,11 @@ def loopUntilRead(cap,url):
 
 # Credit: https://stackoverflow.com/questions/5297448/how-to-get-md5-sum-of-a-string-using-python
 def md5hash(string):
-    '''Return the md5 hash of the string'''
+    '''Return the md5 hash of the string. Used to store passwords in the database.
+    Args:
+        string (str): The string to be hashed.
+    Returns:
+        The md5 hash of the string.'''
 
     return hashlib.md5(string.encode('utf-8')).hexdigest()
 

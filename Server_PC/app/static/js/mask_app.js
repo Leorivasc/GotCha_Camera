@@ -1,3 +1,11 @@
+// MASK APP
+// This script is used to create a mask image for the camera. 
+// The mask image is used to define the area of the image that will be used for motion detection. 
+// The mask image is created by drawing on top of the camera image. 
+// The resulting mask image is then uploaded to the server to be used by the motion detection algorithm.
+// Requires p5.js library for drawing on the canvas and image manipulation.
+// This script works only when loaded from 'mask_app.html' because it requires the buttons to be present in the DOM.
+
 // Global Variables
 let img;
 let mask;
@@ -7,32 +15,29 @@ let brushSize = 20;
 
 let camera_name = ""
 
+/**
+ * P5.js setup() function
+ * Create the canvas and set up event listeners for the buttons
+ * (this is only to be loaded from 'mask_app.html')
+ */
 function setup() {
   let canvas = createCanvas(320, 240);
   canvas.parent('canvasHolder');
   
-  //show canvas
-  //canvas.style('display', 'block');
-  //canvas.style('margin', 'auto');
-  //canvas.style('border', '1px solid black');
-  //canvas.style('margin-top', '10px');
-  //canvas.style('margin-bottom', '10px');
-  //canvas.style('margin-left', 'auto');
- // canvas.style('margin-right', 'auto');
-
-
-  //document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
-  //document.getElementById('saveLocalButton').addEventListener('click', saveMaskLocally, false);
+  // Add event listeners to the buttons
   document.getElementById('uploadButton').addEventListener('click', uploadMaskToServer, false);
   document.getElementById('loadFromCamera').addEventListener('click', loadFromCamera, false);
   document.getElementById('invertColor').addEventListener('click', invertColor, false);
 
-  //get camera name
+  //get camera name from the template
   camera_name = document.getElementById('cameraName').value;
 
   loadFromCamera();
 }
 
+/**
+ * Load an image from the camera to be used as background where the drawing will be done
+ */
 function loadFromCamera(){
 
   //lets make sure to keep the url updated
@@ -41,41 +46,47 @@ function loadFromCamera(){
   var snapshoturl = document.getElementById("snapShotURL");
   snapshoturl.value = "http://"+ hostname + snapshotroute.value;
   
+  //Load the image
   img = loadImage(snapshoturl.value, function() {
-    resizeCanvas(img.width, img.height);
-    mask = createImage(img.width, img.height);
-   
-    image(img, 0, 0);
+                    //resize the canvas to match the image dimensions (future use may allow different dimensions for mask and image)
+                    resizeCanvas(img.width, img.height);
+                    mask = createImage(img.width, img.height);
 
-    // Create the mask image. It is all white, opaque, and the same size as the loaded image
-    mask.loadPixels();
-    for (let i = 0; i < mask.width * mask.height * 4; i += 4) {
-      mask.pixels[i] = 255;
-      mask.pixels[i + 1] = 255;
-      mask.pixels[i + 2] = 255;
-      mask.pixels[i + 3] = 1; // 1 to pass the if
-    }
-    mask.updatePixels();
+                    //Position the image on the canvas
+                    image(img, 0, 0);
+
+                    // Create the mask image. It is all white, opaque, and the same size as the loaded image
+                    mask.loadPixels();
+                    for (let i = 0; i < mask.width * mask.height * 4; i += 4) {
+                      mask.pixels[i] = 255;
+                      mask.pixels[i + 1] = 255;
+                      mask.pixels[i + 2] = 255;
+                      mask.pixels[i + 3] = 1; // 1 to pass the if
+                    }
+                    mask.updatePixels();
 
 
-    // Create a black image to use as copy source
-    black = createImage(img.width, img.height);
-    black.loadPixels();
-    for (let i = 0; i < black.width * black.height * 4; i += 4) {
-      black.pixels[i] = 0;
-      black.pixels[i + 1] = 0;
-      black.pixels[i + 2] = 0;
-      black.pixels[i + 3] = 255; // 0 = transparent, 255 = opaque
-    }
-    black.updatePixels();
+                    // Create a black image to use as copy source
+                    black = createImage(img.width, img.height);
+                    black.loadPixels();
+                    for (let i = 0; i < black.width * black.height * 4; i += 4) {
+                      black.pixels[i] = 0;
+                      black.pixels[i + 1] = 0;
+                      black.pixels[i + 2] = 0;
+                      black.pixels[i + 3] = 255; // 0 = transparent, 255 = opaque
+                    }
+                    black.updatePixels();
 
-  }, function(e) {
-    console.log('Error loading image:', e);
-  });
+                }, function(e) {
+                      console.log('Error loading image:', e);
+                      });
 
 }
 
 
+/**
+ * Invert the color of the mask. Useful to flip the mask from black to white and vice versa
+ */
 function invertColor(){
 //Will invert the color of the mask
   if (img && mask) {
@@ -99,7 +110,11 @@ function invertColor(){
 }
 
 
-//Load the image and create the mask image to match the loaded image dimensions
+/**
+ * Load the image from file selector and create the mask image to match the loaded image dimensions
+ * (Not used anymore, replaced by loadFromCamera), but kept for reference
+ * @param {*} event 
+ */
 function handleFileSelect(event) {
   //Load the image
   let file = event.target.files[0];
@@ -146,7 +161,10 @@ function handleFileSelect(event) {
 
 
 
-//Draw the loaded image, then draw the mask on top of it.
+/**
+ * P5.js draw() function
+ * Draw the loaded image, then draw the mask on top of it.
+ */
 function draw() {
   //The mask is drawn semi-transparently, so that the image underneath can be seen.
   if (img) {
@@ -180,7 +198,10 @@ function draw() {
   }
 }
 
-//Save and download the mask image locally
+/**
+ * Save and download the mask image locally
+ * (Not used anymore, replaced by uploadMaskToServer), but kept for reference
+ */
 function saveMaskLocally() {
   if (img && mask) {
    
@@ -191,7 +212,10 @@ function saveMaskLocally() {
 }
 
 
-//Upload the mask image to the server
+/**
+ * Upload the mask image to the server
+ * Modified from:https://stackoverflow.com/questions/3012566/how-to-upload-string-as-file-with-jquery-or-other-js-framework
+ */
 function uploadMaskToServer() {
   if (img && mask) {
     //prepareMask();
@@ -218,7 +242,10 @@ function uploadMaskToServer() {
 }
 
 
-//Set transparent pixels to white, dark pixels to black
+/**
+ * Set transparent pixels to white, dark pixels to black
+ * so that it can be used as a mask
+ */
 function prepareMask(){
   mask.loadPixels();
   for (let i = 0; i < width * height * 4; i += 4) {
@@ -237,6 +264,10 @@ function prepareMask(){
   mask.updatePixels();
 }
 
+/**
+ * Convert to binary mask
+ * @returns bmp
+ */
 function mask2onezeros(){
   mask.loadPixels();
   bmp=[];
@@ -254,7 +285,10 @@ function mask2onezeros(){
 }
 
 
-//convert mask to bmp of 0 and 1
+/**
+ * convert mask to bmp of 0 and 1
+ * @returns bmp
+ */
 function convertMaskToBMP(){
   let bmp = [];
   mask.loadPixels();

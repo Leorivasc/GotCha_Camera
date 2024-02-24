@@ -295,7 +295,7 @@ var email_info = new w2grid({
 
     columns: [
         { text: 'Server', field: 'MAIL_SERVER', sortable: true, size: '150px', tooltip:"SMTP server address", editable: { type: 'text' }},
-        { text: 'Port', field: 'MAIL_PORT', sortable: true, size: '50px', tooltip:"SMTP server port", editable: { type: 'int',min:1024,max:65535 }},
+        { text: 'Port', field: 'MAIL_PORT', sortable: true, size: '50px', tooltip:"SMTP server port", editable: { type: 'int',min:1,max:65535 }},
         { text: 'Username', field: 'MAIL_USERNAME', sortable: true, size: '150px', tooltip:"SMTP server username", editable: { type: 'text'}},
         { text: 'Password', field: 'MAIL_PASSWORD', sortable: true, size: '150px', render:'password', tooltip:"SMTP server password", editable: { type: 'text'}},
         { text: 'TLS', field: 'MAIL_USE_TLS', sortable: true, size: '50px', tooltip:"TLS encryption", editable: { type: 'checkbox'}},
@@ -368,7 +368,7 @@ function validateSMTPFields(name, value) {
        }
 
        if(name == "MAIL_PORT"){
-           if (!portRegex.test(value) || value < 1024 || value > 65536) {
+           if (!portRegex.test(value) || value < 1 || value > 65536) {
                return false;
            } 
        }
