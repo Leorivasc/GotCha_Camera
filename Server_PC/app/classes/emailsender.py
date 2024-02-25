@@ -20,6 +20,8 @@ class EmailSender:
         self.init_app()
 
 
+
+
     def init_app(self):
         '''Initializes the Flask-Mail extension with the email configuration from the database.'''
 
@@ -33,6 +35,10 @@ class EmailSender:
         self.app.config['MAIL_USE_SSL'] = self.email_conf['MAIL_USE_SSL']
         self.app.config['MAIL_DEFAULT_SENDER'] = self.email_conf['MAIL_DEFAULT_SENDER']
         self.mail.init_app(self.app)
+
+
+
+
 
     #Private method to send the email
     def _send(self, recipient, subject, body, attachment=None):
@@ -60,6 +66,10 @@ class EmailSender:
             print(f"Sending email...")
             self.mail.send(message)
             print(f"Email sent to {recipient}")
+
+
+
+
 
     #Public method to send the email
     def send(self, recipient, subject, body, attachment=None):

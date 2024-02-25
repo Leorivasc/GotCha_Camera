@@ -62,8 +62,7 @@ def read_config(camera_name):
             #If the database is locked, wait 1 second and try again
             print("Database locked. Waiting 1 second...")
             time.sleep(1)
-
-            
+          
     return camera
 
 
@@ -135,8 +134,6 @@ def update_email_config(data):
             #If the database is locked, wait 1 second and try again
             print("Error updating. Waiting 1 second...")
             time.sleep(1)
-            
-    
 
     return ans
 
@@ -161,7 +158,6 @@ def read_users():
             print("Database locked. Waiting 1 second...")
             time.sleep(1)
     
-
     return users
 
 
@@ -214,8 +210,7 @@ def get_user(username):
         except:
             #If the database is locked, wait 1 second and try again
             print("Database locked. Waiting 1 second...")
-            time.sleep(1)
-    
+            time.sleep(1)   
 
     return user
 
@@ -243,8 +238,7 @@ def update_password(username, password):
             #If the database is locked, wait 1 second and try again
             print("Error updating. Waiting 1 second...")
             time.sleep(1)
-            
-    
+              
 
     return ans
 
@@ -275,7 +269,6 @@ def update_config(camera_name, data):
     else:
         condition = "name="+"'"+camera_name+"'"
 
-
     tries=0
     while ans is False and tries<5: ##Will try 5 times before giving up
         try:
@@ -283,9 +276,7 @@ def update_config(camera_name, data):
         except Exception as e:
             #If the database is locked, wait 1 second and try again
             print("Error updating. Waiting 1 second...")
-            time.sleep(1)
-            
-    
+            time.sleep(1)  
 
     return ans
 
@@ -431,6 +422,9 @@ def loopUntilRead(cap,url):
             if _:
                 print("Connection reestablished")                
                 return (True,frame,cap)
+
+
+
 
 
 # Credit: https://stackoverflow.com/questions/5297448/how-to-get-md5-sum-of-a-string-using-python

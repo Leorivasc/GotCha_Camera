@@ -28,7 +28,25 @@ CORS(app) #To allow cross-origin requests
 
 
 #-----------Camera streaming functions-----------------
-#Generates the frames to be served locally (/video_feed/<camera_id> route)
+
+
+############################################
+#-----------Routes----------------#
+
+#entry point
+@app.route('/')
+def index():
+    #Read cookie presence
+    cookiedata=read_user_cookie()
+
+    return render_template('index.html', 
+                           cookiedata=cookiedata)
+
+
+
+#-----------Camera streaming routes-----------------
+
+#Function to generate frames to be served locally in case of need (see /video_feed/<camera_id> route)
 def generate_frames(camera_url):
     cap = cv2.VideoCapture(camera_url)
     
@@ -47,21 +65,6 @@ def generate_frames(camera_url):
                    b'\r\n' + frame_bytes + b'\r\n')
     cap.release()
 
-############################################
-#-----------Routes----------------#
-
-#entry point
-@app.route('/')
-def index():
-    #Read cookie presence
-    cookiedata=read_user_cookie()
-
-    return render_template('index.html', 
-                           cookiedata=cookiedata)
-
-
-
-#-----------Camera streaming routes-----------------
 
 #Camera streaming route (fast, obtains directly from cameras)
 @app.route('/cameras_fast')
@@ -80,7 +83,7 @@ def cameras_fast():
 
 #Same as above, but
 #Video feed route for camera with id=camera_id (PROXY direct from cameras)
-#NOT USED (only for testing, generates overhead and slow response)
+#NOT USED (only for testing, not ideal. Generates overhead and slow response only for forwarding the video feed)
 @app.route('/video_feed/<int:camera_id>')
 def video_feed(camera_id):
     camera = cameras[camera_id]
@@ -95,7 +98,7 @@ def video_feed(camera_id):
 #i.e. the video feeds are processed by the web_cam.py script for each camera. It has the mask and border drawings applied
 #Those streams are served by the web_cam.py script in their mirror ports (5000+camera_id)
 @app.route('/local_stream')
-def video_local_stream():
+def local_stream():
 
     #Read cookie presence
     cookiedata=read_user_cookie()
@@ -115,6 +118,7 @@ def video_local_stream():
                            random_value = random_value, 
                            cookiedata=cookiedata)
     
+
 
 
 #-----------Recordings business routes-----------------

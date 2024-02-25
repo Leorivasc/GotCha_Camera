@@ -24,8 +24,17 @@ class Alerting:
         #Create an email sender object, notice that the app context and the recorder object are passed to the email sender
         self.email = EmailSender(app) 
 
+
+
+
     #Private method to run a timer, then a callback function
     def _run_timer(self, seconds, callback, *arg):
+        ''' This method runs a timer for the specified seconds, then calls the callback function with the specified arguments.
+        Args:
+            seconds: int. The number of seconds to wait before calling the callback function.
+            callback: function. The function to call after the timer ends.
+            *arg: list. The arguments to pass to the callback function.
+        '''
         self.isalerting = True
         def timer_thread():
             time.sleep(seconds)
@@ -35,10 +44,15 @@ class Alerting:
         thread = threading.Thread(target=timer_thread)
         thread.start()
 
+
     
 
     #Method to start the alarm
     def startAlert(self, seconds=None):
+        ''' This method starts the alarm in the camera. It also starts a timer to stop the alarm after the specified seconds.
+        Args:
+            seconds: int. The number of seconds to wait before stopping the alarm. If None, the default value from the camera configuration is used.
+        '''
         
         #Refresh configuration from DB (in case it has changed)
         self.camera_conf = fn.read_config(self.camera_name)[0] 
@@ -65,8 +79,13 @@ class Alerting:
             print(f"Already alerting..{self.camera_conf['name']}")
             
     
+
+
+
     #Method to stop the alarm
     def stopAlert(self):
+        ''' This method stops the alarm in the camera and sends an email to the users with the last video and thumbnail.
+        '''
         conn_ok, alertstatus = fn.do_get(f"{self.url}/status")
         alertstatus=json.loads(alertstatus) #Reads JSON status from camera
         
@@ -92,5 +111,11 @@ class Alerting:
             print("Alarm already inactive")
         
 
+
+    #Method to check if the alert is active
     def isAlerting(self):
+        ''' This method returns the status of the alert.
+        Returns:
+            bool. True if the alert is active, False otherwise.
+        '''
         return self.isalerting

@@ -7,6 +7,10 @@ import time
 import socket
 
 class VideoRecorder:
+    """This class implements a video recorder object.
+    It is used to record time-lapse videos from the camera stream.
+    It also handles the creation of thumbnails and the storage of the videos in the filesystem.
+    """
     
     def __init__(self, cameraName, processName=""):
         self.cameraName = cameraName
@@ -14,8 +18,8 @@ class VideoRecorder:
         self.cameraConfig = fn.read_config(cameraName)[0]
         self.date = None
         self.iniTicks = None
-        self.videofilename = None
-        self.thumbnailname = None
+        self.videofilename = "DEFAULT.WEBM"
+        self.thumbnailname = "DEFAULT.PNG"
         self.video_out = None
 
         self.tempfilename = ""
@@ -28,8 +32,22 @@ class VideoRecorder:
 
     
     def _recordTimeLapseWEBM(self,url,timespan):
-        #vp90 seem to work but accelerates video
-        #vp80 seems to work ok
+        '''This method records a time-lapse video from the camera stream.
+        It uses the OpenCV library to capture the frames and store them in a webm file.
+        The video is stored in the filesystem and a thumbnail is created.
+        Better used from a thread to avoid blocking the main process.
+        
+        Args:
+            url (str): The URL of the camera stream.
+            timespan (int): The duration of the video in seconds.
+
+        Returns:
+            None. It will save the video and the thumbnail in the filesystem.
+        '''
+
+        #Note about codecs:
+        #vp90 seem to work but accelerates video (misses frames?)
+        #vp80 seems to work ok, even in the PI
 
         self.url=url
         #self.tempfilename = f"{self.cameraName}_alert.webm"
@@ -77,13 +95,13 @@ class VideoRecorder:
             time_passed = (current_time - ini_time) / cv2.getTickFrequency()
             #print(time_passed) #DEBUG
             if time_passed > timespan:
-                break
+                self.recording = False #Recording finished
 
         #Free resources
         cap.release()
         video_out.release()
         print("Recording finished")
-        self.recording = False #Recording finished
+        
          #create thumbnail
         self.createThumbnail(self.videofilename, self.thumbnailname)
         #Move files to dest folder
@@ -91,7 +109,18 @@ class VideoRecorder:
         os.rename(self.thumbnailname, os.path.join(self.destfolder,self.thumbnailname)) 
 
 
+
+
     def recordTimeLapse(self,timespan):
+        '''This method records a time-lapse video from the camera stream.
+        It triggers a thread with the _recordTimeLapseWEBM method.
+        
+        Args:
+            timespan (int): The duration of the video in seconds.
+            
+        Returns:
+            None. It will start a recorder thread with the provided timespan.'''
+        
         if self.recording:
             print("Busy recording")
             return
@@ -101,7 +130,17 @@ class VideoRecorder:
         thread.start()
 
 
+
     def recordProcessedTimeLapse(self,timespan):
+        '''This method records a time-lapse video from the processed camera stream.
+        It triggers a thread with the _recordTimeLapseWEBM method but using the processed stream instead of the raw stream.
+        
+        Args:
+            timespan (int): The duration of the video in seconds.
+            
+        Returns:
+            None. It will start a recorder thread with the provided timespan.'''
+
         if self.recording:
             print("Busy recording")
             return
@@ -117,19 +156,40 @@ class VideoRecorder:
         thread.start()
 
 
+
+
     def isRecording(self):
+        '''Returns the recording status.'''
         return self.recording
     
+
+
+
     def stopRecording(self):
+        '''Stops the recording loop.'''
+
         #This will break the recording loop
         self.recording = False
         print("Stopping recording")
 
+
+
+
     def startRecording(self):
-        #Just record a very long video until stopRecording is called
+        '''Just record a very long video until stopRecording is called'''
         self.recordTimeLapse(1000000)
 
+
+
+
     def createThumbnail(self, src, dest_file):
+        '''Creates a thumbnail from a video file.
+        Args:
+            src (str): The source video file.
+            dest_file (str): The destination thumbnail file.
+        Returns:
+            None. It will save the thumbnail in the filesystem.'''
+        
         cap = cv2.VideoCapture(src)
         success, image = cap.read()
         if success:
@@ -137,15 +197,21 @@ class VideoRecorder:
         cap.release()
 
 
+
     def getLastThumbnailName(self):
-        #Returns the last thumbnail created
+        '''Returns the last thumbnail created'''
         return self.thumbnailname
     
+
+
+
     def getLastVideoName(self):
-        #Returns the last video created
+        '''Returns the last video created'''
         return self.videofilename
     
+
+
     def getLastThumbnailPath(self):
-        #Absolute path to the last thumbnail (to prevent the '..' in the path)
+        '''Absolute path to the last thumbnail (to prevent the '..' in the path)'''
         return os.path.abspath(os.path.join(self.destfolder,self.thumbnailname))
     

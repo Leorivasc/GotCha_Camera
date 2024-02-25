@@ -40,6 +40,8 @@ class ProcessMovement:
 
 
 
+
+
     def _main_loop(self):
         '''
         Main method to process the video stream and detect movement. 
@@ -84,13 +86,9 @@ class ProcessMovement:
             for i in range(N):
                 cap.grab()
 
-
             #----Obtain the resulting frames from 3-frame difference algorithm----#
             #Get the 3-frame difference image (binary and dilated), the diff and the last frame
             diff, threshold_diff, currentframe = threeframe.processFrame() 
-
-
-
 
             #----Masking areas on image----#
             #We apply a mask to the image to exclude areas that are not of interest
@@ -108,7 +106,6 @@ class ProcessMovement:
                 fn.createMask(self.camera_name) #Create default null mask (filled with '1')
                 mask = cv2.imread(f"masks/mask_{self.camera_name}.jpg",cv2.COLOR_BGR2GRAY) #Read the mask again
                 
-
             #We apply the mask image to exclude image areas with "0" in the mask
             #diff = cv2.bitwise_and(diff,mask)
             try:    
@@ -118,8 +115,6 @@ class ProcessMovement:
                 #Remove 3rd dimension from mask and retry
                 mask=mask[:,:,0] #If mask is RGB, convert to grayscale
                 threshold_diff = cv2.multiply(threshold_diff,mask) #Retry
-
-
 
             #----Detecting contours----#
 
@@ -166,9 +161,7 @@ class ProcessMovement:
             with self.frame_lock: 
                 self.last_frame = currentframe.copy()
                 fn.add_datetime(self.last_frame)
-            
-
-            
+                       
         cap.release()
 
 
@@ -185,9 +178,7 @@ class ProcessMovement:
             print(f"Starting processmovement thread for {self.camera_name}")
             self.frame_thread.start()
             
-            #self.frame_thread.join() #HANGS LOOP
-
-        
+            #self.frame_thread.join() #HANGS LOOP  
         else:
             print("Thread already running")
             
