@@ -1,4 +1,8 @@
-#Stream server. Accepts multiple clients.
+#Basic stream server. 
+#Accepts multiple clients.
+#Doesnt perform any processing on the frames nor actions on the GPIO.
+
+
 #Based on: https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
 
 

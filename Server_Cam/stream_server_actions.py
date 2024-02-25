@@ -1,12 +1,20 @@
 #Based on: https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
 
-#This script starts a web server that streams the camera feed and allows to control the attached LED and relay
+#This script starts a web server that streams the camera feed and allows 
+# to control the attached LED and/or relay
 #It also provides a status page with the current status of the server
-#This script is intended to be run as a service at startup
+#This script is intended to be run as a service at device startup.
+
+#If not, just run it with 'python3 stream_server_actions.py' 
+# and access it from a web browser at 'http://<device_ip>:8000'
+
 #It can be controlled remotely by sending GET requests to the server
-#This code DOES NOT use OPENCV or performs any image proessing. It uses the picamera library to stream the camera feed
-#The rationale behind this is to keep the server as light as possible to avoid performance issues (so that it can be run on a Raspberry Pi Zero W)
-#The GPIO pins are controlled through the GPIO_Out class, which is a wrapper for the RPi.GPIO library. See classes.py for more info
+#This code DOES NOT use OPENCV nor performs any image proessing. 
+#It uses the picamera library to stream the camera feed
+#The rationale behind this is to keep the server as light as possible 
+# to avoid performance issues (so that it can be run on a Raspberry Pi Zero W)
+#The GPIO pins are controlled through the GPIO_Out class, 
+# which is a wrapper for the RPi.GPIO library. See classes.py for more info
 
 import io
 import picamera
@@ -27,7 +35,7 @@ isAlert=False
 hostname = socket.gethostname()
 port=8000
 
-#Resolution
+#Resolution fixed on this version
 resX=320
 resY=240
 
@@ -36,11 +44,17 @@ fps=12
 
 #Streaming class provided by picamera website. It controls the streaming output by returning the current frame
 class StreamingOutput(object):
+    '''This class implements a streaming output object. 
+    It is used to stream the camera feed. Provided by picamera website.
+    Mostly untouched. It is used to stream the camera feed.
+    '''
+
     def __init__(self):
         self.frame = None
         self.buffer = io.BytesIO()
         self.condition = Condition()
-       
+
+
 
     def write(self, buf):
         if buf.startswith(b'\xff\xd8'):
@@ -54,8 +68,15 @@ class StreamingOutput(object):
         return self.buffer.write(buf)
 
 
+
+
+
 #Streaming handler class. It handles the GET requests and returns the corresponding responses (virtual 'routes' are handled here)
 class StreamingHandler(server.BaseHTTPRequestHandler):
+    '''This class implements a streaming handler object.
+    It is used to handle the GET requests and returns the corresponding responses.
+    Most functionality is implemented here as pseudo-routes.
+    '''
          
     def do_GET(self):
         
@@ -65,6 +86,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         global resY
         global fps
         global port
+
+
 
         #Regexp to emulate GET parameters: '/command?key=value'
         #It supports multiple key=value separated by '&' 
@@ -87,7 +110,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
     
 
 
-        #-----Led business----#
+        #-----Led business routes----#
         #Custom routes to remotely operate the attached LED (default  GPIO 21)
 
         #Turns led ON
@@ -95,20 +118,24 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             led.turn_on()
             self.send_html_response("Led ON")
 
+
         #Turns led OFF
         elif self.path=='/ledoff':
             led.turn_off()
             self.send_html_response("Led OFF")
+
 
         #Starts blinking
         elif self.path=='/blinkon':
             led.start_blinking()
             self.send_html_response("Led blink ON")
 
+
         #Stops blinking
         elif self.path=='/blinkoff':
             led.stop_blinking()
             self.send_html_response("Led blink OFF")
+
 
         #Processes /blinkon/<frequency> routes (regexp here)
         elif freq_pat.match(self.path):
@@ -125,6 +152,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         elif self.path =='/relayon':
             relay.turn_on()
             self.send_html_response("Relay ON")
+
 
         #Turns led OFF
         elif self.path=='/relayoff':
@@ -285,6 +313,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
 
 
+
+
     #'Send' helper class functions to wrap content type
     def send_html_response(self,content):
         self.send_response(200)
@@ -303,13 +333,17 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.wfile.write(content.encode("utf-8"))
 
 
+
+
 #Streaming server class. It contains the server itself. Provided by picamera website
+#Untouched
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
 
 #Camera config. Provided by picamera website
+#Untouched
 with picamera.PiCamera(resolution=f'{resX}x{resY}', framerate=fps) as camera:
     output = StreamingOutput()
     camera.start_recording(output, format='mjpeg')

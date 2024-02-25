@@ -1,5 +1,7 @@
-#FLASK APP. Standalone.Serves video streaming. Useful for PC camera. Lightweight.
+#FLASK APP. 
+#Standalone.Serves video streaming. Useful for PC camera. Lightweight.
 #Uses Flask, OpenCV
+
 #To run: python3 stream_server_pc.py
 #To access: http://localhost:8000/video_feed
 #NO templates provided. Just the video feed. Status/Alarm/Clear endpoints provided.
@@ -57,6 +59,9 @@ def generate_frames():
             print(f"Error reading from camera or color correcting, will pass... {e}")
             pass
 
+
+
+
 #Route for video
 @app.route('/video_feed')
 def video_feed():
@@ -72,6 +77,7 @@ def index():
 
 
 
+
 @app.route('/status')
 def status():
     content = '{'+\
@@ -84,12 +90,16 @@ def status():
     return Response(content, mimetype='application/json')
 
 
+
+
 #Simulate an alarm
 @app.route('/alarm')
 def alarm():
     global isAlert
     isAlert = True
     return "ALARM!"
+
+
 
 #Clear the simulated alarm
 @app.route('/clear')

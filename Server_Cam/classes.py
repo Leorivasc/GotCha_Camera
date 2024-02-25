@@ -1,3 +1,5 @@
+## Useul classes for the server_cam project
+
 import RPi.GPIO as GPIO
 import threading
 import time
@@ -8,6 +10,10 @@ import cv2
 class GPIO_Out:
     #Constructor
     def __init__(self, gpio_pin):
+        '''Initializes the GPIO pin as output and turned off.
+        Args:
+            gpio_pin (int): The GPIO pin number to be used.
+        '''
         self.gpio_pin = gpio_pin
         self.is_blinking = False
         self.frequency = 0.25  # Default requency in hz
@@ -17,152 +23,165 @@ class GPIO_Out:
         self.turn_off() #Start turned off
         self.status = "OFF"
 
+
+
     #Turns on
     def turn_on(self):
+        '''Turns on the GPIO pin using _on() method.'''
         self._on()
         self.status = "ON"
 
+
+
     def _on(self):
-         GPIO.output(self.gpio_pin, GPIO.HIGH)
+        '''Turns on the GPIO pin.'''
+        GPIO.output(self.gpio_pin, GPIO.HIGH)
+
+
 
 
     #Turn off
     def turn_off(self):
+        '''Turns off the GPIO pin using _off() method.'''
         self._off()
         self.status = "OFF"
+
 
 
     def _off(self):
         GPIO.output(self.gpio_pin, GPIO.LOW)
 
 
+
+
     #Blinker (don't use directly)
     def _blink(self):
+        '''Blinking thread. Don't use directly. Use start_blinking() instead.
+        '''
+
         while self.is_blinking:
             self._on()
             time.sleep(1 / (2 * self.frequency))
             self._off()
             time.sleep(1 / (2 * self.frequency))
-            
 
-    #Starts blinking
+
+
+
+    #Starts blinking (use this)
     def start_blinking(self):
+        '''Starts blinking the GPIO pin using _blink() method in a thread.
+        '''
+
         if not self.is_blinking:
             self.is_blinking = True
             self.blink_thread = threading.Thread(target=self._blink)
             self.blink_thread.start()
             self.status = "BLINKING"
 
+
+
+
     #Stops blinking
     def stop_blinking(self):
+        '''Stops blinking the GPIO pin.
+        '''
+
         if self.is_blinking:
             self.is_blinking = False
             self.blink_thread.join()  # Espera a que la thread termine
             self.blink_thread = None
             self.status = "OFF"
 
+
+
+
     #Set blinker frequency
     def set_frequency(self, frequency):
+        '''Sets the frequency of the blinker.
+        Args:
+            frequency (float): The frequency in hz.
+        '''
+
         self.frequency = frequency
         # If it was blinking, restart with new frequency
         if self.is_blinking:
             self.stop_blinking()
             self.start_blinking()
 
+
+
+
     #Get blinker frequency
     def get_frequency(self):
+        '''Gets the frequency of the blinker.
+        Returns:
+            float: The frequency in hz.
+        '''
         return self.frequency
+
+
+
 
 
     #Gets status
     def get_status(self):
+        '''Gets the status of the GPIO pin.
+        Returns:
+            str: The status of the GPIO pin.
+        '''
         return self.status
+
+
+
 
     #Free resource
     def cleanup(self):
+        '''Cleans up the GPIO pin.
+        '''
         GPIO.cleanup()
 
 
 
+
+
+#--------------------------------------------------------------------------------
 #this class implements a counter that can be incremented or decremented
 #Good for use inside 'while true' loops and change values conditionally
 class Counter:
+    '''This class implements a counter that can be incremented or decremented.'''
     def __init__(self, initial_value=0):
         self.value = initial_value
 
+
     def inc(self):
+        '''Increments the counter by 1.'''
         self.value += 1
 
+
     def dec(self):
+        '''Decrements the counter by 1.'''
         self.value -= 1
 
+
     def reset(self):
+        '''Resets the counter to 0.'''
         self.value = 0
 
+
     def set(self, value):
+        '''Sets the counter to a specific value.'''
         self.value = value
 
+
     def get(self):
+        '''Gets the counter value.'''
         return self.value
 
 
 
-def do_get(url):
-    """Perform a GET request to the specified URL.
-    Args:
-        url (str): The URL to which the request will be performed.
-    Returns:
-        str: The response text if the request was successful, an error message otherwise.
-    """
-
-    try:
-        #Perform GET
-        print("Connecting to "+url)
-        ans = requests.get(url)
-
-        #Verify status ok or else
-        if ans.status_code == 200:
-            print(f"Response: {ans.text}")
-            return(f"{ans.text}")
-            pass
-        else:
-            print(f"Connection error: {ans.status_code}")
-            return(f"Connection error: {ans.status_code}")
-
-    except requests.exceptions.Timeout:
-        print("Error: Timeout")
-        return("Error: Timeout")
-    except requests.exceptions.RequestException as e:
-        print(f"Bad request: {e}")
-        return(f"Bad request: {e}")
-
-def wait_timer(seconds, callback, *arg):
-    def timer_thread():
-        time.sleep(seconds)
-        callback(*arg)
-
-    thread = threading.Thread(target=timer_thread)
-    thread.start()
-
-def add_datetime(frame):
-    '''This function adds the current datetime to the frame (needs OPENCV)'''
-
-    #Get date
-    now = datetime.datetime.now()
-    time = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    #Configurar el texto
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    bottom_left_corner = (10, frame.shape[0] - 10)
-    font_scale = 0.5
-    font_color = (0, 255, 0)  # Verde
-    line_type = 1
-
-    #Put text
-    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
-    return frame
-
-
+#Video recorder class (needs OPENCV)(UNUSED, but kept for future use)
+#It produces video with huge frame loss and high CPU usage on the Pi Zero
 class VideoRecorder:
     """This class implements a video recorder. (needs OPENCV)"""
 
@@ -232,7 +251,47 @@ class VideoRecorder:
 
 
 
+#--------------------------------------------------------------------------------
+#This class implements a timer that calls a function after a certain time
+#Useful for waiting a certain time before doing something or keeping a certain state for a while
+#(Alert mode, for example)
+def wait_timer(seconds, callback, *arg):
+    '''This function waits for a certain time and then calls a function.
+    Args:
+        seconds (float): The time to wait in seconds.
+        callback (function): The function to call.
+        *arg: The arguments to pass to the function.
+    '''
+    def timer_thread():
+        time.sleep(seconds)
+        callback(*arg)
 
+    thread = threading.Thread(target=timer_thread)
+    thread.start()
+
+
+
+#Add datetime to frame (needs OPENCV)(UNUSED, but kept for future use)
+def add_datetime(frame):
+    '''This function adds the current datetime to the frame (needs OPENCV)'''
+
+    #Get date
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    #Configurar el texto
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottom_left_corner = (10, frame.shape[0] - 10)
+    font_scale = 0.5
+    font_color = (0, 255, 0)  # Verde
+    line_type = 1
+
+    #Put text
+    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
+    return frame
+
+
+#Class for a small buffer with r/w control bit
 class ThingBuffer:
     """This class implements a small buffer with r/w control bit
         Usable inside main loops to keep values unchanged conditionally
@@ -242,7 +301,14 @@ class ThingBuffer:
         self.value = initial_value
         self.locked = False
 
+
     def store(self, value):
+        '''Stores a value in the buffer if it's not locked.
+        Args:
+            value: The value to store.
+        Returns:
+            bool: True if the value was stored, False if the buffer was locked.
+        '''
         if not self.locked:
             self.value = value #Store value
             self.locked = True #Lock buffer until cleared
@@ -252,12 +318,15 @@ class ThingBuffer:
             return False
 
     def get(self):
+        '''Gets the value from the buffer.'''
         return self.value
     
     def lock(self):
+        '''Locks the buffer.'''
         self.locked = True   
 
     def unlock(self):
+        '''Unlocks the buffer.'''
         self.locked = False
 
 

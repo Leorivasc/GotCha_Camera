@@ -1,4 +1,4 @@
-#Simple client to test the server. It will display the video feed from the server
+#Simple client skeleton to test the server. It will display the video feed from the server
 #It will not do any processing on the frames
 
 import cv2
@@ -14,7 +14,7 @@ while True:
         print("Could not get image. Server down or busy")
         break
 
-    # Tu lógica de procesamiento aquí
+    #Process images here
 
     try:
         cv2.imshow('Live Video', frame)

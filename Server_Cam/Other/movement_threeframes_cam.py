@@ -3,6 +3,8 @@
 # 
 # Works IN THE CAMERA, not in the server.
 # Needs cam config through GET request to server WIP
+# Doesn't run too great on the Pi Zero. It's too slow. Lots of frame drops and stuttering
+# Kept for reference
 
 #USES CV2
 
