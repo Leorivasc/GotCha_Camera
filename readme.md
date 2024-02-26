@@ -29,7 +29,9 @@ Download the repository. In this case, only the **Server_PC** folder is needed.
 1. Create a Python virtual environment and activate it
 
    `python -m venv VENV`
+
    `cd VENV`
+   
    `source bin/activate`
 
 2. Go to Server_PC folder and install dependencies
