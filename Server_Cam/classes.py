@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 import threading
 import time
 import datetime
-import cv2
+
 
 #This class implements a GPIO output that can be turned on, off or blink
 class GPIO_Out:
@@ -180,75 +180,6 @@ class Counter:
 
 
 
-#Video recorder class (needs OPENCV)(UNUSED, but kept for future use)
-#It produces video with huge frame loss and high CPU usage on the Pi Zero
-class VideoRecorder:
-    """This class implements a video recorder. (needs OPENCV)"""
-
-    def __init__(self,url ,fps=12, resX=320, resY=240):
-        self.isRecording = False
-        self.url=url     
-        self.fps=fps
-        self.resX=resX
-        self.resY=resY
-
-    def save_video_span(self,duration):
-        # Init camera
-        cap = cv2.VideoCapture(self.url)
-
-        self.isRecording = True
-
-        now = datetime.datetime.now()
-        time = now.strftime("%Y-%m-%d_%H_%M_%S")
-
-        # Verify cam opening
-        if not cap.isOpened():
-            print("Error opening camera.")
-            exit()
-
-        # Configure video recording
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        video_out = cv2.VideoWriter(f'alarm_{time}.avi', fourcc, self.fps, (self.resX,self.resY))  # Resolution
-
-        # Graba la secuencia de video durante 10 segundos
-        ini_time = cv2.getTickCount()
-
-        #Recording loop
-        while True:
-
-            #Read frame
-            ret, frame = cap.read()
-
-            if not ret:
-                print("Error capturing frame.")
-                break
-
-            #Print datetime on frame
-            frame = add_datetime(frame)
-
-            #Record frame
-            video_out.write(frame)
-
-            #Opens in window
-            #cv2.imshow('Video', frame)
-
-            #Breaks after 'duration' seconds
-            current_time = cv2.getTickCount()
-            time_passed = (current_time - ini_time) / cv2.getTickFrequency()
-            #print(time_passed) #DEBUG
-            if time_passed > duration:
-                break #Breaks recording loop
-
-
-        # Libera los recursos
-        cap.release()
-        video_out.release()
-        self.isRecording = False #Recording finished
-
-
-    def isRecording(self):
-        return self.isRecording
-
 
 
 #--------------------------------------------------------------------------------
@@ -270,25 +201,6 @@ def wait_timer(seconds, callback, *arg):
     thread.start()
 
 
-
-#Add datetime to frame (needs OPENCV)(UNUSED, but kept for future use)
-def add_datetime(frame):
-    '''This function adds the current datetime to the frame (needs OPENCV)'''
-
-    #Get date
-    now = datetime.datetime.now()
-    time = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    #Configurar el texto
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    bottom_left_corner = (10, frame.shape[0] - 10)
-    font_scale = 0.5
-    font_color = (0, 255, 0)  # Verde
-    line_type = 1
-
-    #Put text
-    cv2.putText(frame, time, bottom_left_corner, font, font_scale, font_color, line_type)
-    return frame
 
 
 #Class for a small buffer with r/w control bit

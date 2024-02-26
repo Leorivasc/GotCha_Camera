@@ -1,2 +1,4 @@
+picamera
+cv2
 RPi.GPIO
 Flask
