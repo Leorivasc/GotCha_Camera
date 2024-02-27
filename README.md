@@ -44,7 +44,6 @@ Download the repository. In this case, only the **Server_PC** folder is needed.
    cd VENV
 
    source bin/activate
-   
    ```
 
 2. Go to Server_PC folder and install Python dependencies. Javascript dependencies are already provided in the web app.
@@ -53,7 +52,6 @@ Download the repository. In this case, only the **Server_PC** folder is needed.
    cd Server_PC
 
    pip install -r app/requirements.txt
-   
    ```
 
 3. Run the server
@@ -93,7 +91,6 @@ Download the repository in the Raspberry Pi. In this case, only the Server_Cam f
    cd VENV
 
    source bin/activate
-   
    ```
 
 2. Go to Server_Cam folder and install Python dependencies.
@@ -102,14 +99,12 @@ Download the repository in the Raspberry Pi. In this case, only the Server_Cam f
    cd Server_Cam
 
    pip install -r  requirements.txt
-   
    ```
 
 3. Run the camera server
 
    ```
    python stream_server_actions.py
-   
    ```
 
 
