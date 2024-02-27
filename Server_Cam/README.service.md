@@ -6,7 +6,7 @@ Create the file:
 /etc/systemd/system/gotchacam.service
 ```
 
-With the followig content and modify to fit your setup
+With the followig content and adapt <path_to> and <user> to fit your setup
 
 ```
 [Unit]
@@ -15,7 +15,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/<your_path_to_venv>/bin/python3 /<path_to_script>/stream_server_actions.py
+ExecStart=/<path_to>/VENV/bin/python3 /<path_to_script>/stream_server_actions.py
 Restart=always
 User=<user>
 
