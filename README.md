@@ -39,25 +39,25 @@ Download the repository. In this case, only the **Server_PC** folder is needed.
 1. Create a Python virtual environment and activate it
 
    ```
-   python -m venv VENV
+   >python -m venv VENV
 
-   cd VENV
+   >cd VENV
 
-   source bin/activate
+   >source bin/activate
    ```
 
 2. Go to Server_PC folder and install Python dependencies. Javascript dependencies are already provided in the web app.
 
    ```
-   cd Server_PC
+   >cd Server_PC
 
-   pip install -r app/requirements.txt
+   >pip install -r app/requirements.txt
    ```
 
 3. Run the server
 
    ```
-   python launch.py
+   >python launch.py
    
    ```
 
@@ -86,25 +86,25 @@ Download the repository in the Raspberry Pi. In this case, only the Server_Cam f
 1. Create a Python virtual environment and activate it
 
    ```
-   python -m venv VENV
+   >python -m venv VENV
 
-   cd VENV
+   >cd VENV
 
-   source bin/activate
+   >source bin/activate
    ```
 
 2. Go to Server_Cam folder and install Python dependencies.
 
    ```
-   cd Server_Cam
+   >cd Server_Cam
 
-   pip install -r  requirements.txt
+   >pip install -r  requirements.txt
    ```
 
 3. Run the camera server
 
    ```
-   python stream_server_actions.py
+   >python stream_server_actions.py
    ```
 
 
