@@ -172,7 +172,8 @@ cam=fn.read_config(cam_env)[0] #Read rest of the camera configuration from DB. O
 
 
 #Get server IP to present links properly (gallery and email links)
-host_name = socket.gethostname()+".local"
+#host_name = socket.gethostname()+".local"
+host_name = socket.getfqdn()
 server_ip = socket.gethostbyname(host_name)
 web_app_port = 8080 #Default port for the web app (hardcoded)
 web_app_url = f"http://{server_ip}:{web_app_port}" #URL for the web app

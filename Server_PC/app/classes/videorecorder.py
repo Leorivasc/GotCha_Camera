@@ -147,7 +147,8 @@ class VideoRecorder:
         print(f"Recording {self.cameraName}, {timespan} seconds")
         self.recording = True
 
-        host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
+        #host_name = socket.gethostname()+".local" #.local is needed to avoid having 127.0.0.1 as address (not used)
+        host_name = socket.getfqdn()
         server_ip = socket.gethostbyname(host_name)
         #This is the LOCAL result of the processed video (the one with the bounding boxes)
         processedurl = f"http://{server_ip}:{self.cameraConfig['mirrorport']}"
