@@ -34,9 +34,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"password"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-INSERT INTO "cameras" VALUES (1,'PiZero1','192.168.1.24',8000,'/video_feed',1,1000,100,20,22,1,0,1,5001,'leorivas@yahoo.com');
-INSERT INTO "cameras" VALUES (2,'Pi2','192.168.1.12',8000,'/video_feed',2,5000,30,20,22,1,0,1,5002,'leorivas@yahoo.com');
-INSERT INTO "cameras" VALUES (3,'LaptopLeo','192.168.1.14',8000,'/video_feed',3,300,100,20,10,0,1,1,5003,'leorivas@yahoo.com');
-INSERT INTO "email" VALUES (1,'smtp.mail.yahoo.com','1024','leorivas','tpaxbxvplsitxdjh1',0,1,'leorivas@yahoo.com');
-INSERT INTO "users" VALUES (1,'admin','51b6a2b26c7d4b04e1891bfbf69f424d');
+INSERT INTO "cameras" ("id","name","ip_address","port","path","frameskip","detectionarea","detectionthreshold","recordtime","alertlength","isTriggerable","recordProcessed","isEnabled","mirrorport","emailAlert") VALUES (1,'localhost','127.0.0.1',8000,'/video_feed',1,1000,10,20,22,1,0,1,5001,'yourmail@email.com');
+INSERT INTO "email" ("id","MAIL_SERVER","MAIL_PORT","MAIL_USERNAME","MAIL_PASSWORD","MAIL_USE_TLS","MAIL_USE_SSL","MAIL_DEFAULT_SENDER") VALUES (1,'your.smtp.server','465','mailuser','password',0,1,'from@mail.com');
+INSERT INTO "users" ("id","username","password") VALUES (1,'admin','51b6a2b26c7d4b04e1891bfbf69f424d');
 COMMIT;
