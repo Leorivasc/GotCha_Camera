@@ -65,9 +65,9 @@ Download the repository. In this case, only the **Server_PC** folder is needed.
 
    1. To edit/add/delete cameras, please login as: 
 
-      User: admin
+      **User: admin**
 
-      Pass: gotchacam
+      **Pass: gotchacam**
 
       And click on 'System Setup' on the navigation bar.
 
