@@ -45,7 +45,7 @@ def generate_frames():
             time.sleep(0.083) #12fps
             # Lee un cuadro de la cámara
             success, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) ## Color correct for cv2, or else it looks blue in some cameras (?)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2RGBA) ## Color correct for cv2, or else it looks blue in some cameras (?)
             ##16:9=640,360
             frame = cv2.resize(frame, (320, 240)) ####FORCE RESIZE (pc camera refuses to change resolution using cap.set())
             if not success:
