@@ -396,6 +396,10 @@ def modify_smtp_conf():
 @app.route('/w2ui_db', methods=['GET','POST'])
 def w2ui_db():
     
+    #Verify user        
+    if not verify_credentials('admin'):
+        return 'Unauthorized access. Please login first.'
+    
     #Get the request method and values
     method = request.method
     records = read_config_all()
