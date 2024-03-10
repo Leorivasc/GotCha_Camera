@@ -56,6 +56,7 @@ class Alerting:
         
         #Refresh configuration from DB (in case it has changed)
         self.camera_conf = fn.read_config(self.camera_name)[0] 
+        self.url = f"http://{self.camera_conf['ip_address']}:{self.camera_conf['port']}" #url for the camera stream
         
         #To allow triggering a different alert length than the camera default
         if seconds is None:
