@@ -17,24 +17,24 @@ CREATE TABLE IF NOT EXISTS "cameras" (
 	"emailAlert"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "email" (
-	"id"	INTEGER NOT NULL,
-	"MAIL_SERVER"	TEXT NOT NULL DEFAULT 'smtp.gmail.com',
-	"MAIL_PORT"	BLOB NOT NULL DEFAULT 465,
-	"MAIL_USERNAME"	BLOB NOT NULL DEFAULT 'gmail_user',
-	"MAIL_PASSWORD"	TEXT NOT NULL DEFAULT 'passwd',
-	"MAIL_USE_TLS"	INTEGER NOT NULL DEFAULT 0,
-	"MAIL_USE_SSL"	INTEGER NOT NULL DEFAULT 1,
-	"MAIL_DEFAULT_SENDER"	TEXT NOT NULL DEFAULT 'sender@mail.com',
-	PRIMARY KEY("id" AUTOINCREMENT)
-);
 CREATE TABLE IF NOT EXISTS "users" (
 	"id"	INTEGER NOT NULL,
 	"username"	TEXT NOT NULL UNIQUE,
 	"password"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-INSERT INTO "cameras" ("id","name","ip_address","port","path","frameskip","detectionarea","detectionthreshold","recordtime","alertlength","isTriggerable","recordProcessed","isEnabled","mirrorport","emailAlert") VALUES (1,'localhost','127.0.0.1',8000,'/video_feed',1,1000,10,20,22,1,0,1,5001,'yourmail@email.com');
-INSERT INTO "email" ("id","MAIL_SERVER","MAIL_PORT","MAIL_USERNAME","MAIL_PASSWORD","MAIL_USE_TLS","MAIL_USE_SSL","MAIL_DEFAULT_SENDER") VALUES (1,'your.smtp.server','465','mailuser','password',0,1,'from@mail.com');
-INSERT INTO "users" ("id","username","password") VALUES (1,'admin','51b6a2b26c7d4b04e1891bfbf69f424d');
+CREATE TABLE IF NOT EXISTS "email" (
+	"id"	INTEGER NOT NULL,
+	"MAIL_SERVER"	TEXT NOT NULL DEFAULT 'smtp.gmail.com',
+	"MAIL_PORT"	INTEGER NOT NULL DEFAULT 465,
+	"MAIL_USERNAME"	TEXT NOT NULL DEFAULT 'gmail_user',
+	"MAIL_PASSWORD"	TEXT NOT NULL DEFAULT 'passwd',
+	"MAIL_USE_TLS"	INTEGER NOT NULL DEFAULT 0,
+	"MAIL_USE_SSL"	INTEGER NOT NULL DEFAULT 1,
+	"MAIL_DEFAULT_SENDER"	TEXT NOT NULL DEFAULT 'sender@mail.com',
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+INSERT INTO "cameras" VALUES (1,'Cam1','127.0.0.1',8000,'/video_feed',2,300,10,20,22,1,1,1,5001,'email@email.com');
+INSERT INTO "users" VALUES (1,'admin','51b6a2b26c7d4b04e1891bfbf69f424d');
+INSERT INTO "email" VALUES (1,'put.smtp.here',465,'user','password',0,1,'gotcha@mail.com');
 COMMIT;
